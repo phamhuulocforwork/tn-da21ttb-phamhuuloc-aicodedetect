@@ -2,9 +2,9 @@
 
 ## 📆 Tuần 1 (8/04 - 13/04): Phân tích đề tài
 
-- [ ] Lựa chọn công nghệ
-- [ ] Lập kế hoạch
-- [ ] Viết đề cương chi tiết khóa luận
+- [x] Lựa chọn công nghệ
+- [x] Lập kế hoạch
+- [x] Viết đề cương chi tiết khóa luận
 
 ## 📆 Tuần 2 (14/04 - 20/04): Nghiên cứu cơ bản
 
