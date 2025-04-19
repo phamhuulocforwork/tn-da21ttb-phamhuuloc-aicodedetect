@@ -8,10 +8,10 @@
 
 ## 📆 Tuần 2 (14/04 - 20/04): Nghiên cứu cơ bản
 
-- [ ] Khảo sát các công cụ AI phổ biến (ChatGPT, Copilot, Deepseek, Remini)
-- [ ] Thu thập mẫu mã nguồn sinh từ AI
-- [ ] Tìm hiểu các phương pháp phân tích đặc trưng code (code fingerprint, syntax tree, cyclomatic complexity, clone detection)
-- [ ] Trao đổi với GVHD
+- [x] Khảo sát các công cụ AI phổ biến (ChatGPT, Copilot, Deepseek, Remini)
+- [x] Thu thập mẫu mã nguồn sinh từ AI
+- [x] Tìm hiểu các phương pháp phân tích đặc trưng code (code fingerprint, syntax tree, cyclomatic complexity, clone detection)
+- [x] Trao đổi với GVHD
 
 ## 📆 Tuần 3 (21/04 - 27/04): Xây dựng tập dữ liệu mẫu
 
