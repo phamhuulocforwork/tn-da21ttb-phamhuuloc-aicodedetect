@@ -15,26 +15,26 @@
 
 ## 📆 Tuần 3 (21/04 - 27/04): Xây dựng tập dữ liệu mẫu
 
-- [ ] Thu thập bài tập từ sinh viên
-- [ ] Sinh mẫu code từ AI với cùng đề bài
-- [ ] Phân loại thủ công mã AI vs mã con người
-- [ ] Báo cáo tiến độ tuần 2 với GVHD
+- [x] Thu thập bài tập từ sinh viên
+- [x] Sinh mẫu code từ AI với cùng đề bài
+- [x] Phân loại thủ công mã AI vs mã con người
+- [x] Báo cáo tiến độ tuần 2 với GVHD
 
 ## 📆 Tuần 4 (28/04 - 04/05): Phân tích đặc trưng mã nguồn
 
-- [ ] Viết tool Python để đo:
-  - [ ] Độ phức tạp (radon)
-  - [ ] Độ lặp lại (token-level)
-  - [ ] Tỷ lệ comment, biến đặt tên chung chung
-- [ ] Định nghĩa bộ đặc trưng đầu tiên
-- [ ] Báo cáo tiến độ tuần 3 với GVHD
+- [x] Viết tool Python để đo:
+  - [x] Độ phức tạp (radon)
+  - [x] Độ lặp lại (token-level)
+  - [x] Tỷ lệ comment, biến đặt tên chung chung
+- [x] Định nghĩa bộ đặc trưng đầu tiên
+- [x] Báo cáo tiến độ tuần 3 với GVHD
 
 ## 📆 Tuần 5 (05/05 - 11/05): Phân tích và thống kê dữ liệu
 
-- [ ] Chạy phân tích trên tập dữ liệu
-- [ ] Thống kê đặc trưng nào để phân biệt tốt giữa AI và người
-- [ ] Lập bảng, biểu đồ so sánh, nhận xét
-- [ ] Báo cáo tiến độ tuần 4 với GVHD
+- [x] Chạy phân tích trên tập dữ liệu
+- [x] Thống kê đặc trưng nào để phân biệt tốt giữa AI và người
+- [x] Lập bảng, biểu đồ so sánh, nhận xét
+- [x] Báo cáo tiến độ tuần 4 với GVHD
 
 ## 📆 Tuần 6 (12/05 - 18/05): Xây dựng prototype cơ bản
 
