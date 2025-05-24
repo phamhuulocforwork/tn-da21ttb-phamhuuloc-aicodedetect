@@ -38,7 +38,7 @@
 
 ## 📆 Tuần 6 (12/05 - 18/05): Xây dựng prototype cơ bản
 
-- [ ] Viết tool CLI/Web nhỏ nhận input mã nguồn
+- [x] Viết tool CLI/Web nhỏ nhận input mã nguồn
 - [ ] Tính toán đặc trưng và xuất kết quả
 - [ ] Gợi ý cảnh báo nếu nghi ngờ là mã AI-generated
 - [ ] Báo cáo tiến độ tuần 5 với GVHD
