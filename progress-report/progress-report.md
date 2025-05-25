@@ -1,4 +1,4 @@
- # 📆 Kế hoạch chi tiết theo tuần
+# 📆 Kế hoạch chi tiết theo tuần
 
 ## 📆 Tuần 1 (8/04 - 13/04): Phân tích đề tài
 
@@ -39,7 +39,7 @@
 ## 📆 Tuần 6 (12/05 - 18/05): Xây dựng prototype cơ bản
 
 - [x] Viết tool CLI/Web nhỏ nhận input mã nguồn
-- [ ] Tính toán đặc trưng và xuất kết quả
+- [x] Tính toán đặc trưng và xuất kết quả
 - [ ] Gợi ý cảnh báo nếu nghi ngờ là mã AI-generated
 - [ ] Báo cáo tiến độ tuần 5 với GVHD
 
