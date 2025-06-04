@@ -40,8 +40,8 @@
 
 - [x] Viết tool CLI/Web nhỏ nhận input mã nguồn
 - [x] Tính toán đặc trưng và xuất kết quả
-- [ ] Gợi ý cảnh báo nếu nghi ngờ là mã AI-generated
-- [ ] Báo cáo tiến độ tuần 5 với GVHD
+- [x] Gợi ý cảnh báo nếu nghi ngờ là mã AI-generated
+- [x] Báo cáo tiến độ tuần 5 với GVHD
 
 ## 📆 Tuần 7 (19/05 - 25/05): Kiểm thử - tinh chỉnh thuật toán
 
