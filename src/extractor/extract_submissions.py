@@ -6,15 +6,10 @@ import re
 def extract_submissions():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
-    # Input file
     dataset_file = os.path.join(current_dir, '..', 'dataset', 'c', 'csv', 'submission_with_problem.csv')
     base_output_dir = os.path.join(current_dir, '..', 'dataset', 'c', 'human')
-    
-    print(f"Reading dataset from: {dataset_file}")
-    print(f"Output will be organized in: {base_output_dir}")
-    
+        
     try:
-        # Đọc file CSV
         data = []
         with open(dataset_file, 'r', encoding='utf-8-sig', newline='') as f:
             reader = csv.DictReader(f)
@@ -36,12 +31,10 @@ def extract_submissions():
                 source_code = row['source']
                 language_id = row['language_id']
                 
-                # Lấy submission có language_id là 4 (C++) hoặc 5 (C)
                 if language_id not in ['4', '5']:
                     filtered_count += 1
                     continue
                 
-                # Xử lý source code để khôi phục các ký tự đặc biệt
                 source_code = process_source_code(source_code)
                 
                 extension = '.cpp' if language_id == '4' else '.c'
@@ -57,7 +50,6 @@ def extract_submissions():
                 problem_counts[problem_id] = problem_counts.get(problem_id, 0) + 1
                 processed_count += 1
                 
-                # In tiến độ mỗi 100 submissions
                 if processed_count % 100 == 0:
                     print(f"Progress: {processed_count} submissions processed")
                 
@@ -65,7 +57,6 @@ def extract_submissions():
                 print(f"Error processing submission {row.get('submission_id', 'unknown')}: {str(e)}")
                 continue
             
-        # In thống kê
         print("\nExport summary:")
         for problem_id, count in sorted(problem_counts.items(), key=lambda x: int(x[0])):
             print(f"Problem {problem_id}: {count} submissions extracted")
@@ -85,19 +76,14 @@ def process_source_code(source_code):
     if source_code is None:
         return ""
     
-    # Tạo bản sao để theo dõi thay đổi
     original_code = source_code
     
-    # 1. Xử lý trường hợp ký tự escape ""text"" (nháy kép đôi)
     processed_code = re.sub(r'""([^"]*?)""', r'"\1"', source_code)
     
-    # 2. Xử lý chuỗi \\" thành "
     processed_code = re.sub(r'\\+"', '"', processed_code)
     
-    # 3. Xử lý dấu backslash kép thành dấu backslash đơn
     processed_code = processed_code.replace('\\\\', '\\')
     
-    # 4. Đảm bảo các ký tự escape phổ biến được xử lý đúng
     escape_chars = {
         '\\n': '\n',
         '\\t': '\t',
@@ -108,27 +94,21 @@ def process_source_code(source_code):
     for escaped, unescaped in escape_chars.items():
         processed_code = processed_code.replace(escaped, unescaped)
     
-    # 5. Xử lý đặc biệt cho các định dạng trong printf/scanf
     processed_code = re.sub(r'\\+(%[diouxXfFeEgGaAcspn])', r'\1', processed_code)
     
-    # 6. Xử lý các trường hợp bất thường
     processed_code = processed_code.replace('\\\"', '"')
     
-    # 7. Xử lý dấu nháy kép lặp lại (mẫu "")
     processed_code = re.sub(r'""+', '"', processed_code)
     processed_code = re.sub(r'""([^"])', r'"\1', processed_code)
     processed_code = re.sub(r'([^"])+""', r'\1"', processed_code)
     
-    # 8. Kiểm tra lại toàn bộ để đảm bảo tất cả nháy kép đều được xử lý
     if '""' in processed_code:
         processed_code = processed_code.replace('""', '"')
     
-    # Debug: In ra báo cáo nếu còn ký tự escape bất thường
     suspicious_patterns = ['\\\"', '\\\\', '""']
     for pattern in suspicious_patterns:
         if pattern in processed_code:
             print(f"Warning: Still found '{pattern}' after processing in submission")
-            # Thêm debug info
             print(f"  Original: {original_code[:100]}...")
             print(f"  Processed: {processed_code[:100]}...")
     

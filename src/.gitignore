@@ -1,2 +1,3 @@
 dataset/**/*.c
 dataset/**/*.cpp
+.env

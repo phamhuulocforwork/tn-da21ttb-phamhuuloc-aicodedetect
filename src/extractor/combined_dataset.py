@@ -8,7 +8,7 @@ def join_datasets():
     
     # Input files
     submission_file = os.path.join(csv_dir, 'submission.csv')
-    source_file = os.path.join(csv_dir, 'submissionsource.csv')
+    source_file = os.path.join(csv_dir, 'submission_source.csv')
     
     # Output file
     output_file = os.path.join(csv_dir, 'submission_with_problem.csv')
@@ -18,17 +18,14 @@ def join_datasets():
     print(f"Output will be written to: {output_file}")
     
     try:
-        # Đọc submission
         submissions_df = pd.read_csv(submission_file, encoding='utf-8')
         
-        # Đọc source code
         source_data = []
         with open(source_file, 'r', encoding='utf-8-sig', newline='') as f:
             reader = csv.DictReader(f)
             for row in reader:
                 source_data.append(row)
         
-        # Chuyển source data thành DataFrame
         source_df = pd.DataFrame(source_data)
         
         print(f"Loaded {len(submissions_df)} submission records")
@@ -40,7 +37,6 @@ def join_datasets():
         source_df['submission_id'] = source_df['submission_id'].astype(int)
         submissions_df['id'] = submissions_df['id'].astype(int)
         
-        # Merge hai DataFrame
         merged_df = pd.merge(
             source_df,
             submissions_df[['id', 'problem_id', 'language_id']],
@@ -53,14 +49,11 @@ def join_datasets():
         
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         
-        # Lưu với UTF-8-BOM encoding
         with open(output_file, 'w', encoding='utf-8-sig', newline='') as f:
             writer = csv.writer(f, quoting=csv.QUOTE_ALL)
             
-            # Ghi header
             writer.writerow(['id', 'source', 'submission_id', 'problem_id', 'language_id'])
             
-            # Ghi data
             for _, row in result_df.iterrows():
                 writer.writerow([
                     row['id'],
