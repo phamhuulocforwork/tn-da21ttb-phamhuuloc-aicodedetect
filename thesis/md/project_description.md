@@ -10,80 +10,67 @@
 
 ## 📆 Kế hoạch chi tiết theo tuần
 
-### 📆 Tuần 1 (8/04 - 13/04): Phân tích đề tài
+### 📆 Tuần 1 (03/07 – 06/07): Khởi động & Xác định phạm vi
 
-- [ ] Lựa chọn công nghệ
-- [ ] Lập kế hoạch
-- [ ] Viết đề cương chi tiết khóa luận
+- [ ] Nghiên cứu: rà soát yêu cầu bài tập, khảo sát giải pháp tương tự
+- [ ] Phát triển: khởi tạo repo, thiết lập môi trường, chọn thư viện phân tích mã
+- [ ] Test: chạy thử parser trên vài bài tập mẫu
+- [ ] Viết báo cáo: hoàn thiện đề cương chi tiết, lập WBS
+- [ ] Báo cáo tiến độ với GVHD (04/07)
 
-### 📆 Tuần 2 (14/04 - 20/04): Nghiên cứu cơ bản
+### 📆 Tuần 2 (07/07 – 13/07): Thu thập & xây dựng tập dữ liệu
 
-- [ ] Khảo sát các công cụ AI phổ biến (ChatGPT, Copilot, Deepseek, Remini)
-- [ ] Thu thập mẫu mã nguồn sinh từ AI
-- [ ] Tìm hiểu các phương pháp phân tích đặc trưng code (code fingerprint, synta tree, cyclomatic complexity, clone detection)
-- [ ] Trao đổi với GVHD
+- [ ] Nghiên cứu: khảo sát công cụ AI (ChatGPT, Copilot, Deepseek, Remini)
+- [ ] Phát triển: script thu thập/chuẩn hoá bài tập SV & mã AI, định nghĩa schema dữ liệu
+- [ ] Test: kiểm tra tính toàn vẹn, loại bỏ trùng lặp
+- [ ] Viết báo cáo: mô tả quy trình xây dựng dataset
+- [ ] Báo cáo tiến độ với GVHD (11/07)
 
-### 📆 Tuần 3 (21/04 - 27/04): Xây dựng tập dữ liệu mẫu
+### 📆 Tuần 3 (14/07 – 20/07): Phát triển bộ trích xuất đặc trưng
 
-- [ ] Thu thập bài tập từ sinh viên
-- [ ] Sinh mẫu code từ AI với cùng đề bài
-- [ ] Phân loại thủ công mã AI vs mã con người
-- [ ] Báo cáo tiến độ tuần 2 với GVHD
+- [ ] Nghiên cứu: code fingerprint, AST metrics, cyclomatic complexity
+- [ ] Phát triển: cài đặt các extractor (fingerprint, phức tạp, lặp lại, tỷ lệ comment)
+- [ ] Test: unit-test từng đặc trưng trên dataset nhỏ
+- [ ] Viết báo cáo: mô tả module & kết quả test
+- [ ] Báo cáo tiến độ với GVHD (18/07)
 
-### 📆 Tuần 4 (28/04 - 04/05): Phân tích đặc trưng mã nguồn
+### 📆 Tuần 4 (21/07 – 27/07): Phân tích dữ liệu & mô hình baseline
 
-- [ ] Viết tool Python để đo:
-  - [ ] Độ phức tạp (radon)
-  - [ ] Độ lặp lại (token-level)
-  - [ ] Tỷ lệ comment, biến đặt tên chung chung
-- [ ] Định nghĩa bộ đặc trưng đầu tiên
-- [ ] Báo cáo tiến độ tuần 3 với GVHD
+- [ ] Nghiên cứu: thống kê đặc trưng, chọn tín hiệu mạnh
+- [ ] Phát triển: mô hình rule-based / scoring, xác định ngưỡng ban đầu
+- [ ] Test: cross-validation, ghi nhận precision/recall
+- [ ] Viết báo cáo: báo cáo EDA & baseline
+- [ ] Báo cáo tiến độ với GVHD (25/07)
 
-### 📆 Tuần 5 (05/05 - 11/05): Phân tích và thống kê dữ liệu
+### 📆 Tuần 5 (28/07 – 03/08): Hoàn thiện Prototype CLI
 
-- [ ] Chạy phân tích trên tập dữ liệu
-- [ ] Thống kê đặc trưng nào để phân biệt tốt giữa AI và người
-- [ ] Lập bảng, biểu đồ so sánh, nhận xét
-- [ ] Báo cáo tiến độ tuần 4 với GVHD
+- [ ] Phát triển: tích hợp pipeline mô hình vào CLI, sinh report phân tích
+- [ ] Test: thử nghiệm trên tập chưa thấy, tinh chỉnh tham số
+- [ ] Viết báo cáo: hướng dẫn sử dụng, kiến trúc hệ thống
+- [ ] Báo cáo tiến độ với GVHD (01/08)
 
-### 📆 Tuần 6 (12/05 - 18/05): Xây dựng prototype cơ bản
+### 📆 Tuần 6 (04/08 – 10/08): Giao diện Web & kiểm thử hệ thống
 
-- [ ] Viết tool CLI/Web nhỏ nhận input mã nguồn
-- [ ] Tính toán đặc trưng và xuất kết quả
-- [ ] Gợi ý cảnh báo nếu nghi ngờ là mã AI-generated
-- [ ] Báo cáo tiến độ tuần 5 với GVHD
+- [ ] Phát triển: Web API (FastAPI) frontend đơn giản, Dockerize
+- [ ] Test: end-to-end, đánh giá UX, đo hiệu năng
+- [ ] Viết báo cáo: chương triển khai & kết quả test hệ thống
+- [ ] Báo cáo tiến độ với GVHD (08/08)
 
-### 📆 Tuần 7 (19/05 - 25/05): Kiểm thử - tinh chỉnh thuật toán
+### 📆 Tuần 7 (11/08 – 17/08): Hoàn thiện, đánh giá & chuẩn bị bảo vệ
 
-- [ ] Thử nghiệm với nhiều mẫu code
-- [ ] Tối ưu ngưỡng cảnh báo
-- [ ] Loại bỏ false positive nhiều nhất có thể
-- [ ] Báo cáo tiến độ tuần 6 với GVHD
+- [ ] Phát triển: tối ưu, đóng gói, script auto-evaluation
+- [ ] Test: kiểm thử cuối, thu số liệu đánh giá
+- [ ] Viết báo cáo: hoàn thiện khóa luận, slide & demo
+- [ ] Báo cáo tiến độ: gửi bản nháp cuối, lấy phản hồi GVHD (14/08)
+- [ ] Bảo vệ: 16-17/08 (dự kiến)
 
-### 📆 Tuần 8 (26/05 - 01/06): Phát triển giao diện người dùng
+## 🚩 Mốc quan trọng
 
-- [ ] Web app nhỏ để nhập mã và hiển thị kết quả
-- [ ] Giao diện đơn giản (Next.js/FastAPI)
-- [ ] Hoàn thiện chức năng toàn hệ thống
-- [ ] Báo cáo tiến độ tuần 7 GVHD
-
-### 📆 Tuần 9 (02/06 - 08/06): Kiểm thử toàn hệ thống + viết khóa luận
-
-- [ ] Test thử toàn diện
-- [ ] Viết các phần chính của khóa luận: Cơ sở lý thuyết, Phương pháp tiếp cận, Phân tích dữ liệu
-- [ ] Báo cáo tiến độ tuần 8 với GVHD
-
-### 📆 Tuần 10 (09/06 - 11/06): Chỉnh sửa - Viết báo cáo hoàn chỉnh
-
-- [ ] Viết phần đánh giá, kết luận, hướng phát triển
-- [ ] Gửi GVHD xem bản nháp
-
-### 📆 Tuần 11 (12/06 - 14/06): Sửa báo cáo theo phản hồi GVHD
-
-- [ ] Hoàn thiện quyển khóa luận, chuẩn bị slide báo cáo
-- [ ] Gửi khóa luận hoàn chỉnh
-
-### 📆 Tuần 12 (15/06 - 16/06): Bảo vệ, nộp đồ khóa luận
-
-- [ ] Chuẩn bị trình bày
-- [ ] Nộp source code, tài liệu, slide
+| Thời hạn | Mốc               | Ghi chú                      |
+| -------- | ----------------- | ---------------------------- |
+| 13/07    | Dataset đóng băng | Không chỉnh sửa sau mốc này  |
+| 20/07    | Khóa bộ đặc trưng | Không thêm đặc trưng mới     |
+| 27/07    | Baseline hoàn tất | Có kết quả đánh giá đầu tiên |
+| 03/08    | Prototype CLI     | Sẵn sàng demo                |
+| 10/08    | Web demo          | Hoạt động end-to-end         |
+| 17/08    | Nộp khóa luận     | Mốc cứng                     |
