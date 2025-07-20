@@ -52,7 +52,7 @@ def main() -> None:
     parser = argparse.ArgumentParser("Parser smoke-test")
     parser.add_argument(
         "--dataset-path",
-        default="src/dataset/c",
+        default="dataset/code/c",
         help="Root folder containing ai/ and human/",
     )
     parser.add_argument(
