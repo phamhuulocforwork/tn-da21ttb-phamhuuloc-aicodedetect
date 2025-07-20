@@ -10,7 +10,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  #FIXME: Cho phép tất cả
@@ -22,8 +21,8 @@ app.add_middleware(
 @app.get("/")
 async def root():
     return {
-        "message": "Chào mừng đến với FastAPI!",
-        "status": "API đang hoạt động",
+        "message": "Server is running...",
+        "status": "OK",
         "timestamp": time.time()
     }
 
