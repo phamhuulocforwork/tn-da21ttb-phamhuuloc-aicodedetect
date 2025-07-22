@@ -1,29 +1,29 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
-import { NeatConfig, NeatGradient } from '@firecms/neat';
+import { NeatConfig, NeatGradient } from "@firecms/neat";
 
 const config: NeatConfig = {
   colors: [
     {
-      color: '#D2F4FB',
+      color: "#D2F4FB",
       enabled: true,
     },
     {
-      color: '#AAE8F7',
+      color: "#AAE8F7",
       enabled: true,
     },
     {
-      color: '#2FB9E1',
+      color: "#2FB9E1",
       enabled: true,
     },
     {
-      color: '#97C8EC',
+      color: "#97C8EC",
       enabled: true,
     },
     {
-      color: '#a2d2ff',
+      color: "#a2d2ff",
       enabled: false,
     },
   ],
@@ -39,12 +39,12 @@ const config: NeatConfig = {
   colorSaturation: 7,
   wireframe: false,
   colorBlending: 8,
-  backgroundColor: '#003FFF',
+  backgroundColor: "#003FFF",
   backgroundAlpha: 1,
   grainScale: 3,
   grainIntensity: 0.3,
   grainSpeed: 1,
-  resolution: 1,
+  resolution: 0.5,
 };
 
 export default function AuthLayout({
@@ -57,8 +57,8 @@ export default function AuthLayout({
 
   useEffect(() => {
     const checkCanvasSupport = () => {
-      const canvas = document.createElement('canvas');
-      setIsCanvasSupported(!!(canvas.getContext && canvas.getContext('2d')));
+      const canvas = document.createElement("canvas");
+      setIsCanvasSupported(!!(canvas.getContext && canvas.getContext("2d")));
     };
 
     checkCanvasSupport();
