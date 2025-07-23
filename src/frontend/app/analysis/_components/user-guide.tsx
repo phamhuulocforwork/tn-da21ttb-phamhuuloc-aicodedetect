@@ -80,7 +80,6 @@ export function UserGuide() {
 
   return (
     <div className='space-y-6 h-full overflow-y-auto'>
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -96,7 +95,6 @@ export function UserGuide() {
         </p>
       </motion.div>
 
-      {/* Supported Languages */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -135,7 +133,6 @@ export function UserGuide() {
         </Card>
       </motion.div>
 
-      {/* Analysis Features */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -173,7 +170,6 @@ export function UserGuide() {
         </Card>
       </motion.div>
 
-      {/* Confidence Levels */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -208,7 +204,6 @@ export function UserGuide() {
         </Card>
       </motion.div>
 
-      {/* Usage Tips */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
