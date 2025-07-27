@@ -2,31 +2,50 @@
 
 import { useState } from "react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-import { AnalysisResults } from "./_components/analysis-results";
 import { AnalysisResult, CodeEditor } from "./_components/code-editor";
 import Header from "./_components/header";
-// import Header from "./_components/header";
 import oneDarkPro from "./_components/onedarkpro.json";
-import { UserGuide } from "./_components/user-guide";
-
-// import { UserGuide } from "./_components/user-guide";
 
 export default function TestPage() {
   const [code, setCode] = useState(`#include <iostream>
+#include <cmath>    // dùng sqrt()
+using namespace std;
 
 int main() {
-    cout << "Hello, World!" << endl;
+  double a, b, c;
+  cout << "Nhap he so a, b, c: ";
+  cin >> a >> b >> c;
 
-    return 0;
+  if (a == 0) {
+    if (b == 0) {
+      if (c == 0) {
+        cout << "Phuong trinh vo so nghiem." << endl;
+      } else {
+        cout << "Phuong trinh vo nghiem." << endl;
+      }
+    } else {
+      double x = -c / b;
+      cout << "Phuong trinh co mot nghiem: x = " << x << endl;
+    }
+  } else {
+    double delta = b * b - 4 * a * c;
+    if (delta > 0) {
+      double x1 = (-b + sqrt(delta)) / (2 * a);
+      double x2 = (-b - sqrt(delta)) / (2 * a);
+      cout << "Phuong trinh co hai nghiem phan biet:\n";
+      cout << "x1 = " << x1 << ", x2 = " << x2 << endl;
+    } else if (delta == 0) {
+      double x = -b / (2 * a);
+      cout << "Phuong trinh co nghiem kep: x = " << x << endl;
+    } else {
+      cout << "Phuong trinh vo nghiem thuc." << endl;
+    }
+  }
+
+  return 0;
 }
 `);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
-    null,
-  );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showResults, setShowResults] = useState(false);
 
   const handleCodeChange = (value: string | undefined) => {
     if (value !== undefined) {
@@ -36,7 +55,6 @@ int main() {
 
   const handleSubmitCode = async (): Promise<AnalysisResult> => {
     setIsSubmitting(true);
-    setShowResults(false);
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -58,8 +76,6 @@ int main() {
         ].slice(0, Math.floor(Math.random() * 4) + 1),
       };
 
-      setAnalysisResult(mockResult);
-      setShowResults(true);
       return mockResult;
     } finally {
       setIsSubmitting(false);
@@ -67,61 +83,25 @@ int main() {
   };
 
   return (
-    <div className='flex flex-col h-screen'>
+    <>
       <Header />
-      <div className='h-[calc(100vh-var(--header-height))] '>
-        <div className='container mx-auto p-4 h-full'>
-          <div
-            className={`grid gap-4 md:gap-6 h-full transition-all duration-500 ease-in-out ${
-              showResults
-                ? "grid-cols-1 lg:grid-cols-12"
-                : "grid-cols-1 lg:grid-cols-8"
-            }`}
-          >
-            {!showResults && (
-              <div className='order-2 lg:order-1 transition-all duration-500 ease-in-out lg:col-span-2'>
-                <UserGuide />
-              </div>
-            )}
-
-            <div
-              className={`order-1 lg:order-2 transition-all duration-500 ease-in-out ${
-                showResults ? "lg:col-span-8" : "lg:col-span-6"
-              }`}
-            >
-              <Card className='h-full flex flex-col'>
-                <CardHeader className='pb-3 flex-shrink-0'>
-                  <CardTitle className='text-lg'>Code Editor</CardTitle>
-                </CardHeader>
-                <CardContent className='flex-1 flex flex-col'>
-                  <CodeEditor
-                    value={code}
-                    onChange={handleCodeChange}
-                    height='100%'
-                    onSubmit={handleSubmitCode}
-                    isSubmitting={isSubmitting}
-                    placeholder='Nhập code của bạn vào đây để phân tích...'
-                    customDarkTheme={{
-                      base: "vs-dark",
-                      inherit: true,
-                      ...oneDarkPro,
-                    }}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-
-            {showResults && (
-              <div className='lg:col-span-4 order-3 animate-in slide-in-from-right-10 duration-700 ease-out'>
-                <AnalysisResults
-                  result={analysisResult}
-                  isVisible={showResults}
-                />
-              </div>
-            )}
-          </div>
+      <div className='h-[calc(100vh-var(--header-height))] flex flex-col'>
+        <div className='flex-1 p-4'>
+          <CodeEditor
+            value={code}
+            height='100%'
+            onChange={handleCodeChange}
+            onSubmit={handleSubmitCode}
+            isSubmitting={isSubmitting}
+            placeholder='Nhập code của bạn vào đây để phân tích...'
+            customDarkTheme={{
+              base: "vs-dark",
+              inherit: true,
+              ...oneDarkPro,
+            }}
+          />
         </div>
       </div>
-    </div>
+    </>
   );
 }

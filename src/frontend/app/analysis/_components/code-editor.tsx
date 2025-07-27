@@ -3,11 +3,18 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { Editor as MonacoEditor } from "@monaco-editor/react";
-import { Copy, Download, FileCode, Loader2, Send } from "lucide-react";
+import { FileCode, Loader2, Send } from "lucide-react";
 import { editor } from "monaco-editor";
 import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export interface CodeEditorTheme {
   base: string;
@@ -61,7 +68,7 @@ export function CodeEditor({
   value,
   onChange,
   language,
-  height = "200px",
+  height,
   theme: propTheme,
   customLightTheme,
   customDarkTheme,
@@ -103,7 +110,7 @@ export function CodeEditor({
 
   const defaultOptions: editor.IStandaloneEditorConstructionOptions = {
     fontSize: 14,
-    fontWeight: "400",
+    fontWeight: "500",
     fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
     scrollBeyondLastLine: false,
     automaticLayout: true,
@@ -186,72 +193,32 @@ export function CodeEditor({
     }
   };
 
-  const handleCopyCode = () => {
-    if (value) {
-      navigator.clipboard.writeText(value);
-    }
-  };
-
-  const handleDownloadCode = () => {
-    if (!value) return;
-
-    const languageInfo = SUPPORTED_LANGUAGES.find(
-      (lang) => lang.id === detectedLanguage,
-    );
-    const extension = languageInfo?.extensions[0] || ".txt";
-    const filename = `code${extension}`;
-
-    const blob = new Blob([value], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div className='space-y-4 h-full flex flex-col'>
-      {/* Editor Controls */}
       <div className='flex items-center justify-between gap-4 flex-shrink-0'>
         <div className='flex items-center gap-2'>
-          <select
+          <Select
             value={selectedLanguage}
-            onChange={(e) => setSelectedLanguage(e.target.value)}
-            className='px-3 py-1.5 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary'
+            onValueChange={(value) => setSelectedLanguage(value)}
           >
-            {SUPPORTED_LANGUAGES.map((lang) => (
-              <option key={lang.id} value={lang.id}>
-                {lang.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className='w-[180px]'>
+              <SelectValue placeholder='Language' />
+            </SelectTrigger>
+            <SelectContent>
+              {SUPPORTED_LANGUAGES.map((lang) => (
+                <SelectItem key={lang.id} value={lang.id}>
+                  {lang.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className='flex items-center gap-2'>
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={handleCopyCode}
-            disabled={!value?.trim()}
-          >
-            <Copy className='w-4 h-4 mr-1' />
-            Copy
-          </Button>
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={handleDownloadCode}
-            disabled={!value?.trim()}
-          >
-            <Download className='w-4 h-4 mr-1' />
-            Download
-          </Button>
           {onSubmit && (
             <Button
               onClick={handleSubmit}
               disabled={!value?.trim() || isSubmitting}
-              size='sm'
               className='min-w-[120px]'
             >
               {isSubmitting ? (
@@ -265,16 +232,15 @@ export function CodeEditor({
         </div>
       </div>
 
-      {/* Editor */}
-      <div className='relative rounded-md border flex-1' style={{ height }}>
+      <div className='relative rounded-md border flex-1'>
         <MonacoEditor
           value={value || ""}
           onChange={onChange}
+          height={height}
           options={defaultOptions}
           className={className}
           language={detectedLanguage}
           theme={editorTheme}
-          height='100%'
           beforeMount={beforeMount}
           loading={
             <div className='flex h-full items-center justify-center text-sm text-muted-foreground'>

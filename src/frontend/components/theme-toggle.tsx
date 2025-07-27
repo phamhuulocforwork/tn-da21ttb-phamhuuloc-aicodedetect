@@ -24,25 +24,14 @@ export function ThemeToggle({
 
   if (!mounted) {
     return (
-      <Button
-        variant='outline'
-        size='icon'
-        className='cursor-pointer'
-        {...props}
-      >
+      <Button variant='outline' size='icon' {...props}>
         <span className='sr-only'>Toggle Theme</span>
       </Button>
     );
   }
 
   return (
-    <Button
-      variant='outline'
-      size='icon'
-      className='cursor-pointer'
-      onClick={toggleTheme}
-      {...props}
-    >
+    <Button variant='outline' size='icon' onClick={toggleTheme} {...props}>
       {theme === "dark" ? (
         <Sun className='size-5' />
       ) : (
