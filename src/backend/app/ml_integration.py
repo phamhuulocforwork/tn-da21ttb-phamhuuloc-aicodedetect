@@ -1,15 +1,10 @@
-"""
-ML Integration Layer - Tích hợp với Core ML Components từ src/src/
-FIXED VERSION - Sửa bug reasoning logic
-"""
-
 import sys
 import tempfile
 import re
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-# Thêm src/src vào path để import ML components
+# NOTE: Thêm src/src vào path để import ML components
 current_dir = Path(__file__).parent
 src_src_path = current_dir.parent.parent / "src"
 sys.path.append(str(src_src_path))
@@ -23,7 +18,7 @@ except ImportError:
 
 class CodeAnalyzer:
     """
-    Lớp chịu trách nhiệm phân tích code và trích xuất features
+        Class phân tích code và trích xuất features
     """
     
     def __init__(self):
@@ -31,10 +26,10 @@ class CodeAnalyzer:
     
     def extract_features(self, code: str, language: str, filename: Optional[str] = None) -> Dict:
         """
-        Trích xuất các đặc trưng từ source code
-        
-        Returns:
-            Dict chứa các metrics: loc, token_count, cyclomatic_avg, functions, comment_ratio, blank_ratio
+            Trích xuất các đặc trưng từ source code
+            
+            Returns:
+                Dict chứa các metrics: loc, token_count, cyclomatic_avg, functions, comment_ratio, blank_ratio
         """
         try:
             if self.has_advanced_features:
@@ -46,7 +41,6 @@ class CodeAnalyzer:
             return self._extract_minimal_features(code)
     
     def _extract_advanced_features(self, code: str, language: str) -> Dict:
-        """Sử dụng lizard để phân tích chuyên sâu"""
         with tempfile.NamedTemporaryFile(mode='w', suffix=f'.{language}', delete=False) as f:
             f.write(code)
             temp_path = Path(f.name)
@@ -66,7 +60,6 @@ class CodeAnalyzer:
                 temp_path.unlink()
     
     def _extract_basic_features(self, code: str) -> Dict:
-        """Fallback sử dụng basic metrics"""
         metrics = basic_metrics(code)
         return {
             "loc": metrics["loc"],
@@ -78,7 +71,6 @@ class CodeAnalyzer:
         }
     
     def _extract_minimal_features(self, code: str) -> Dict:
-        """Fallback tối thiểu khi có lỗi"""
         lines = code.splitlines()
         return {
             "loc": len(lines),
@@ -90,7 +82,6 @@ class CodeAnalyzer:
         }
     
     def _calculate_comment_ratio(self, code: str) -> float:
-        """Tính tỷ lệ comment"""
         lines = code.splitlines()
         if not lines:
             return 0.0
@@ -98,7 +89,6 @@ class CodeAnalyzer:
         return comment_lines / len(lines)
     
     def _calculate_blank_ratio(self, code: str) -> float:
-        """Tính tỷ lệ dòng trống"""
         lines = code.splitlines()
         if not lines:
             return 0.0
@@ -107,41 +97,31 @@ class CodeAnalyzer:
 
 class AIDetector:
     """
-    Lớp chịu trách nhiệm phát hiện AI-generated code sử dụng rule-based logic
-    FIXED: Reasoning logic đã được sửa để phân biệt AI vs Human patterns
+        Class phát hiện AI-generated code sử dụng rule-based logic
     """
     
     def __init__(self):
         self.ai_patterns = [
-            # Naming patterns
             self._check_descriptive_naming,
-            # Comment patterns  
             self._check_comment_patterns,
-            # Include patterns
             self._check_include_patterns,
-            # Structure patterns
             self._check_structure_patterns,
-            # Template patterns
             self._check_template_patterns,
-            # Variable patterns
             self._check_variable_patterns
         ]
         
         self.human_patterns = [
-            # Short code
             self._check_short_code,
-            # Single char variables
             self._check_single_char_vars,
-            # Inconsistent formatting
             self._check_inconsistent_formatting
         ]
     
     def detect(self, code: str, features: Dict) -> Tuple[str, float, List[str]]:
         """
-        Phát hiện AI vs Human code
-        
-        Returns:
-            Tuple[prediction, confidence, reasoning]
+            Phát hiện AI vs Human code
+            
+            Returns:
+                Tuple[prediction, confidence, reasoning]
         """
         ai_reasons = []
         human_reasons = []
@@ -195,12 +175,8 @@ class AIDetector:
         
         return prediction, round(confidence, 3), reasoning
     
-    # AI Pattern Detectors
     def _check_descriptive_naming(self, code: str, features: Dict) -> Tuple[float, str]:
-        """Kiểm tra tên biến/hàm mô tả (AI pattern)"""
-        # camelCase descriptive names
         camel_case = re.findall(r'\\b[a-zA-Z][a-zA-Z0-9]*[A-Z][a-zA-Z0-9]*\\b', code)
-        # snake_case descriptive names
         snake_case = re.findall(r'\\b[a-z]+_[a-z]+\\b', code)
         
         descriptive_count = len(camel_case) + len(snake_case)
@@ -212,7 +188,6 @@ class AIDetector:
         return 0.0, ""
     
     def _check_comment_patterns(self, code: str, features: Dict) -> Tuple[float, str]:
-        """Kiểm tra pattern comment (AI thường comment nhiều)"""
         comment_ratio = features.get("comment_ratio", 0)
         if comment_ratio > 0.15:  # >15% comment
             return 0.15, "Tỷ lệ comment cao (AI pattern)"
@@ -221,7 +196,6 @@ class AIDetector:
         return 0.0, ""
     
     def _check_include_patterns(self, code: str, features: Dict) -> Tuple[float, str]:
-        """Kiểm tra include statements"""
         includes = re.findall(r'#include\\s*<[^>]+>', code)
         if len(includes) >= 3:
             return 0.1, "Sử dụng nhiều thư viện chuẩn"
@@ -230,22 +204,18 @@ class AIDetector:
         return 0.0, ""
     
     def _check_structure_patterns(self, code: str, features: Dict) -> Tuple[float, str]:
-        """Kiểm tra structure patterns"""
         score = 0.0
         reasons = []
         
-        # Error handling
         if 'try' in code or 'catch' in code or ('if' in code and 'error' in code.lower()):
             score += 0.1
             reasons.append("error handling")
         
-        # Function complexity
         cyclomatic_avg = features.get("cyclomatic_avg")
         if cyclomatic_avg and cyclomatic_avg < 3:
             score += 0.1
             reasons.append("độ phức tạp thấp")
         
-        # Consistent formatting
         lines = code.split('\\n')
         indented_lines = [l for l in lines if l.startswith('    ') or l.startswith('\\t')]
         if len(indented_lines) > len(lines) * 0.3:
@@ -256,28 +226,23 @@ class AIDetector:
         return score, reason_text
     
     def _check_template_patterns(self, code: str, features: Dict) -> Tuple[float, str]:
-        """Kiểm tra template patterns"""
         if 'int main()' in code and 'return 0' in code:
             return 0.05, "Sử dụng template chuẩn"
         return 0.0, ""
     
     def _check_variable_patterns(self, code: str, features: Dict) -> Tuple[float, str]:
-        """Kiểm tra variable declaration patterns"""
         declarations = re.findall(r'\\b(int|float|double|char|string)\\s+\\w+', code)
         if len(declarations) > 3:
             return 0.05, "Khai báo biến rõ ràng"
         return 0.0, ""
     
-    # Human Pattern Detectors
     def _check_short_code(self, code: str, features: Dict) -> Tuple[float, str]:
-        """Code ngắn thường là human"""
         loc = features.get("loc", 0)
         if loc < 20:
             return 0.1, "Code ngắn (human pattern)"
         return 0.0, ""
     
     def _check_single_char_vars(self, code: str, features: Dict) -> Tuple[float, str]:
-        """Single character variables (human pattern)"""
         single_vars = re.findall(r'\\b[a-z]\\b', code)
         if len(single_vars) > 3:
             return 0.15, "Nhiều biến 1 ký tự (human pattern)"
@@ -286,26 +251,22 @@ class AIDetector:
         return 0.0, ""
     
     def _check_inconsistent_formatting(self, code: str, features: Dict) -> Tuple[float, str]:
-        """Inconsistent formatting (human pattern)"""
         lines = code.split('\\n')
         if not lines:
             return 0.0, ""
         
-        # Check for mixed indentation
         space_indented = len([l for l in lines if l.startswith('    ')])
         tab_indented = len([l for l in lines if l.startswith('\\t')])
         
         if space_indented > 0 and tab_indented > 0:
             return 0.05, "Mixed indentation (human pattern)"
         
-        # Check for inconsistent spacing around operators
         inconsistent_spacing = re.findall(r'\\w+=[^=]|\\w+ = [^=]|\\w+=[^=]', code)
         if len(inconsistent_spacing) > 2:
             return 0.03, "Inconsistent spacing"
         
         return 0.0, ""
 
-# Global instances
 code_analyzer = CodeAnalyzer()
 ai_detector = AIDetector()
 

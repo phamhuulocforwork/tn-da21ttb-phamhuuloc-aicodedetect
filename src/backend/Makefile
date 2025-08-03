@@ -18,9 +18,6 @@ help:
 	@echo "$(GREEN)  make dev$(NC)       - Chạy server development với hot reload"
 	@echo "$(GREEN)  make start$(NC)     - Chạy server production"
 	@echo "$(GREEN)  make clean$(NC)     - Xóa virtual environment và cache"
-	@echo "$(GREEN)  make test$(NC)      - Chạy tests (khi có)"
-	@echo "$(GREEN)  make lint$(NC)      - Kiểm tra code style"
-	@echo "$(GREEN)  make format$(NC)    - Format code"
 
 setup:
 	@echo "$(YELLOW)📦 Creating virtual environment...$(NC)"
@@ -51,20 +48,9 @@ start:
 clean:
 	@echo "$(RED)🧹 Cleaning up...$(NC)"
 	rm -rf $(VENV)
+	find . -type d -name "venv" -exec rm -rf {} +
 	find . -type d -name "__pycache__" -delete
 	find . -type f -name "*.pyc" -delete
 	@echo "$(GREEN)✅ Cleanup completed!$(NC)"
-
-test:
-	@echo "$(YELLOW)🧪 Running tests...$(NC)"
-	@echo "$(RED)No tests configured yet$(NC)"
-
-lint:
-	@echo "$(YELLOW)🔍 Checking code style...$(NC)"
-	@echo "$(RED)No linting configured yet$(NC)"
-
-format:
-	@echo "$(YELLOW)🎨 Formatting code...$(NC)"
-	@echo "$(RED)No formatting configured yet$(NC)"
 
 quick: dev 

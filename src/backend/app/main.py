@@ -8,13 +8,13 @@ import os
 import sys
 from pathlib import Path
 
-# Import ML integration modules
+# NOTE: Kiểm tra có enhanced ML không (nếu có thì sử dụng)
 try:
     from .enhanced_ml_integration import analyze_code_with_enhanced_ml, get_enhanced_analyzer
     from .ml_integration import analyze_code_features, detect_ai_code, code_analyzer
     HAS_ENHANCED_ML = True
 except ImportError:
-    # Fallback if running as script or enhanced ML not available
+    # NOTE: Fallback khi chạy như script hoặc chưa có enhanced ML
     try:
         from enhanced_ml_integration import analyze_code_with_enhanced_ml, get_enhanced_analyzer
         from ml_integration import analyze_code_features, detect_ai_code, code_analyzer
@@ -38,7 +38,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Data Models
 class CodeAnalysisRequest(BaseModel):
     code: str = Field(..., description="Source code để phân tích")
     language: str = Field(default="cpp", description="Ngôn ngữ lập trình (c, cpp)")
@@ -55,14 +54,14 @@ class BasicCodeFeatures(BaseModel):
     blank_ratio: Optional[float] = Field(description="Tỷ lệ dòng trống")
 
 class EnhancedFeatures(BaseModel):
-    ast_features: Optional[Dict] = Field(description="AST analysis features")
-    redundancy_features: Optional[Dict] = Field(description="Code redundancy features")
-    naming_patterns: Optional[Dict] = Field(description="Naming pattern features")
-    complexity_features: Optional[Dict] = Field(description="Advanced complexity features")
-    ai_patterns: Optional[Dict] = Field(description="AI-specific pattern features")
+    ast_features: Optional[Dict] = Field(description="Các features AST")
+    redundancy_features: Optional[Dict] = Field(description="Các features redundancy")
+    naming_patterns: Optional[Dict] = Field(description="Các features naming pattern")
+    complexity_features: Optional[Dict] = Field(description="Các features complexity")
+    ai_patterns: Optional[Dict] = Field(description="Các features AI-specific pattern")
 
 class DetectionResult(BaseModel):
-    prediction: str = Field(description="AI-generated, Human-written, or Uncertain")
+    prediction: str = Field(description="AI-generated, Human-written, or Uncertain (chưa xác định)")
     confidence: float = Field(description="Độ tin cậy (0-1)")
     reasoning: List[str] = Field(description="Lý do phán đoán")
     method_used: str = Field(description="Phương pháp sử dụng")
@@ -105,13 +104,29 @@ class DetectorInfoResponse(BaseModel):
     available_detectors: List[str]
     detector_details: Dict[str, Dict]
 
-# Global variables for tracking
 start_time = time.time()
+
+def get_ml_model_path() -> Optional[str]:
+    # Tự động tìm đường dẫn đến mô hình ML từ src/src/ml_output/models/
+    try:
+        # Lấy đường dẫn hiện tại của backend
+        backend_dir = Path(__file__).parent.parent
+        # Di chuyển đến src/src/ml_output/models/
+        model_path = backend_dir.parent / "src" / "ml_output" / "models" / "ml_model.pkl"
+        
+        if model_path.exists():
+            return str(model_path)
+        else:
+            print(f"ML model not found at: {model_path}")
+            return None
+    except Exception as e:
+        print(f"Error detecting ML model path: {e}")
+        return None
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
     """
-    Kiểm tra trạng thái hoạt động của backend API
+        API kiểm tra server
     """
     ml_available = hasattr(code_analyzer, 'has_advanced_features') and code_analyzer.has_advanced_features if 'code_analyzer' in globals() else False
     
@@ -126,9 +141,6 @@ async def health_check():
 
 @app.get("/")
 async def root():
-    """
-    Root endpoint - chuyển hướng đến health check
-    """
     return {
         "message": "AI Code Detection API v2.0",
         "status": "OK", 
@@ -141,10 +153,11 @@ async def root():
 @app.get("/detectors", response_model=DetectorInfoResponse)
 async def get_detector_info():
     """
-    Lấy thông tin về các detector có sẵn
+        API lấy thông tin của các detector
     """
     if HAS_ENHANCED_ML:
-        analyzer = get_enhanced_analyzer()
+        model_path = get_ml_model_path()
+        analyzer = get_enhanced_analyzer(model_path)
         return analyzer.get_detector_info()
     else:
         return DetectorInfoResponse(
@@ -162,32 +175,33 @@ async def get_detector_info():
 @app.post("/analyze-code", response_model=EnhancedAnalysisResponse)
 async def analyze_code(request: CodeAnalysisRequest):
     """
-    Phân tích code với enhanced ML features
-    
-    Workflow:
-    1. Validate input
-    2. Extract comprehensive features (nếu enhanced=True)
-    3. Run detection với specified detector
-    4. Return detailed results với performance metrics
+        API phân tích code với enhanced ML features
+        
+        Workflow:
+        1. Kiểm tra đầu vào
+        2. Trích xuất các features (nếu enhanced=True)
+        3. Chạy kiểm tra đầu vào bằng detector đã chọn
+        4. Trả về kết quả chi tiết với các metrics
     """
     try:
-        # Validate input
+        # NOTE: Kiểm tra đầu vào
         if not request.code.strip():
             raise HTTPException(status_code=400, detail="Code không được để trống")
         
         if request.language not in ["c", "cpp"]:
             raise HTTPException(status_code=400, detail="Chỉ hỗ trợ ngôn ngữ C và C++")
         
-        # Enhanced analysis
         if request.enhanced_analysis and HAS_ENHANCED_ML:
+            model_path = get_ml_model_path()
             result = analyze_code_with_enhanced_ml(
                 code=request.code,
                 language=request.language,
                 filename=request.filename,
-                detector_type=request.detector_type
+                detector_type=request.detector_type,
+                model_path=model_path
             )
             
-            # Convert to response format
+            # Trả đúng định dạng
             response = EnhancedAnalysisResponse(
                 basic_features=BasicCodeFeatures(**result['basic_features']),
                 enhanced_features=EnhancedFeatures(**result['enhanced_features']) if result['enhanced_features'] else None,
@@ -198,12 +212,12 @@ async def analyze_code(request: CodeAnalysisRequest):
             
             return response
         
-        # Fallback to basic analysis
+        # NOTE: Fallback to basic analysis
         else:
-            # Use existing basic analysis
+            # NOTE: Sử dụng phân tích cơ bản
             features_dict = analyze_code_features(request.code, request.language, request.filename)
             
-            # Convert to basic features
+            # NOTE: Chuyển đổi sang định dạng cơ bản
             basic_features = BasicCodeFeatures(
                 loc=features_dict.get("loc", 0),
                 token_count=features_dict.get("token_count"),
@@ -213,7 +227,6 @@ async def analyze_code(request: CodeAnalysisRequest):
                 blank_ratio=features_dict.get("blank_ratio", 0)
             )
             
-            # Run basic detection
             prediction, confidence, reasoning = detect_ai_code(request.code, features_dict)
             
             detection = DetectionResult(
@@ -253,10 +266,9 @@ async def analyze_code_file(file: UploadFile = File(...),
                            detector_type: str = "hybrid",
                            enhanced_analysis: bool = True):
     """
-    Phân tích code từ file upload
+        API phân tích code từ file upload
     """
     try:
-        # Validate file type
         if not file.filename:
             raise HTTPException(status_code=400, detail="Filename không hợp lệ")
         
@@ -264,17 +276,14 @@ async def analyze_code_file(file: UploadFile = File(...),
         if file_ext not in [".c", ".cpp", ".h", ".hpp"]:
             raise HTTPException(status_code=400, detail="Chỉ hỗ trợ file C/C++ (.c, .cpp, .h, .hpp)")
         
-        # Read file content
         content = await file.read()
         try:
             code = content.decode('utf-8')
         except UnicodeDecodeError:
             raise HTTPException(status_code=400, detail="File không thể đọc được (encoding issue)")
         
-        # Determine language from extension
         language = "cpp" if file_ext in [".cpp", ".hpp"] else "c"
         
-        # Create analysis request
         request = CodeAnalysisRequest(
             code=code,
             language=language,
@@ -293,7 +302,7 @@ async def analyze_code_file(file: UploadFile = File(...),
 @app.post("/analyze-code/batch")
 async def analyze_code_batch(requests: List[CodeAnalysisRequest]):
     """
-    Phân tích batch nhiều code samples
+        API phân tích batch nhiều code samples
     """
     if len(requests) > 10:
         raise HTTPException(status_code=400, detail="Maximum 10 samples per batch")
@@ -322,33 +331,12 @@ async def analyze_code_batch(requests: List[CodeAnalysisRequest]):
         "failed": len([r for r in results if r["status"] == "failed"])
     }
 
-@app.post("/benchmark-detectors")
-async def benchmark_detectors(request: CodeAnalysisRequest):
-    """
-    Benchmark tất cả detectors trên code sample
-    """
-    if not HAS_ENHANCED_ML:
-        raise HTTPException(status_code=501, detail="Enhanced ML required for benchmarking")
-    
-    try:
-        analyzer = get_enhanced_analyzer()
-        benchmark_results = analyzer.benchmark_detectors(request.code, request.language)
-        
-        return {
-            "benchmark_results": benchmark_results,
-            "timestamp": time.time()
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Benchmark failed: {str(e)}")
-
 @app.post("/submit-feedback")
 async def submit_feedback(feedback: FeedbackRequest):
     """
-    Thu thập feedback từ giảng viên để cải thiện model
+        API thu thập feedback
     """
     try:
-        # TODO: Lưu feedback vào database hoặc file để training
         feedback_data = {
             "timestamp": time.time(),
             "code_hash": hash(feedback.code),
@@ -358,8 +346,8 @@ async def submit_feedback(feedback: FeedbackRequest):
             "code_length": len(feedback.code)
         }
         
-        # Tạm thời log feedback (sau này có thể lưu vào DB)
-        print(f"📝 Feedback received: {feedback_data}")
+        # TODO: Lưu feedback vào database hoặc file để training
+        print({feedback_data})
         
         return {
             "message": "Feedback đã được ghi nhận",
