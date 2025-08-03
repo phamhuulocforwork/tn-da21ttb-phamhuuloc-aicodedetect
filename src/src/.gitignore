@@ -1,5 +1,48 @@
+# Dataset files (specific to this AI code detection project)
 dataset/**/*.c
 dataset/**/*.cpp
+dataset/**/*.java
+dataset/**/*.js
+dataset/**/*.py
+dataset/**/*.ts
+dataset/**/*.jsx
+dataset/**/*.tsx
+dataset/**/*.php
+dataset/**/*.rb
+dataset/**/*.go
+dataset/**/*.rs
+dataset/**/*.swift
+dataset/**/*.kt
+dataset/**/*.scala
+dataset/**/*.sh
+dataset/**/*.sql
+dataset/**/*.html
+dataset/**/*.css
+dataset/**/*.json
+dataset/**/*.xml
+dataset/**/*.yaml
+dataset/**/*.yml
+
+# ML Output and Model files
+ml_output/models/*.pkl
+ml_output/models/*.joblib
+ml_output/models/*.h5
+ml_output/models/*.pt
+ml_output/models/*.pth
+ml_output/models/*.onnx
+ml_output/models/*.tflite
+ml_output/features/feature_cache/
+ml_output/evaluation/temp/
+ml_output/comparison/temp/
+
+# Large dataset files
+*.csv
+*.parquet
+*.feather
+*.hdf5
+*.h5
+
+# Environment files
 .env
 
 # Byte-compiled / optimized / DLL files
@@ -107,4 +150,50 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# IDE and Editor files
 .idea/*
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Logs and debugging
+*.log
+logs/
+debug.log
+error.log
+
+# ML specific temporary files
+*.npy
+*.npz
+checkpoints/
+tensorboard_logs/
+wandb/
+mlruns/
+
+# Jupyter notebook outputs (keep structure but ignore outputs)
+*.ipynb_checkpoints
+
+# Cache directories
+.cache/
+__pycache__/
+.pytest_cache/
+
+# Virtual environments (additional patterns)
+.conda/
+conda-env/

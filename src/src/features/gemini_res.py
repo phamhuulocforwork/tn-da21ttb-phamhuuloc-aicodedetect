@@ -36,7 +36,7 @@ Tên bài: {problem_name}
 
 Yêu cầu:
 - Code đơn giản, dễ hiểu cho sinh viên năm 1
-- Có đầy đủ thư viện cần thiết
+- Có đầy đủ thư viện cần thiết`
 - Có comment giải thích
 - Code phải biên dịch được""",
 
