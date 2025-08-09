@@ -1,0 +1,2602 @@
+[
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5281.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.994,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5296.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.97,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_12.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.998,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3185.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.992,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_33.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5639.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5428.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3119.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.984,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_26.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5266.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.92,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_23.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.98,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_45.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3123.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.953,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_61.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.941,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_3.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.998,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3240.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.989,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5681.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_27.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3145.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.988,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_28.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3024.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.978,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_4.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3177.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.992,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_41.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5312.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.996,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3151.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.989,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_15.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.996,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_48.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_55.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5433.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5344.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_38.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.982,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_29.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3142.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.998,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_11.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.995,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_5.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_11.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.993,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5619.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5655.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.98,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_27.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_17.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.992,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3147.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.99,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5340.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_9.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_7.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.995,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3170.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.994,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5265.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5690.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5667.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5648.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3130.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_43.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.998,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_36.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.996,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3241.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.992,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5424.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_50.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_47.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_24.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3080.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.987,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_1.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_32.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.974,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_39.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5306.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.996,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_30.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.977,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5274.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5258.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5640.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_18.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5270.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3181.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.992,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5625.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_13.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.987,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_40.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_42.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_54.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.996,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_52.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_21.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.994,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_19.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5289.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_34.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.998,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5290.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5282.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_28.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_44.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5622.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_15.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3164.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.988,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_51.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.985,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5257.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.798,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5250.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_2932.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.997,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_37.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.997,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_38.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.983,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_2.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.993,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_62.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.998,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5329.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5443.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_31.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.997,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_30.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.98,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5251.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_2.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_58.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5271.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_13.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_57.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.997,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5613.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5633.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_60.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_29.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3109.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.967,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3139.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.998,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_64.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_56.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5260.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.915,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_4073.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.992,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3804.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.997,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_59.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.996,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_10.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.992,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5283.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5242.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5277.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5630.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5275.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.994,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_5.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.997,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_26.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5247.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3188.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.992,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3071.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.967,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5354.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3376.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.982,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5646.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_34.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.998,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5303.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_36.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.966,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_49.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.993,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5279.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.994,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_18.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.995,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5616.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_66.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.992,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5278.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5620.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_23.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_9.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.97,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3175.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.991,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_24.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.988,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_33.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5692.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_32.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.97,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5324.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5333.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_22.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.95,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_10.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.997,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_20.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.995,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5263.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.933,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3660.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.995,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5269.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3124.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_16.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.998,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_25.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.87,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_31.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_53.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.989,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5641.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_35.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_6.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.998,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3153.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.988,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_2925.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.995,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_3.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_68.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_4.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_40.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.989,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3116.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.995,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5355.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_69.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.997,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5654.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_20.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3330.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.995,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5676.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_4319.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.992,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3090.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.984,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_6.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_22.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.998,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_17.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_35.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5243.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3117.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.995,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5286.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_7.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.998,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_67.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.999,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_8.cpp",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.991,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_1.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.993,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_2/submission_14.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5284.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3025.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.985,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_2957.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.988,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3129.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.997,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5421.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_65.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.979,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_55/submission_5628.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 1.0,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/human/problem_38/submission_3081.c",
+    "true_label": "human",
+    "predicted_label": "Human-written",
+    "confidence": 0.981,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  },
+  {
+    "file_path": "dataset/code/c/ai/problem_1/submission_63.c",
+    "true_label": "ai",
+    "predicted_label": "AI-generated",
+    "confidence": 0.985,
+    "method_used": "ml",
+    "is_correct": true,
+    "reasoning": [
+      "Feature 'ast_total_nodes' importance: 0.199",
+      "Feature 'ast_for_loops' importance: 0.132",
+      "Feature 'complexity_maintainability_index' importance: 0.100"
+    ]
+  }
+]

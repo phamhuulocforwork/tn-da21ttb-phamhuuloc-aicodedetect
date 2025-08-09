@@ -1,0 +1,98 @@
+{
+  "pipeline_summary": {
+    "timestamp": "2025-08-08 01:28:56",
+    "directories": {
+      "base": "ml_output",
+      "features": "ml_output/features",
+      "models": "ml_output/models",
+      "evaluation": "ml_output/evaluation",
+      "comparison": "ml_output/comparison"
+    },
+    "model_training_results": {
+      "ml_model": "ml_output/models/ml_model.pkl",
+      "rule_based": "ready",
+      "hybrid": "ready"
+    },
+    "evaluation_results": {
+      "Rule-Based": {
+        "accuracy": 0.555,
+        "precision": 0.5455,
+        "recall": 0.6061,
+        "f1_score": 0.5742,
+        "specificity": 0.505,
+        "sensitivity": 0.6061,
+        "balanced_accuracy": 0.5555,
+        "avg_confidence": 0.6015,
+        "confidence_calibration": 0.08,
+        "true_positives": 60,
+        "true_negatives": 51,
+        "false_positives": 50,
+        "false_negatives": 39,
+        "auc_score": 0.6305,
+        "avg_precision_score": 0.7089
+      },
+      "ML": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "specificity": 1.0,
+        "sensitivity": 1.0,
+        "balanced_accuracy": 1.0,
+        "avg_confidence": 0.9917,
+        "confidence_calibration": 0,
+        "true_positives": 99,
+        "true_negatives": 101,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "auc_score": 1.0,
+        "avg_precision_score": 1.0
+      },
+      "Hybrid": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "specificity": 1.0,
+        "sensitivity": 1.0,
+        "balanced_accuracy": 1.0,
+        "avg_confidence": 0.8026,
+        "confidence_calibration": 0,
+        "true_positives": 99,
+        "true_negatives": 101,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "auc_score": 1.0,
+        "avg_precision_score": 1.0
+      }
+    }
+  },
+  "best_performer": {
+    "model": "ML",
+    "f1_score": 1.0,
+    "metrics": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "specificity": 1.0,
+      "sensitivity": 1.0,
+      "balanced_accuracy": 1.0,
+      "avg_confidence": 0.9917,
+      "confidence_calibration": 0,
+      "true_positives": 99,
+      "true_negatives": 101,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "auc_score": 1.0,
+      "avg_precision_score": 1.0
+    }
+  },
+  "recommendations": [
+    "\u26a0\ufe0f  Rule-Based accuracy (0.555) below 70% - consider more training data",
+    "\u26a0\ufe0f  Rule-Based F1-score (0.574) below 60% - review feature selection",
+    "\u2705 Consider combining multiple detectors for better performance",
+    "\ud83d\udcca Monitor performance on new data regularly",
+    "\ud83d\udd04 Retrain models as more data becomes available"
+  ]
+}

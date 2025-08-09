@@ -336,7 +336,8 @@ class AdvancedFeatureExtractor:
         if comment_lines:
             features.code_to_comment_ratio = len(code_lines) / len(comment_lines)
         else:
-            features.code_to_comment_ratio = float('inf') if code_lines else 0
+            # Use a high but finite value instead of infinity to avoid ML training issues
+            features.code_to_comment_ratio = 999.0 if code_lines else 0
         
         # Simplified Halstead complexity
         operators = re.findall(r'[+\-*/=<>!&|]+', code)

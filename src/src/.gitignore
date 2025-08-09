@@ -34,6 +34,7 @@ ml_output/models/*.tflite
 ml_output/features/feature_cache/
 ml_output/evaluation/temp/
 ml_output/comparison/temp/
+ml_output/features/cache/*.json
 
 # Large dataset files
 *.csv
