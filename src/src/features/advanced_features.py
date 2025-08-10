@@ -1,8 +1,3 @@
-"""
-Advanced Feature Extraction System for AI Code Detection
-Hệ thống trích xuất đặc trưng nâng cao cho phát hiện code AI
-"""
-
 import re
 import math
 import numpy as np
@@ -18,11 +13,10 @@ try:
     HAS_LIZARD = True
 except ImportError:
     HAS_LIZARD = False
-    print("Warning: Some dependencies not available. Using fallback mode.")
 
 @dataclass
 class CodeRedundancyFeatures:
-    """Đặc trưng về code redundancy và repetition"""
+    # NOTE: Đặc trưng về code redundancy và repetition
     duplicate_lines: int = 0
     duplicate_line_ratio: float = 0.0
     repeated_patterns: int = 0
@@ -31,7 +25,7 @@ class CodeRedundancyFeatures:
 
 @dataclass
 class NamingPatternFeatures:
-    """Đặc trưng về naming patterns chi tiết"""
+    # NOTE: Đặc trưng về naming patterns chi tiết
     # Variable naming
     descriptive_var_ratio: float = 0.0
     generic_var_ratio: float = 0.0
@@ -47,7 +41,7 @@ class NamingPatternFeatures:
 
 @dataclass
 class CodeComplexityFeatures:
-    """Đặc trưng về độ phức tạp code"""
+    # NOTE: Đặc trưng về độ phức tạp code
     halstead_complexity: float = 0.0
     cognitive_complexity: float = 0.0
     maintainability_index: float = 0.0
@@ -55,7 +49,7 @@ class CodeComplexityFeatures:
     
 @dataclass
 class AIPatternFeatures:
-    """Đặc trưng đặc trưng của AI-generated code"""
+    # NOTE: Đặc trưng đặc trưng của AI-generated code
     template_usage_score: float = 0.0
     boilerplate_ratio: float = 0.0
     error_handling_score: float = 0.0
@@ -64,7 +58,7 @@ class AIPatternFeatures:
 
 @dataclass
 class ComprehensiveFeatures:
-    """Tập hợp đầy đủ tất cả features"""
+    # NOTE: Tập hợp đầy đủ tất cả features
     # Basic features (từ existing system)
     loc: int = 0
     token_count: Optional[int] = None
@@ -83,7 +77,7 @@ class ComprehensiveFeatures:
     ai_patterns: AIPatternFeatures = None
     
     def to_dict(self) -> Dict:
-        """Convert to dictionary for ML processing"""
+        # NOTE: Convert to dictionary for ML processing
         result = {}
         
         # Basic features
@@ -121,17 +115,14 @@ class ComprehensiveFeatures:
         return result
 
 class AdvancedFeatureExtractor:
-    """
-    Hệ thống trích xuất đặc trưng nâng cao
-    """
+    # NOTE: Hệ thống trích xuất đặc trưng nâng cao
     
     def __init__(self):
         self.ast_analyzer = CppASTAnalyzer() if 'CppASTAnalyzer' in globals() else None
         self.setup_patterns()
     
     def setup_patterns(self):
-        """Setup regex patterns for analysis"""
-        # Common templates and boilerplate patterns
+        # NOTE: Setup regex patterns cho việc phân tích code
         self.template_patterns = [
             r'#include\s*<stdio\.h>',
             r'#include\s*<iostream>',
@@ -140,31 +131,29 @@ class AdvancedFeatureExtractor:
             r'using\s+namespace\s+std\s*;'
         ]
         
-        # Generic variable names
+        # NOTE: Tên biến chung chung
         self.generic_vars = {
             'i', 'j', 'k', 'n', 'm', 'x', 'y', 'z', 'a', 'b', 'c', 
             'temp', 'tmp', 'val', 'value', 'data', 'item', 'var'
         }
         
-        # Descriptive naming patterns
+        # NOTE: Tên biến có ý nghĩa
         self.descriptive_patterns = [
-            r'[a-z]+[A-Z][a-z]*',  # camelCase
+            r'[a-z]+[A-Z][a-z]*',  # camelCase  
             r'[a-z]+_[a-z_]+',      # snake_case
             r'\w{4,}',              # Long names
         ]
         
-        # AI-typical patterns
+        # NOTE: Các patterns thường gặp của AI
         self.ai_patterns = [
-            r'//\s*[A-Z][a-z].*',  # Comments starting with capital
-            r'printf\s*\(\s*".*":',  # Descriptive printf
-            r'scanf\s*\(\s*".*",',  # Input prompts
-            r'if\s*\(.*!=.*\)',     # Error checking
+            r'//\s*[A-Z][a-z].*',  # Comments bắt đầu bằng chữ cái viết hoa
+            r'printf\s*\(\s*".*":',  # printf có ý nghĩa
+            r'scanf\s*\(\s*".*",',  # scanf có ý nghĩa
+            r'if\s*\(.*!=.*\)',     # if có ý nghĩa
         ]
     
     def extract_all_features(self, code: str, filename: str = "") -> ComprehensiveFeatures:
-        """
-        Trích xuất tất cả features từ source code
-        """
+        # NOTE: Trích xuất tất cả features từ source code
         features = ComprehensiveFeatures()
         
         # Basic features
@@ -181,21 +170,21 @@ class AdvancedFeatureExtractor:
         features.ai_patterns = self._extract_ai_pattern_features(code)
         
         return features
-    
+
     def _extract_basic_features(self, code: str, features: ComprehensiveFeatures) -> ComprehensiveFeatures:
-        """Trích xuất basic features (tương thích với existing system)"""
+        # NOTE: Trích xuất basic features
         lines = code.splitlines()
         features.loc = len(lines)
         
-        # Comment ratio
+        # NOTE: Tỷ lệ comment
         comment_lines = len([l for l in lines if l.strip().startswith('//') or '/*' in l])
         features.comment_ratio = comment_lines / len(lines) if lines else 0
         
-        # Blank ratio
+        # NOTE: Tỷ lệ dòng trống
         blank_lines = len([l for l in lines if not l.strip()])
         features.blank_ratio = blank_lines / len(lines) if lines else 0
         
-        # Try to get advanced metrics if available
+        # NOTE: Trích xuất các metrics nâng cao nếu có
         if HAS_LIZARD:
             try:
                 import tempfile
@@ -217,7 +206,7 @@ class AdvancedFeatureExtractor:
         return features
     
     def _extract_redundancy_features(self, code: str) -> CodeRedundancyFeatures:
-        """Trích xuất features về code redundancy"""
+        # NOTE: Trích xuất features về code redundancy
         features = CodeRedundancyFeatures()
         
         lines = [l.strip() for l in code.splitlines() if l.strip()]
@@ -225,13 +214,13 @@ class AdvancedFeatureExtractor:
         if not lines:
             return features
         
-        # Duplicate lines
+        # NOTE: Dòng trùng lặp
         line_counts = Counter(lines)
         duplicates = sum(count - 1 for count in line_counts.values() if count > 1)
         features.duplicate_lines = duplicates
         features.duplicate_line_ratio = duplicates / len(lines)
         
-        # Repeated patterns (look for similar code blocks)
+        # NOTE: Các patterns lặp lại (tìm kiếm các khối code tương tự)
         patterns = []
         for i, line in enumerate(lines):
             # Create 3-gram patterns
@@ -243,7 +232,7 @@ class AdvancedFeatureExtractor:
         repeated = sum(1 for count in pattern_counts.values() if count > 1)
         features.repeated_patterns = repeated
         
-        # Copy-paste score (heuristic based on identical sequences)
+        # NOTE: Điểm copy-paste (heuristic dựa trên các chuỗi giống hệt nhau)
         max_sequence = 0
         for i in range(len(lines)):
             for j in range(i + 1, len(lines)):
@@ -259,10 +248,11 @@ class AdvancedFeatureExtractor:
         return features
     
     def _extract_naming_features(self, code: str) -> NamingPatternFeatures:
-        """Trích xuất features về naming patterns"""
+        # NOTE: Trích xuất features về naming patterns
         features = NamingPatternFeatures()
         
-        # Find all identifiers - FIXED REGEX
+        # NOTE: Tìm tất cả các identifiers
+        # FIXME: Cần tối ưu chỗ này
         identifiers = re.findall(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', code)
         variables = re.findall(r'\b(?:int|float|double|char|string|bool)\s+([a-zA-Z_][a-zA-Z0-9_]*)\b', code)
         functions = re.findall(r'\b(?:int|void|float|double|char|string|bool)\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(', code)
@@ -270,7 +260,7 @@ class AdvancedFeatureExtractor:
         if not identifiers:
             return features
         
-        # Descriptive vs generic variables
+        # NOTE: Tên biến có ý nghĩa vs tên biến chung chung
         descriptive_vars = 0
         generic_vars = 0
         
@@ -285,7 +275,7 @@ class AdvancedFeatureExtractor:
             features.descriptive_var_ratio = descriptive_vars / total_vars
             features.generic_var_ratio = generic_vars / total_vars
         
-        # Function naming patterns
+        # NOTE: Tên hàm có ý nghĩa vs tên hàm chung chung
         verb_functions = 0
         descriptive_functions = 0
         
@@ -303,18 +293,17 @@ class AdvancedFeatureExtractor:
             features.verb_function_ratio = verb_functions / total_funcs
             features.descriptive_function_ratio = descriptive_functions / total_funcs
         
-        # Meaningful names score (heuristic)
+        # NOTE: Điểm tên biến có ý nghĩa (heuristic)
         meaningful_score = 0
         for identifier in set(identifiers):
             if len(identifier) >= 3 and identifier not in self.generic_vars:
-                # Check for vowels (meaningful words usually have vowels)
                 vowel_ratio = sum(1 for c in identifier.lower() if c in 'aeiou') / len(identifier)
                 if vowel_ratio > 0.2:
                     meaningful_score += 1
         
         features.meaningful_names_score = meaningful_score / len(set(identifiers)) if identifiers else 0
         
-        # Naming consistency (camelCase vs snake_case consistency) - FIXED REGEX
+        # NOTE: Độ nhất quán của naming (camelCase vs snake_case consistency)
         camel_case_count = len(re.findall(r'\b[a-z][a-zA-Z0-9]*[A-Z][a-zA-Z0-9]*\b', code))
         snake_case_count = len(re.findall(r'\b[a-z]+_[a-z_0-9]*\b', code))
         
@@ -325,23 +314,22 @@ class AdvancedFeatureExtractor:
         return features
     
     def _extract_complexity_features(self, code: str) -> CodeComplexityFeatures:
-        """Trích xuất features về complexity"""
+        # NOTE: Trích xuất features về complexity
         features = CodeComplexityFeatures()
         
         lines = code.splitlines()
         code_lines = [l for l in lines if l.strip() and not l.strip().startswith('//')]
         comment_lines = [l for l in lines if l.strip().startswith('//') or '/*' in l]
         
-        # Code to comment ratio
+        # NOTE: Tỷ lệ code to comment
         if comment_lines:
             features.code_to_comment_ratio = len(code_lines) / len(comment_lines)
         else:
-            # Use a high but finite value instead of infinity to avoid ML training issues
+            # NOTE: Sử dụng một giá trị cao nhưng hữu hạn để tránh vấn đề với ML training
             features.code_to_comment_ratio = 999.0 if code_lines else 0
         
-        # Simplified Halstead complexity
         operators = re.findall(r'[+\-*/=<>!&|]+', code)
-        operands = re.findall(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', code)  # FIXED REGEX
+        operands = re.findall(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', code)
         
         unique_operators = len(set(operators))
         unique_operands = len(set(operands))
@@ -355,7 +343,6 @@ class AdvancedFeatureExtractor:
             if vocabulary > 0 and length > 0:
                 features.halstead_complexity = length * math.log2(vocabulary)
         
-        # Cognitive complexity (simplified)
         nesting_score = 0
         current_depth = 0
         
@@ -369,27 +356,26 @@ class AdvancedFeatureExtractor:
         
         features.cognitive_complexity = nesting_score
         
-        # Maintainability index (simplified)
         if features.halstead_complexity > 0 and len(code_lines) > 0:
             features.maintainability_index = max(0, 171 - 5.2 * math.log(features.halstead_complexity) - 0.23 * 1 - 16.2 * math.log(len(code_lines)))
         
         return features
     
     def _extract_ai_pattern_features(self, code: str) -> AIPatternFeatures:
-        """Trích xuất features đặc trưng của AI-generated code"""
+        # NOTE: Trích xuất features đặc trưng của AI-generated code
         features = AIPatternFeatures()
         
         lines = code.splitlines()
         code_content = ' '.join(lines)
         
-        # Template usage score
+        # NOTE: Điểm sử dụng template
         template_matches = 0
         for pattern in self.template_patterns:
             template_matches += len(re.findall(pattern, code, re.IGNORECASE))
         
         features.template_usage_score = template_matches / len(lines) if lines else 0
         
-        # Boilerplate ratio
+        # NOTE: Tỷ lệ boilerplate
         boilerplate_lines = 0
         for line in lines:
             line = line.strip()
@@ -401,7 +387,7 @@ class AdvancedFeatureExtractor:
         
         features.boilerplate_ratio = boilerplate_lines / len(lines) if lines else 0
         
-        # Error handling score
+        # NOTE: Điểm xử lý lỗi
         error_patterns = ['if', '!=', 'NULL', 'errno', 'error', 'exception', 'try', 'catch']
         error_score = 0
         
@@ -410,7 +396,7 @@ class AdvancedFeatureExtractor:
         
         features.error_handling_score = error_score / len(lines) if lines else 0
         
-        # Defensive programming score
+        # NOTE: Điểm defensive programming
         defensive_patterns = ['assert', 'check', 'validate', 'verify', 'bounds']
         defensive_score = 0
         
@@ -419,70 +405,9 @@ class AdvancedFeatureExtractor:
         
         features.defensive_programming_score = defensive_score / len(lines) if lines else 0
         
-        # Over-engineering score (too many functions for simple tasks) - FIXED REGEX
+        # NOTE: Điểm over-engineering (quá nhiều hàm cho các tác vụ đơn giản)
         function_count = len(re.findall(r'\b(?:int|void|float|double|char|string|bool)\s+\w+\s*\(', code))
-        if function_count > 1 and len(lines) < 50:  # Many functions in short code
+        if function_count > 1 and len(lines) < 50:  # NOTE: Nhiều hàm trong code ngắn
             features.over_engineering_score = function_count / len(lines)
         
         return features
-
-# Test and utility functions
-def analyze_sample_codes():
-    """Test function để so sánh AI vs Human code"""
-    extractor = AdvancedFeatureExtractor()
-    
-    ai_code = '''#include <stdio.h>
-#include <stdlib.h>
-
-// Function to calculate the sum of two numbers
-int calculateSum(int firstNumber, int secondNumber) {
-    // Return the sum of both parameters
-    return firstNumber + secondNumber;
-}
-
-int main() {
-    int userInput1, userInput2;
-    int resultSum;
-    
-    // Get input from user
-    printf("Enter first number: ");
-    scanf("%d", &userInput1);
-    
-    printf("Enter second number: ");
-    scanf("%d", &userInput2);
-    
-    // Calculate the sum
-    resultSum = calculateSum(userInput1, userInput2);
-    
-    // Display the result
-    printf("The sum is: %d\\n", resultSum);
-    
-    return 0;
-}'''
-
-    human_code = '''#include <stdio.h>
-int main() {
-    int a, b;
-    scanf("%d %d", &a, &b);
-    printf("%d", a + b);
-    return 0;
-}'''
-    
-    print("=== AI Code Analysis ===")
-    ai_features = extractor.extract_all_features(ai_code)
-    print(f"LOC: {ai_features.loc}")
-    print(f"Comment ratio: {ai_features.comment_ratio:.3f}")
-    if ai_features.naming_patterns:
-        print(f"Descriptive variables: {ai_features.naming_patterns.descriptive_var_ratio:.3f}")
-    if ai_features.ai_patterns:
-        print(f"Template usage: {ai_features.ai_patterns.template_usage_score:.3f}")
-    
-    print("\\n=== Human Code Analysis ===")
-    human_features = extractor.extract_all_features(human_code)
-    print(f"LOC: {human_features.loc}")
-    print(f"Comment ratio: {human_features.comment_ratio:.3f}")
-    if human_features.naming_patterns:
-        print(f"Generic variables: {human_features.naming_patterns.generic_var_ratio:.3f}")
-
-if __name__ == "__main__":
-    analyze_sample_codes()

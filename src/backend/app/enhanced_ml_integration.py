@@ -1,35 +1,31 @@
 import sys
-import os
 import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
-import tempfile
-import pickle
 
-# NOTE: Thêm src/src vào path để import ML components
 current_dir = Path(__file__).parent
 src_src_path = current_dir.parent.parent / "src"
 sys.path.append(str(src_src_path))
 
+from .basic_analysis import basic_analyze_code_features, basic_detect_ai_code
+
+# NOTE: Kiểm tra features và detectors
 try:
     from features.advanced_features import AdvancedFeatureExtractor, ComprehensiveFeatures
-    # Import only the heuristic detector
     from features.detection_models import create_detector, DetectionResult
-    HAS_ENHANCED_ML = True
-    print("✅ Enhanced static components imported successfully")
+    HAS_ADVANCED_FEATURES = True
 except ImportError as e:
-    HAS_ENHANCED_ML = False
-    print(f"⚠️  Enhanced static components not available: {e}")
+    HAS_ADVANCED_FEATURES = False
 
-# Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class EnhancedMLAnalyzer:
-    # NOTE: Enhanced ML Analyzer với toàn bộ các đặc trưng được trích xuất + các detectors
-    
+    # NOTE: Phân tích với toàn bộ các feat được trích xuất và các detectors
+    # NOTE: Nếu không có features, sẽ fallback về basic analysis
+
     def __init__(self, model_path: Optional[str] = None):
-        self.has_enhanced_features = HAS_ENHANCED_ML
+        self.has_enhanced_features = HAS_ADVANCED_FEATURES
         
         if self.has_enhanced_features:
             self.feature_extractor = AdvancedFeatureExtractor()
@@ -37,20 +33,18 @@ class EnhancedMLAnalyzer:
             self.detectors = {}
             self._initialize_detectors(model_path)
         else:
-            logger.warning("Enhanced ML features not available - using basic analysis only")
+            logger.warning("Không có công cụ phân tích nâng cao - sử dụng phân tích cơ bản")
     
     def _initialize_detectors(self, model_path: Optional[str] = None):        
-        # Initialize only heuristic/static detector
         try:
             self.detectors['heuristic'] = create_detector("heuristic")
-            logger.info("✅ Heuristic static detector initialized")
+            logger.info("Sử dụng detector heuristic")
         except Exception as e:
-            logger.error(f"Failed to initialize heuristic detector: {e}")
+            logger.error(f"Không thể khởi tạo detector heuristic: {e}")
     
     def analyze_code_comprehensive(self, code: str, language: str = "cpp", 
                                  filename: Optional[str] = None,
                                  detector_type: str = "heuristic") -> Dict[str, Any]:
-        # NOTE: Phân tích code với enhanced features và detection
         
         if not self.has_enhanced_features:
             # NOTE: Fallback sử dụng phân tích cơ bản
@@ -65,7 +59,6 @@ class EnhancedMLAnalyzer:
             # NOTE: Chuyển đổi features sang dict để detection
             feature_dict = features.to_dict()
             
-            # NOTE: Chạy detection với detector đã chọn (heuristic)
             detection_start = self._get_time()
             detection_result = self._run_detection(feature_dict, detector_type)
             detection_time = self._get_time() - detection_start
@@ -113,7 +106,7 @@ class EnhancedMLAnalyzer:
             return response
             
         except Exception as e:
-            logger.error(f"Enhanced analysis failed: {e}")
+            logger.error(f"Phân tích không thành công: {e}")
             return self._basic_analysis_fallback(code, language, error=str(e))
     
     def _run_detection(self, features: Dict[str, Any], detector_type: str) -> DetectionResult:
@@ -122,33 +115,21 @@ class EnhancedMLAnalyzer:
         detector = self.detectors.get(detector_type)
         
         if not detector:
-            # NOTE: Fallback: always use heuristic detector
+            # NOTE: Fallback: sử dụng detector heuristic
             if self.detectors:
                 detector = self.detectors.get('heuristic') or next(iter(self.detectors.values()))
-                logger.warning("Requested detector not available, using heuristic")
+                logger.warning("Không tồn tại detector này, sử dụng detector mặc định - heuristic")
             else:
-                raise ValueError("No detectors available")
+                raise ValueError("Không tìm thấy detector nào")
         
-        # Run detection
         result = detector.detect(features)
         return result
     
     def _basic_analysis_fallback(self, code: str, language: str, error: Optional[str] = None) -> Dict[str, Any]:
         # NOTE: Fallback sử dụng phân tích cơ bản
-        
-        lines = code.splitlines()
-        
-        basic_features = {
-            'loc': len(lines),
-            'comment_ratio': len([l for l in lines if l.strip().startswith('//')]) / len(lines) if lines else 0,
-            'blank_ratio': len([l for l in lines if not l.strip()]) / len(lines) if lines else 0,
-            'token_count': None,
-            'cyclomatic_complexity': None,
-            'functions': None
-        }
-        
-        detection = self._simple_rule_detection(basic_features, code)
-        
+        basic_features = basic_analyze_code_features(code)
+        detection = basic_detect_ai_code(code, basic_features)
+
         return {
             'basic_features': basic_features,
             'enhanced_features': None,
@@ -163,47 +144,8 @@ class EnhancedMLAnalyzer:
                 'detector_type': 'fallback',
                 'available_detectors': [],
                 'feature_count': len(basic_features),
-                'fallback_reason': error or "Enhanced features not available"
+                'fallback_reason': error or "Không có công cụ phân tích nâng cao"
             }
-        }
-    
-    def _simple_rule_detection(self, features: Dict[str, Any], code: str) -> Dict[str, Any]:        
-        score = 0.0
-        reasoning = []
-        
-        if features['comment_ratio'] > 0.15:
-            score += 0.3
-            reasoning.append("High comment ratio (AI tendency)")
-        
-        import re
-        descriptive_names = len(re.findall(r'\\b[a-zA-Z][a-zA-Z0-9]*[A-Z][a-zA-Z0-9]*\\b', code))
-        if descriptive_names > 3:
-            score += 0.2
-            reasoning.append("Descriptive variable names")
-        
-        if '#include' in code and 'int main()' in code and 'return 0' in code:
-            score += 0.2
-            reasoning.append("Standard template usage")
-        
-        if features['loc'] < 20:
-            score -= 0.2
-            reasoning.append("Short code (human tendency)")
-        
-        if score > 0.5:
-            prediction = "AI-generated"
-            confidence = min(0.95, score)
-        elif score < 0.3:
-            prediction = "Human-written"
-            confidence = min(0.95, 1.0 - score)
-        else:
-            prediction = "Uncertain"
-            confidence = 0.5
-        
-        return {
-            'prediction': prediction,
-            'confidence': round(confidence, 3),
-            'reasoning': reasoning[:3],
-            'method_used': 'simple-rule-fallback'
         }
     
     def get_detector_info(self) -> Dict[str, Any]:
@@ -234,7 +176,7 @@ class EnhancedMLAnalyzer:
                 result = self.analyze_code_comprehensive(code, language, detector_type=detector_type)
                 results.append(result)
             except Exception as e:
-                logger.error(f"Batch analysis error: {e}")
+                logger.error(f"Lỗi phân tích batch: {e}")
                 results.append({
                     'error': str(e),
                     'code_length': len(code),
@@ -244,7 +186,6 @@ class EnhancedMLAnalyzer:
         return results
     
     def _get_time(self) -> float:
-        """Get current time for performance measurement"""
         import time
         return time.time()
 
@@ -252,7 +193,6 @@ class EnhancedMLAnalyzer:
 enhanced_analyzer = None
 
 def get_enhanced_analyzer(model_path: Optional[str] = None) -> EnhancedMLAnalyzer:
-    """Get global enhanced analyzer instance"""
     global enhanced_analyzer
     
     if enhanced_analyzer is None:
@@ -264,58 +204,6 @@ def analyze_code_with_enhanced_ml(code: str, language: str = "cpp",
                                 filename: Optional[str] = None,
                                 detector_type: str = "heuristic",
                                 model_path: Optional[str] = None) -> Dict[str, Any]:
-    """
-    Convenience function cho enhanced code analysis
-    """
+    
     analyzer = get_enhanced_analyzer(model_path)
     return analyzer.analyze_code_comprehensive(code, language, filename, detector_type)
-
-
-def test_enhanced_integration():
-    """Test function để verify enhanced integration"""
-    
-    test_code = '''#include <stdio.h>
-#include <stdlib.h>
-
-// Function to calculate the sum of two numbers
-int calculateSum(int firstNumber, int secondNumber) {
-    // Return the sum of both parameters
-    return firstNumber + secondNumber;
-}
-
-int main() {
-    int userInput1, userInput2;
-    int resultSum;
-    
-    // Get input from user
-    printf("Enter first number: ");
-    scanf("%d", &userInput1);
-    
-    printf("Enter second number: ");
-    scanf("%d", &userInput2);
-    
-    // Calculate the sum
-    resultSum = calculateSum(userInput1, userInput2);
-    
-    // Display the result
-    printf("The sum is: %d\\n", resultSum);
-    
-    return 0;
-}'''
-    
-    print("🧪 Testing Enhanced ML Integration...")
-    
-    # Test basic analysis
-    result = analyze_code_with_enhanced_ml(test_code, "cpp")
-    
-    print(f"✅ Analysis completed:")
-    print(f"   Enhanced features: {result['meta']['enhanced_analysis']}")
-    print(f"   Prediction: {result['detection']['prediction']}")
-    print(f"   Confidence: {result['detection']['confidence']}")
-    print(f"   Method: {result['detection']['method_used']}")
-    print(f"   Processing time: {result['performance']['total_time']}s")
-    
-    return result
-
-if __name__ == "__main__":
-    test_enhanced_integration()

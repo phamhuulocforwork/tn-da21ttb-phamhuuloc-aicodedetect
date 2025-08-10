@@ -1,26 +1,17 @@
-"""
-Heuristic/static Detection Models for AI Code Detection
-Chỉ sử dụng heuristic scoring + AST/style metrics (không ML/hybrid)
-"""
-
 from typing import Dict, List, Tuple, Optional, Any
 from dataclasses import dataclass
 from pathlib import Path
 import pickle
 from abc import ABC, abstractmethod
 
-# ML dependencies removed
-
 try:
     from .advanced_features import AdvancedFeatureExtractor, ComprehensiveFeatures
     HAS_ADVANCED_FEATURES = True
 except ImportError:
     HAS_ADVANCED_FEATURES = False
-    print("Warning: Advanced features not available.")
 
 @dataclass 
 class DetectionResult:
-    """Kết quả phát hiện"""
     prediction: str  # "AI-generated" | "Human-written" | "Uncertain"
     confidence: float  # 0.0 - 1.0
     reasoning: List[str]
@@ -28,7 +19,7 @@ class DetectionResult:
     method_used: str  # "heuristic-static"
 
 class BaseDetector(ABC):
-    """Base class cho các detector"""
+    # NOTE: Base class cho các detector
     
     @abstractmethod
     def detect(self, features: Dict[str, Any]) -> DetectionResult:
@@ -39,19 +30,12 @@ class BaseDetector(ABC):
         pass
 
 class HeuristicScoringDetector(BaseDetector):
-    """
-    Heuristics-based static detector.
-    - Aggregates multi-feature static signals (AST + style + naming + redundancy)
-    - Produces a continuous score in [0, 1]
-    - No ML dependency
-    """
-
     def __init__(self):
-        # Feature weights for AI-leaning (positive) and Human-leaning (negative)
-        # The sum of absolute weights is <= 1.0 to keep score stable.
+        # NOTE: Feature weights cho AI-leaning (positive) và Human-leaning (negative)
+        # NOTE: Tổng các trọng số tuyệt đối <= 1.0 để giữ điểm ổn định
         self.ai_feature_weights = {
             # Basic/style
-            'comment_ratio': 0.10,  # High comment ratio → AI tendency
+            'comment_ratio': 0.10,  # Tỷ lệ comment cao → AI-generated
             'ast_indentation_consistency': 0.08,
             'naming_naming_consistency_score': 0.07,
 
@@ -60,51 +44,48 @@ class HeuristicScoringDetector(BaseDetector):
             'ai_pattern_boilerplate_ratio': 0.08,
             'ai_pattern_error_handling_score': 0.06,
 
-            # Redundancy
+            # Redundancy (copy-paste)
             'redundancy_copy_paste_score': 0.08,
             'redundancy_duplicate_line_ratio': 0.05,
 
             # Structure/complexity
-            'low_cyclomatic_complexity': 0.06,  # derived from cyclomatic_complexity
-            'function_density': 0.04,           # derived: functions / max(loc, 1)
+            'low_cyclomatic_complexity': 0.06,  # Từ cyclomatic_complexity
+            'function_density': 0.04,           # Từ functions / max(loc, 1)
         }
 
         self.human_feature_weights = {
-            'short_loc': 0.07,                       # derived from loc
+            'short_loc': 0.07,                       # Từ loc
             'naming_generic_var_ratio': 0.10,
-            'ast_operator_spacing_inconsistency': 0.05,  # derived from ast_operator_spacing_consistency
-            'ast_single_char_vars_density': 0.06,        # derived from ast_single_char_vars / max(variable_count, 1)
+            'ast_operator_spacing_inconsistency': 0.05,  # Từ ast_operator_spacing_consistency
+            'ast_single_char_vars_density': 0.06,        # Từ ast_single_char_vars / max(variable_count, 1)
         }
 
         self.ai_threshold = 0.60
         self.human_threshold = 0.40
 
-    # -------------------------- helpers --------------------------
     @staticmethod
     def _clamp(value: float, low: float = 0.0, high: float = 1.0) -> float:
         return max(low, min(high, value))
 
     @staticmethod
     def _normalize_high(value: float, low: float, high: float) -> float:
-        """Normalize where higher values imply stronger signal."""
+        # NOTE: Chuẩn hóa giá trị cao hơn
         if high <= low:
             return 0.0
         return HeuristicScoringDetector._clamp((value - low) / (high - low))
 
     @staticmethod
     def _normalize_low(value: float, low: float, high: float) -> float:
-        """Normalize where lower values imply stronger signal (invert)."""
+        # NOTE: Chuẩn hóa giá trị thấp hơn
         if high <= low:
             return 0.0
         return HeuristicScoringDetector._clamp((high - value) / (high - low))
 
-    # -------------------------- scoring --------------------------
     def detect(self, features: Dict[str, Any]) -> DetectionResult:
-        """Compute heuristic score and final prediction."""
+        # NOTE: Tính toán điểm heuristic -> đưa ra dự đoán
         contributions: Dict[str, float] = {}
         reasons: List[str] = []
 
-        # Positive contributions (AI-leaning)
         def add_ai(name: str, score: float, desc: str):
             if score <= 0:
                 return
@@ -113,7 +94,6 @@ class HeuristicScoringDetector(BaseDetector):
             contributions[name] = contrib
             reasons.append(f"{desc} (+{contrib:.3f})")
 
-        # Negative contributions (Human-leaning)
         def add_human(name: str, score: float, desc: str):
             if score <= 0:
                 return
@@ -122,7 +102,7 @@ class HeuristicScoringDetector(BaseDetector):
             contributions[name] = -contrib
             reasons.append(f"{desc} (-{contrib:.3f})")
 
-        # Fetch raw metrics with safe defaults
+        # NOTE: Lấy các metrics raw với giá trị mặc định an toàn
         loc = float(features.get('loc', 0) or 0)
         functions = float(features.get('functions', 0) or 0)
         cyclomatic = float(features.get('cyclomatic_complexity', features.get('cyclomatic_avg', 0) or 0))
@@ -144,40 +124,39 @@ class HeuristicScoringDetector(BaseDetector):
         ast_single_char_vars = float(features.get('ast_single_char_vars', 0) or 0)
         ast_variable_count = float(features.get('ast_variable_count', features.get('variable_count', 0) or 0))
 
-        # Derived metrics
-        function_density = functions / max(loc, 1.0)  # higher density in short code can be AI-ish
+        # NOTE: Các metrics dẫn xuất
+        function_density = functions / max(loc, 1.0)  # NOTE: Mật độ cao hơn trong code ngắn thì có thể là AI-generated
 
-        # Normalize and add AI-leaning signals
-        add_ai('comment_ratio', self._normalize_high(comment_ratio, 0.10, 0.35), 'High comment ratio')
-        add_ai('ast_indentation_consistency', self._normalize_high(indentation_consistency, 0.6, 1.0), 'Consistent indentation style')
-        add_ai('naming_naming_consistency_score', self._normalize_high(naming_consistency, 0.5, 1.0), 'Consistent naming style')
+        add_ai('comment_ratio', self._normalize_high(comment_ratio, 0.10, 0.35), 'Tỷ lệ comment cao')
+        add_ai('ast_indentation_consistency', self._normalize_high(indentation_consistency, 0.6, 1.0), 'Cách thụt lề nhất quán')
+        add_ai('naming_naming_consistency_score', self._normalize_high(naming_consistency, 0.5, 1.0), 'Cách đặt tên nhất quán')
 
-        add_ai('ai_pattern_template_usage_score', self._normalize_high(template_usage, 0.05, 0.30), 'Template/boilerplate patterns present')
-        add_ai('ai_pattern_boilerplate_ratio', self._normalize_high(boilerplate_ratio, 0.05, 0.30), 'High boilerplate ratio')
-        add_ai('ai_pattern_error_handling_score', self._normalize_high(error_handling_score, 0.02, 0.20), 'Explicit error-handling patterns')
+        add_ai('ai_pattern_template_usage_score', self._normalize_high(template_usage, 0.05, 0.30), 'Tồn tại các mẫu/template/boilerplate')
+        add_ai('ai_pattern_boilerplate_ratio', self._normalize_high(boilerplate_ratio, 0.05, 0.30), 'Tỷ lệ boilerplate cao')
+        add_ai('ai_pattern_error_handling_score', self._normalize_high(error_handling_score, 0.02, 0.20), 'Có mẫu xử lý lỗi rõ ràng')
 
-        add_ai('redundancy_copy_paste_score', self._normalize_high(copy_paste_score, 0.05, 0.40), 'Copy-paste repetition detected')
-        add_ai('redundancy_duplicate_line_ratio', self._normalize_high(duplicate_line_ratio, 0.02, 0.25), 'Duplicate lines present')
+        add_ai('redundancy_copy_paste_score', self._normalize_high(copy_paste_score, 0.05, 0.40), 'Có lặp lại copy-paste')
+        add_ai('redundancy_duplicate_line_ratio', self._normalize_high(duplicate_line_ratio, 0.02, 0.25), 'Có dòng trùng lặp')
 
-        # Lower cyclomatic complexity → AI-leaning
-        add_ai('low_cyclomatic_complexity', self._normalize_low(cyclomatic, 1.0, 6.0), 'Low cyclomatic complexity')
+        # NOTE: Độ phức tạp của code → AI-generated
+        add_ai('low_cyclomatic_complexity', self._normalize_low(cyclomatic, 1.0, 6.0), 'Độ phức tạp cyclomatic thấp')
 
-        # More functions per LOC in short code → AI-leaning
-        add_ai('function_density', self._normalize_high(function_density, 0.02, 0.12), 'High function density for code length')
+        # NOTE: Nhiều hàm trên mỗi LOC trong code ngắn → AI-generated
+        add_ai('function_density', self._normalize_high(function_density, 0.02, 0.12), 'Mật độ hàm cao so với độ dài code')
 
-        # Normalize and add Human-leaning signals
-        add_human('short_loc', self._normalize_low(loc, 20.0, 80.0), 'Very short code')
-        add_human('naming_generic_var_ratio', self._normalize_high(naming_generic_ratio, 0.20, 0.70), 'Generic variable names')
+        # NOTE: Chuẩn hóa và thêm tín hiệu nghiêng về code của người viết
+        add_human('short_loc', self._normalize_low(loc, 20.0, 80.0), 'Code rất ngắn')
+        add_human('naming_generic_var_ratio', self._normalize_high(naming_generic_ratio, 0.20, 0.70), 'Tên biến chung chung')
 
-        # Operator spacing inconsistency (invert consistency)
+        # NOTE: Không nhất quán khoảng cách toán tử (đảo ngược tính nhất quán)  
         op_inconsistency = self._clamp(1.0 - operator_spacing_consistency)
-        add_human('ast_operator_spacing_inconsistency', self._normalize_high(op_inconsistency, 0.20, 0.80), 'Inconsistent operator spacing')
+        add_human('ast_operator_spacing_inconsistency', self._normalize_high(op_inconsistency, 0.20, 0.80), 'Khoảng cách toán tử không nhất quán')
 
-        # Single-char var density
+        # NOTE: Mật độ biến ký tự đơn
         scv_density = ast_single_char_vars / max(ast_variable_count, 1.0)
-        add_human('ast_single_char_vars_density', self._normalize_high(scv_density, 0.10, 0.50), 'High single-character variable usage')
+        add_human('ast_single_char_vars_density', self._normalize_high(scv_density, 0.10, 0.50), 'Sử dụng biến ký tự đơn cao')
 
-        # Aggregate score around 0.5 baseline
+        # NOTE: Tổng hợp điểm xung quanh mốc 0.5
         total = 0.5
         for k, v in contributions.items():
             total += v
@@ -193,15 +172,15 @@ class HeuristicScoringDetector(BaseDetector):
             prediction = "Uncertain"
             confidence = 0.5
 
-        # Sort reasons by absolute contribution and keep top 6
+        # NOTE: Sắp xếp lý do theo đóng góp tuyệt đối và giữ lại top 6
         sorted_items = sorted(contributions.items(), key=lambda x: abs(x[1]), reverse=True)
         top_keys = set(k for k, _ in sorted_items[:6])
         filtered_reasons = [r for r in reasons if any(r.startswith(lbl) for lbl in [
-            'High comment ratio', 'Consistent indentation style', 'Consistent naming style',
-            'Template/boilerplate patterns present', 'High boilerplate ratio', 'Explicit error-handling patterns',
-            'Copy-paste repetition detected', 'Duplicate lines present', 'Low cyclomatic complexity',
-            'High function density for code length', 'Very short code', 'Generic variable names',
-            'Inconsistent operator spacing', 'High single-character variable usage'])]
+            'Tỷ lệ comment cao', 'Cách thụt lề nhất quán', 'Cách đặt tên nhất quán',
+            'Tồn tại các mẫu/template/boilerplate', 'Tỷ lệ boilerplate cao', 'Có mẫu xử lý lỗi rõ ràng',
+            'Có lặp lại copy-paste', 'Có dòng trùng lặp', 'Độ phức tạp cyclomatic thấp',
+            'Mật độ hàm cao so với độ dài code', 'Code rất ngắn', 'Tên biến chung chung',
+            'Khoảng cách toán tử không nhất quán', 'Sử dụng biến ký tự đơn cao'])]
 
         feature_importance = {k: round(abs(v), 4) for k, v in contributions.items() if k in top_keys}
 
@@ -216,43 +195,10 @@ class HeuristicScoringDetector(BaseDetector):
     def get_name(self) -> str:
         return "Heuristic Scoring Detector"
 
-# ML/Hybrid detectors removed
-
-# Factory function
 def create_detector(detector_type: str = "heuristic", model_path: Optional[str] = None) -> BaseDetector:
-    """
-    Factory function để tạo detector
-    """
-    # Map legacy names to heuristic detector
-    if detector_type in ("heuristic", "rule", "rule-based", "static"):
+    # NOTE: Factory function để tạo detector
+    # NOTE: Map legacy names to heuristic detector
+    if detector_type in ("heuristic"):
         return HeuristicScoringDetector()
-    elif detector_type == "ml":
-        raise ValueError("ML detector removed from codebase")
-    elif detector_type == "hybrid":
-        raise ValueError("Hybrid detector removed from codebase")
     else:
         raise ValueError(f"Unknown detector type: {detector_type}")
-
-# Example usage and testing
-if __name__ == "__main__":
-    # Test với sample features
-    sample_features = {
-        'loc': 25,
-        'comment_ratio': 0.2,
-        'naming_descriptive_var_ratio': 0.8,
-        'ast_indentation_consistency': 0.9,
-        'ai_pattern_template_usage_score': 0.4,
-        'ai_pattern_error_handling_score': 0.15,
-        'cyclomatic_complexity': 2.5,
-        'functions': 2
-    }
-    
-    # Test rule-based detector
-    detector = create_detector("rule")
-    result = detector.detect(sample_features)
-    
-    print(f"Detector: {detector.get_name()}")
-    print(f"Prediction: {result.prediction}")
-    print(f"Confidence: {result.confidence}")
-    print(f"Reasoning: {result.reasoning[:3]}")
-    print(f"Method: {result.method_used}")

@@ -8,6 +8,9 @@ import os
 import sys
 from pathlib import Path
 
+# Shared basic analysis (fallback)
+from .basic_analysis import basic_analyze_code_features, basic_detect_ai_code
+
 # NOTE: Kiểm tra enhanced static analyzer (không còn ML integration cũ)
 try:
     from .enhanced_ml_integration import analyze_code_with_enhanced_ml, get_enhanced_analyzer
@@ -20,36 +23,7 @@ except ImportError:
         HAS_ENHANCED_ML = False
         print("Enhanced static analyzer not available - using basic fallback")
 
-# Basic fallback functions (in case enhanced analyzer not importable)
-def _basic_analyze_code_features(code: str, language: str, filename: Optional[str]) -> Dict:
-    lines = code.splitlines()
-    return {
-        "loc": len(lines),
-        "token_count": None,
-        "cyclomatic_avg": None,
-        "functions": None,
-        "comment_ratio": len([l for l in lines if l.strip().startswith('//')]) / len(lines) if lines else 0,
-        "blank_ratio": len([l for l in lines if not l.strip()]) / len(lines) if lines else 0,
-    }
-
-def _basic_detect_ai_code(code: str, features: Dict) -> tuple[str, float, list[str]]:
-    score = 0.0
-    reasons: list[str] = []
-    if features.get("comment_ratio", 0) > 0.15:
-        score += 0.3; reasons.append("High comment ratio (AI tendency)")
-    import re
-    descriptive_names = len(re.findall(r"\b[a-zA-Z][a-zA-Z0-9]*[A-Z][a-zA-Z0-9]*\b", code))
-    if descriptive_names > 3:
-        score += 0.2; reasons.append("Descriptive variable names")
-    if "#include" in code and "int main()" in code and "return 0" in code:
-        score += 0.2; reasons.append("Standard template usage")
-    if features.get("loc", 0) < 20:
-        score -= 0.2; reasons.append("Short code (human tendency)")
-    if score > 0.5:
-        return ("AI-generated", min(0.95, score), reasons[:3])
-    elif score < 0.3:
-        return ("Human-written", min(0.95, 1.0 - score), reasons[:3])
-    return ("Uncertain", 0.5, reasons[:3])
+# Basic fallback functions are provided by basic_analysis module
 
 app = FastAPI(
     title="AI Code Detection API",
@@ -226,26 +200,21 @@ async def analyze_code(request: CodeAnalysisRequest):
         # NOTE: Fallback to basic analysis
         else:
             # NOTE: Sử dụng phân tích cơ bản (fallback nội bộ)
-            features_dict = _basic_analyze_code_features(request.code, request.language, request.filename)
+            features_dict = basic_analyze_code_features(request.code)
             
             # NOTE: Chuyển đổi sang định dạng cơ bản
             basic_features = BasicCodeFeatures(
                 loc=features_dict.get("loc", 0),
                 token_count=features_dict.get("token_count"),
-                cyclomatic_complexity=features_dict.get("cyclomatic_avg"),
+                cyclomatic_complexity=features_dict.get("cyclomatic_complexity"),
                 functions=features_dict.get("functions"),
                 comment_ratio=features_dict.get("comment_ratio", 0),
                 blank_ratio=features_dict.get("blank_ratio", 0)
             )
             
-            prediction, confidence, reasoning = _basic_detect_ai_code(request.code, features_dict)
+            detection_dict = basic_detect_ai_code(request.code, features_dict)
             
-            detection = DetectionResult(
-                prediction=prediction,
-                confidence=confidence,
-                reasoning=reasoning,
-                method_used="heuristic-static"
-            )
+            detection = DetectionResult(**detection_dict)
             
             performance = PerformanceMetrics(
                 feature_extraction_time=0.001,
