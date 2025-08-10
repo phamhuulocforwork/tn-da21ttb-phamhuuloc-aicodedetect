@@ -23,18 +23,7 @@ dataset/**/*.xml
 dataset/**/*.yaml
 dataset/**/*.yml
 
-# ML Output and Model files
-ml_output/models/*.pkl
-ml_output/models/*.joblib
-ml_output/models/*.h5
-ml_output/models/*.pt
-ml_output/models/*.pth
-ml_output/models/*.onnx
-ml_output/models/*.tflite
-ml_output/features/feature_cache/
-ml_output/evaluation/temp/
-ml_output/comparison/temp/
-ml_output/features/cache/*.json
+# ML Output and Model files (removed from project)
 
 # Large dataset files
 *.csv

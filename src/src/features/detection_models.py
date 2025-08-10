@@ -1,26 +1,15 @@
 """
-Enhanced Detection Models for AI Code Detection
-Mô hình phát hiện nâng cao kết hợp rule-based và machine learning
+Heuristic/static Detection Models for AI Code Detection
+Chỉ sử dụng heuristic scoring + AST/style metrics (không ML/hybrid)
 """
 
-import numpy as np
-import json
 from typing import Dict, List, Tuple, Optional, Any
 from dataclasses import dataclass
 from pathlib import Path
 import pickle
 from abc import ABC, abstractmethod
 
-try:
-    from sklearn.ensemble import RandomForestClassifier
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.preprocessing import StandardScaler
-    from sklearn.model_selection import train_test_split
-    from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
-    HAS_SKLEARN = True
-except ImportError:
-    HAS_SKLEARN = False
-    print("Warning: scikit-learn not available. ML models disabled.")
+# ML dependencies removed
 
 try:
     from .advanced_features import AdvancedFeatureExtractor, ComprehensiveFeatures
@@ -36,7 +25,7 @@ class DetectionResult:
     confidence: float  # 0.0 - 1.0
     reasoning: List[str]
     feature_importance: Dict[str, float]
-    method_used: str  # "rule-based" | "ml" | "hybrid"
+    method_used: str  # "heuristic-static"
 
 class BaseDetector(ABC):
     """Base class cho các detector"""
@@ -49,435 +38,198 @@ class BaseDetector(ABC):
     def get_name(self) -> str:
         pass
 
-class EnhancedRuleBasedDetector(BaseDetector):
+class HeuristicScoringDetector(BaseDetector):
     """
-    Enhanced Rule-based Detector với sophisticated thresholds
+    Heuristics-based static detector.
+    - Aggregates multi-feature static signals (AST + style + naming + redundancy)
+    - Produces a continuous score in [0, 1]
+    - No ML dependency
     """
-    
+
     def __init__(self):
-        self.setup_rules()
-    
-    def setup_rules(self):
-        """Setup detection rules với weights và thresholds"""
-        
-        # AI Indicators (positive score = more likely AI)
-        self.ai_rules = {
-            # Basic features
-            'high_comment_ratio': {
-                'threshold': 0.15,
-                'weight': 0.2,
-                'description': 'Tỷ lệ comment cao (>15%)'
-            },
-            'descriptive_naming': {
-                'threshold': 0.6,
-                'weight': 0.25,
-                'description': 'Tên biến mô tả chi tiết'
-            },
-            'consistent_formatting': {
-                'threshold': 0.8,
-                'weight': 0.15,
-                'description': 'Formatting nhất quán'
-            },
-            'template_usage': {
-                'threshold': 0.3,
-                'weight': 0.2,
-                'description': 'Sử dụng template chuẩn'
-            },
-            'error_handling': {
-                'threshold': 0.1,
-                'weight': 0.15,
-                'description': 'Có error handling'
-            },
-            'boilerplate_code': {
-                'threshold': 0.2,
-                'weight': 0.1,
-                'description': 'Nhiều boilerplate code'
-            },
-            
-            # AST features
-            'low_complexity': {
-                'threshold': 3.0,
-                'weight': 0.1,
-                'description': 'Độ phức tạp thấp'
-            },
-            'structured_code': {
-                'threshold': 0.5,
-                'weight': 0.1,
-                'description': 'Code có cấu trúc tốt'
-            }
+        # Feature weights for AI-leaning (positive) and Human-leaning (negative)
+        # The sum of absolute weights is <= 1.0 to keep score stable.
+        self.ai_feature_weights = {
+            # Basic/style
+            'comment_ratio': 0.10,  # High comment ratio → AI tendency
+            'ast_indentation_consistency': 0.08,
+            'naming_naming_consistency_score': 0.07,
+
+            # AI patterns
+            'ai_pattern_template_usage_score': 0.12,
+            'ai_pattern_boilerplate_ratio': 0.08,
+            'ai_pattern_error_handling_score': 0.06,
+
+            # Redundancy
+            'redundancy_copy_paste_score': 0.08,
+            'redundancy_duplicate_line_ratio': 0.05,
+
+            # Structure/complexity
+            'low_cyclomatic_complexity': 0.06,  # derived from cyclomatic_complexity
+            'function_density': 0.04,           # derived: functions / max(loc, 1)
         }
-        
-        # Human Indicators (negative score = more likely Human)
-        self.human_rules = {
-            'short_code': {
-                'threshold': 30,
-                'weight': -0.15,
-                'description': 'Code ngắn (<30 LOC)'
-            },
-            'generic_variables': {
-                'threshold': 0.5,
-                'weight': -0.2,
-                'description': 'Nhiều biến generic (a,b,i,j)'
-            },
-            'minimal_comments': {
-                'threshold': 0.05,
-                'weight': -0.1,
-                'description': 'Ít comment (<5%)'
-            },
-            'inconsistent_style': {
-                'threshold': 0.3,
-                'weight': -0.15,
-                'description': 'Style không nhất quán'
-            },
-            'pragmatic_approach': {
-                'threshold': 0.7,
-                'weight': -0.1,
-                'description': 'Approach thực dụng'
-            }
+
+        self.human_feature_weights = {
+            'short_loc': 0.07,                       # derived from loc
+            'naming_generic_var_ratio': 0.10,
+            'ast_operator_spacing_inconsistency': 0.05,  # derived from ast_operator_spacing_consistency
+            'ast_single_char_vars_density': 0.06,        # derived from ast_single_char_vars / max(variable_count, 1)
         }
-        
-        # Thresholds for final decision
-        self.decision_thresholds = {
-            'ai_threshold': 0.6,      # > 0.6 = AI-generated
-            'human_threshold': 0.4,   # < 0.4 = Human-written
-            'uncertainty_zone': (0.4, 0.6)  # Between = Uncertain
-        }
-    
+
+        self.ai_threshold = 0.60
+        self.human_threshold = 0.40
+
+    # -------------------------- helpers --------------------------
+    @staticmethod
+    def _clamp(value: float, low: float = 0.0, high: float = 1.0) -> float:
+        return max(low, min(high, value))
+
+    @staticmethod
+    def _normalize_high(value: float, low: float, high: float) -> float:
+        """Normalize where higher values imply stronger signal."""
+        if high <= low:
+            return 0.0
+        return HeuristicScoringDetector._clamp((value - low) / (high - low))
+
+    @staticmethod
+    def _normalize_low(value: float, low: float, high: float) -> float:
+        """Normalize where lower values imply stronger signal (invert)."""
+        if high <= low:
+            return 0.0
+        return HeuristicScoringDetector._clamp((high - value) / (high - low))
+
+    # -------------------------- scoring --------------------------
     def detect(self, features: Dict[str, Any]) -> DetectionResult:
-        """
-        Phát hiện sử dụng enhanced rule-based approach
-        """
-        reasoning = []
-        feature_importance = {}
-        total_score = 0.0
-        
-        # Apply AI rules
-        for rule_name, rule_config in self.ai_rules.items():
-            score = self._evaluate_rule(rule_name, rule_config, features)
-            if score > 0:
-                total_score += score
-                feature_importance[rule_name] = score
-                reasoning.append(f"{rule_config['description']} (score: +{score:.3f})")
-        
-        # Apply Human rules  
-        for rule_name, rule_config in self.human_rules.items():
-            score = self._evaluate_rule(rule_name, rule_config, features)
-            if score < 0:
-                total_score += score
-                feature_importance[rule_name] = abs(score)
-                reasoning.append(f"{rule_config['description']} (score: {score:.3f})")
-        
-        # Normalize score to 0-1 range
-        normalized_score = max(0.0, min(1.0, (total_score + 1.0) / 2.0))
-        
-        # Make decision
-        if normalized_score > self.decision_thresholds['ai_threshold']:
+        """Compute heuristic score and final prediction."""
+        contributions: Dict[str, float] = {}
+        reasons: List[str] = []
+
+        # Positive contributions (AI-leaning)
+        def add_ai(name: str, score: float, desc: str):
+            if score <= 0:
+                return
+            weight = self.ai_feature_weights[name]
+            contrib = weight * score
+            contributions[name] = contrib
+            reasons.append(f"{desc} (+{contrib:.3f})")
+
+        # Negative contributions (Human-leaning)
+        def add_human(name: str, score: float, desc: str):
+            if score <= 0:
+                return
+            weight = self.human_feature_weights[name]
+            contrib = weight * score
+            contributions[name] = -contrib
+            reasons.append(f"{desc} (-{contrib:.3f})")
+
+        # Fetch raw metrics with safe defaults
+        loc = float(features.get('loc', 0) or 0)
+        functions = float(features.get('functions', 0) or 0)
+        cyclomatic = float(features.get('cyclomatic_complexity', features.get('cyclomatic_avg', 0) or 0))
+
+        comment_ratio = float(features.get('comment_ratio', 0) or 0)
+        indentation_consistency = float(features.get('ast_indentation_consistency', 0) or 0)
+        operator_spacing_consistency = float(features.get('ast_operator_spacing_consistency', 0) or 0)
+
+        naming_consistency = float(features.get('naming_naming_consistency_score', 0) or 0)
+        naming_generic_ratio = float(features.get('naming_generic_var_ratio', 0) or 0)
+
+        template_usage = float(features.get('ai_pattern_template_usage_score', 0) or 0)
+        boilerplate_ratio = float(features.get('ai_pattern_boilerplate_ratio', 0) or 0)
+        error_handling_score = float(features.get('ai_pattern_error_handling_score', 0) or 0)
+
+        copy_paste_score = float(features.get('redundancy_copy_paste_score', 0) or 0)
+        duplicate_line_ratio = float(features.get('redundancy_duplicate_line_ratio', 0) or 0)
+
+        ast_single_char_vars = float(features.get('ast_single_char_vars', 0) or 0)
+        ast_variable_count = float(features.get('ast_variable_count', features.get('variable_count', 0) or 0))
+
+        # Derived metrics
+        function_density = functions / max(loc, 1.0)  # higher density in short code can be AI-ish
+
+        # Normalize and add AI-leaning signals
+        add_ai('comment_ratio', self._normalize_high(comment_ratio, 0.10, 0.35), 'High comment ratio')
+        add_ai('ast_indentation_consistency', self._normalize_high(indentation_consistency, 0.6, 1.0), 'Consistent indentation style')
+        add_ai('naming_naming_consistency_score', self._normalize_high(naming_consistency, 0.5, 1.0), 'Consistent naming style')
+
+        add_ai('ai_pattern_template_usage_score', self._normalize_high(template_usage, 0.05, 0.30), 'Template/boilerplate patterns present')
+        add_ai('ai_pattern_boilerplate_ratio', self._normalize_high(boilerplate_ratio, 0.05, 0.30), 'High boilerplate ratio')
+        add_ai('ai_pattern_error_handling_score', self._normalize_high(error_handling_score, 0.02, 0.20), 'Explicit error-handling patterns')
+
+        add_ai('redundancy_copy_paste_score', self._normalize_high(copy_paste_score, 0.05, 0.40), 'Copy-paste repetition detected')
+        add_ai('redundancy_duplicate_line_ratio', self._normalize_high(duplicate_line_ratio, 0.02, 0.25), 'Duplicate lines present')
+
+        # Lower cyclomatic complexity → AI-leaning
+        add_ai('low_cyclomatic_complexity', self._normalize_low(cyclomatic, 1.0, 6.0), 'Low cyclomatic complexity')
+
+        # More functions per LOC in short code → AI-leaning
+        add_ai('function_density', self._normalize_high(function_density, 0.02, 0.12), 'High function density for code length')
+
+        # Normalize and add Human-leaning signals
+        add_human('short_loc', self._normalize_low(loc, 20.0, 80.0), 'Very short code')
+        add_human('naming_generic_var_ratio', self._normalize_high(naming_generic_ratio, 0.20, 0.70), 'Generic variable names')
+
+        # Operator spacing inconsistency (invert consistency)
+        op_inconsistency = self._clamp(1.0 - operator_spacing_consistency)
+        add_human('ast_operator_spacing_inconsistency', self._normalize_high(op_inconsistency, 0.20, 0.80), 'Inconsistent operator spacing')
+
+        # Single-char var density
+        scv_density = ast_single_char_vars / max(ast_variable_count, 1.0)
+        add_human('ast_single_char_vars_density', self._normalize_high(scv_density, 0.10, 0.50), 'High single-character variable usage')
+
+        # Aggregate score around 0.5 baseline
+        total = 0.5
+        for k, v in contributions.items():
+            total += v
+        total = self._clamp(total)
+
+        if total > self.ai_threshold:
             prediction = "AI-generated"
-            confidence = normalized_score
-        elif normalized_score < self.decision_thresholds['human_threshold']:
+            confidence = total
+        elif total < self.human_threshold:
             prediction = "Human-written"
-            confidence = 1.0 - normalized_score
+            confidence = 1.0 - total
         else:
             prediction = "Uncertain"
             confidence = 0.5
-            reasoning.append("Score in uncertainty zone - cần thêm analysis")
-        
+
+        # Sort reasons by absolute contribution and keep top 6
+        sorted_items = sorted(contributions.items(), key=lambda x: abs(x[1]), reverse=True)
+        top_keys = set(k for k, _ in sorted_items[:6])
+        filtered_reasons = [r for r in reasons if any(r.startswith(lbl) for lbl in [
+            'High comment ratio', 'Consistent indentation style', 'Consistent naming style',
+            'Template/boilerplate patterns present', 'High boilerplate ratio', 'Explicit error-handling patterns',
+            'Copy-paste repetition detected', 'Duplicate lines present', 'Low cyclomatic complexity',
+            'High function density for code length', 'Very short code', 'Generic variable names',
+            'Inconsistent operator spacing', 'High single-character variable usage'])]
+
+        feature_importance = {k: round(abs(v), 4) for k, v in contributions.items() if k in top_keys}
+
         return DetectionResult(
             prediction=prediction,
             confidence=round(confidence, 3),
-            reasoning=reasoning[:5],  # Top 5 reasons
+            reasoning=filtered_reasons[:6],
             feature_importance=feature_importance,
-            method_used="rule-based"
+            method_used="heuristic-static",
         )
-    
-    def _evaluate_rule(self, rule_name: str, rule_config: Dict, features: Dict) -> float:
-        """Evaluate a single rule"""
-        
-        # Basic feature rules
-        if rule_name == 'high_comment_ratio':
-            comment_ratio = features.get('comment_ratio', 0)
-            if comment_ratio > rule_config['threshold']:
-                return rule_config['weight']
-        
-        elif rule_name == 'descriptive_naming':
-            descriptive_ratio = features.get('naming_descriptive_var_ratio', 0)
-            if descriptive_ratio > rule_config['threshold']:
-                return rule_config['weight']
-        
-        elif rule_name == 'consistent_formatting':
-            consistency = features.get('ast_indentation_consistency', 0)
-            if consistency > rule_config['threshold']:
-                return rule_config['weight']
-        
-        elif rule_name == 'template_usage':
-            template_score = features.get('ai_pattern_template_usage_score', 0)
-            if template_score > rule_config['threshold']:
-                return rule_config['weight']
-        
-        elif rule_name == 'error_handling':
-            error_score = features.get('ai_pattern_error_handling_score', 0)
-            if error_score > rule_config['threshold']:
-                return rule_config['weight']
-        
-        elif rule_name == 'boilerplate_code':
-            boilerplate = features.get('ai_pattern_boilerplate_ratio', 0)
-            if boilerplate > rule_config['threshold']:
-                return rule_config['weight']
-        
-        elif rule_name == 'low_complexity':
-            complexity = features.get('cyclomatic_complexity', 10)
-            if complexity < rule_config['threshold']:
-                return rule_config['weight']
-        
-        elif rule_name == 'structured_code':
-            structure_score = features.get('ast_branching_factor', 0)
-            if structure_score > rule_config['threshold']:
-                return rule_config['weight']
-        
-        # Human indicator rules
-        elif rule_name == 'short_code':
-            loc = features.get('loc', 100)
-            if loc < rule_config['threshold']:
-                return rule_config['weight']
-        
-        elif rule_name == 'generic_variables':
-            generic_ratio = features.get('naming_generic_var_ratio', 0)
-            if generic_ratio > rule_config['threshold']:
-                return rule_config['weight']
-        
-        elif rule_name == 'minimal_comments':
-            comment_ratio = features.get('comment_ratio', 0)
-            if comment_ratio < rule_config['threshold']:
-                return rule_config['weight']
-        
-        elif rule_name == 'inconsistent_style':
-            consistency = features.get('ast_indentation_consistency', 1.0)
-            if consistency < rule_config['threshold']:
-                return rule_config['weight']
-        
-        elif rule_name == 'pragmatic_approach':
-            # Heuristic: short code với ít functions
-            loc = features.get('loc', 100)
-            functions = features.get('functions', 1)
-            if loc < 30 and functions <= 1:
-                return rule_config['weight']
-        
-        return 0.0
-    
-    def get_name(self) -> str:
-        return "Enhanced Rule-Based Detector"
 
-class MLDetector(BaseDetector):
-    """
-    Machine Learning Detector sử dụng Random Forest và Logistic Regression
-    """
-    
-    def __init__(self, model_path: Optional[str] = None):
-        self.models = {}
-        self.scalers = {}
-        self.feature_names = []
-        self.is_trained = False
-        
-        if model_path and Path(model_path).exists():
-            self.load_model(model_path)
-    
-    def train(self, X: np.ndarray, y: np.ndarray, feature_names: List[str]):
-        """
-        Train ML models
-        """
-        if not HAS_SKLEARN:
-            raise ValueError("scikit-learn not available for ML training")
-        
-        self.feature_names = feature_names
-        
-        # Split data
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        
-        # Scale features
-        self.scalers['scaler'] = StandardScaler()
-        X_train_scaled = self.scalers['scaler'].fit_transform(X_train)
-        X_test_scaled = self.scalers['scaler'].transform(X_test)
-        
-        # Train Random Forest
-        self.models['random_forest'] = RandomForestClassifier(
-            n_estimators=100,
-            max_depth=10,
-            random_state=42
-        )
-        self.models['random_forest'].fit(X_train_scaled, y_train)
-        
-        # Train Logistic Regression
-        self.models['logistic'] = LogisticRegression(random_state=42)
-        self.models['logistic'].fit(X_train_scaled, y_train)
-        
-        # Evaluate models
-        self._evaluate_models(X_test_scaled, y_test)
-        
-        self.is_trained = True
-    
-    def _evaluate_models(self, X_test: np.ndarray, y_test: np.ndarray):
-        """Evaluate trained models"""
-        for name, model in self.models.items():
-            y_pred = model.predict(X_test)
-            accuracy = accuracy_score(y_test, y_pred)
-            print(f"{name} accuracy: {accuracy:.3f}")
-    
-    def detect(self, features: Dict[str, Any]) -> DetectionResult:
-        """
-        Phát hiện sử dụng ML models
-        """
-        if not self.is_trained:
-            raise ValueError("Models not trained yet")
-        
-        # Convert features to array
-        feature_vector = np.array([features.get(name, 0) for name in self.feature_names]).reshape(1, -1)
-        feature_vector_scaled = self.scalers['scaler'].transform(feature_vector)
-        
-        # Get predictions from both models
-        rf_pred = self.models['random_forest'].predict(feature_vector_scaled)[0]
-        rf_proba = self.models['random_forest'].predict_proba(feature_vector_scaled)[0]
-        
-        lr_pred = self.models['logistic'].predict(feature_vector_scaled)[0]
-        lr_proba = self.models['logistic'].predict_proba(feature_vector_scaled)[0]
-        
-        # Ensemble prediction (average probabilities)
-        avg_proba = (rf_proba + lr_proba) / 2
-        final_pred = 1 if avg_proba[1] > 0.5 else 0
-        confidence = max(avg_proba)
-        
-        # Get feature importance
-        rf_importance = dict(zip(self.feature_names, self.models['random_forest'].feature_importances_))
-        top_features = sorted(rf_importance.items(), key=lambda x: x[1], reverse=True)[:5]
-        
-        prediction = "AI-generated" if final_pred == 1 else "Human-written"
-        reasoning = [f"Feature '{name}' importance: {score:.3f}" for name, score in top_features]
-        
-        return DetectionResult(
-            prediction=prediction,
-            confidence=round(confidence, 3),
-            reasoning=reasoning,
-            feature_importance=rf_importance,
-            method_used="ml"
-        )
-    
-    def save_model(self, path: str):
-        """Save trained models"""
-        model_data = {
-            'models': self.models,
-            'scalers': self.scalers,
-            'feature_names': self.feature_names,
-            'is_trained': self.is_trained
-        }
-        
-        with open(path, 'wb') as f:
-            pickle.dump(model_data, f)
-    
-    def load_model(self, path: str):
-        """Load trained models"""
-        with open(path, 'rb') as f:
-            model_data = pickle.load(f)
-        
-        self.models = model_data['models']
-        self.scalers = model_data['scalers']
-        self.feature_names = model_data['feature_names']
-        self.is_trained = model_data['is_trained']
-    
     def get_name(self) -> str:
-        return "ML Detector (Random Forest + Logistic Regression)"
+        return "Heuristic Scoring Detector"
 
-class HybridDetector(BaseDetector):
-    """
-    Hybrid Detector kết hợp rule-based và ML
-    """
-    
-    def __init__(self, ml_model_path: Optional[str] = None):
-        self.rule_detector = EnhancedRuleBasedDetector()
-        self.ml_detector = MLDetector(ml_model_path) if HAS_SKLEARN else None
-        self.use_ml = self.ml_detector and self.ml_detector.is_trained
-    
-    def detect(self, features: Dict[str, Any]) -> DetectionResult:
-        """
-        Phát hiện sử dụng hybrid approach
-        """
-        # Always get rule-based result
-        rule_result = self.rule_detector.detect(features)
-        
-        if not self.use_ml:
-            # Fallback to rule-based only
-            rule_result.method_used = "hybrid-rule-only"
-            return rule_result
-        
-        # Get ML result
-        ml_result = self.ml_detector.detect(features)
-        
-        # Combine results với weighted voting
-        rule_weight = 0.4
-        ml_weight = 0.6
-        
-        # Convert predictions to numeric scores
-        rule_score = self._prediction_to_score(rule_result.prediction, rule_result.confidence)
-        ml_score = self._prediction_to_score(ml_result.prediction, ml_result.confidence)
-        
-        # Weighted average
-        combined_score = rule_weight * rule_score + ml_weight * ml_score
-        
-        # Convert back to prediction
-        if combined_score > 0.6:
-            final_prediction = "AI-generated"
-            final_confidence = combined_score
-        elif combined_score < 0.4:
-            final_prediction = "Human-written"
-            final_confidence = 1.0 - combined_score
-        else:
-            final_prediction = "Uncertain"
-            final_confidence = 0.5
-        
-        # Combine reasoning
-        combined_reasoning = []
-        combined_reasoning.extend([f"Rule: {r}" for r in rule_result.reasoning[:3]])
-        combined_reasoning.extend([f"ML: {r}" for r in ml_result.reasoning[:2]])
-        
-        # Combine feature importance
-        combined_importance = {}
-        for feature, importance in rule_result.feature_importance.items():
-            combined_importance[f"rule_{feature}"] = importance * rule_weight
-        
-        for feature, importance in ml_result.feature_importance.items():
-            combined_importance[f"ml_{feature}"] = importance * ml_weight
-        
-        return DetectionResult(
-            prediction=final_prediction,
-            confidence=round(final_confidence, 3),
-            reasoning=combined_reasoning,
-            feature_importance=combined_importance,
-            method_used="hybrid"
-        )
-    
-    def _prediction_to_score(self, prediction: str, confidence: float) -> float:
-        """Convert prediction to numeric score (0=Human, 1=AI)"""
-        if prediction == "AI-generated":
-            return confidence
-        elif prediction == "Human-written":
-            return 1.0 - confidence
-        else:  # Uncertain
-            return 0.5
-    
-    def get_name(self) -> str:
-        return "Hybrid Detector (Rule-based + ML)"
+# ML/Hybrid detectors removed
 
 # Factory function
-def create_detector(detector_type: str = "hybrid", model_path: Optional[str] = None) -> BaseDetector:
+def create_detector(detector_type: str = "heuristic", model_path: Optional[str] = None) -> BaseDetector:
     """
     Factory function để tạo detector
     """
-    if detector_type == "rule":
-        return EnhancedRuleBasedDetector()
+    # Map legacy names to heuristic detector
+    if detector_type in ("heuristic", "rule", "rule-based", "static"):
+        return HeuristicScoringDetector()
     elif detector_type == "ml":
-        if not HAS_SKLEARN:
-            raise ValueError("scikit-learn not available for ML detector")
-        return MLDetector(model_path)
+        raise ValueError("ML detector removed from codebase")
     elif detector_type == "hybrid":
-        return HybridDetector(model_path)
+        raise ValueError("Hybrid detector removed from codebase")
     else:
         raise ValueError(f"Unknown detector type: {detector_type}")
 

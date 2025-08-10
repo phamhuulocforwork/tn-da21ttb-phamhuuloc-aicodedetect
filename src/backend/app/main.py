@@ -8,25 +8,52 @@ import os
 import sys
 from pathlib import Path
 
-# NOTE: Kiểm tra có enhanced ML không (nếu có thì sử dụng)
+# NOTE: Kiểm tra enhanced static analyzer (không còn ML integration cũ)
 try:
     from .enhanced_ml_integration import analyze_code_with_enhanced_ml, get_enhanced_analyzer
-    from .ml_integration import analyze_code_features, detect_ai_code, code_analyzer
     HAS_ENHANCED_ML = True
 except ImportError:
-    # NOTE: Fallback khi chạy như script hoặc chưa có enhanced ML
     try:
         from enhanced_ml_integration import analyze_code_with_enhanced_ml, get_enhanced_analyzer
-        from ml_integration import analyze_code_features, detect_ai_code, code_analyzer
         HAS_ENHANCED_ML = True
     except ImportError:
-        from ml_integration import analyze_code_features, detect_ai_code, code_analyzer
         HAS_ENHANCED_ML = False
-        print("Enhanced ML not available - using basic analysis")
+        print("Enhanced static analyzer not available - using basic fallback")
+
+# Basic fallback functions (in case enhanced analyzer not importable)
+def _basic_analyze_code_features(code: str, language: str, filename: Optional[str]) -> Dict:
+    lines = code.splitlines()
+    return {
+        "loc": len(lines),
+        "token_count": None,
+        "cyclomatic_avg": None,
+        "functions": None,
+        "comment_ratio": len([l for l in lines if l.strip().startswith('//')]) / len(lines) if lines else 0,
+        "blank_ratio": len([l for l in lines if not l.strip()]) / len(lines) if lines else 0,
+    }
+
+def _basic_detect_ai_code(code: str, features: Dict) -> tuple[str, float, list[str]]:
+    score = 0.0
+    reasons: list[str] = []
+    if features.get("comment_ratio", 0) > 0.15:
+        score += 0.3; reasons.append("High comment ratio (AI tendency)")
+    import re
+    descriptive_names = len(re.findall(r"\b[a-zA-Z][a-zA-Z0-9]*[A-Z][a-zA-Z0-9]*\b", code))
+    if descriptive_names > 3:
+        score += 0.2; reasons.append("Descriptive variable names")
+    if "#include" in code and "int main()" in code and "return 0" in code:
+        score += 0.2; reasons.append("Standard template usage")
+    if features.get("loc", 0) < 20:
+        score -= 0.2; reasons.append("Short code (human tendency)")
+    if score > 0.5:
+        return ("AI-generated", min(0.95, score), reasons[:3])
+    elif score < 0.3:
+        return ("Human-written", min(0.95, 1.0 - score), reasons[:3])
+    return ("Uncertain", 0.5, reasons[:3])
 
 app = FastAPI(
     title="AI Code Detection API",
-    description="API for detecting AI-generated code vs Human-written code with enhanced ML features",
+    description="API for detecting AI-generated code vs Human-written code with enhanced static analysis (no ML)",
     version="2.0.0"
 )
 
@@ -42,8 +69,8 @@ class CodeAnalysisRequest(BaseModel):
     code: str = Field(..., description="Source code để phân tích")
     language: str = Field(default="cpp", description="Ngôn ngữ lập trình (c, cpp)")
     filename: Optional[str] = Field(default=None, description="Tên file (tùy chọn)")
-    detector_type: str = Field(default="hybrid", description="Loại detector: rule, ml, hybrid")
-    enhanced_analysis: bool = Field(default=True, description="Sử dụng enhanced analysis")
+    detector_type: str = Field(default="heuristic", description="Loại detector: heuristic (mặc định)")
+    enhanced_analysis: bool = Field(default=True, description="Sử dụng enhanced static analysis (không ML)")
 
 class BasicCodeFeatures(BaseModel):
     loc: float = Field(description="Lines of Code")
@@ -106,29 +133,14 @@ class DetectorInfoResponse(BaseModel):
 
 start_time = time.time()
 
-def get_ml_model_path() -> Optional[str]:
-    # Tự động tìm đường dẫn đến mô hình ML từ src/src/ml_output/models/
-    try:
-        # Lấy đường dẫn hiện tại của backend
-        backend_dir = Path(__file__).parent.parent
-        # Di chuyển đến src/src/ml_output/models/
-        model_path = backend_dir.parent / "src" / "ml_output" / "models" / "ml_model.pkl"
-        
-        if model_path.exists():
-            return str(model_path)
-        else:
-            print(f"ML model not found at: {model_path}")
-            return None
-    except Exception as e:
-        print(f"Error detecting ML model path: {e}")
-        return None
+# Removed ML model path resolution (no ML in codebase)
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
     """
         API kiểm tra server
     """
-    ml_available = hasattr(code_analyzer, 'has_advanced_features') and code_analyzer.has_advanced_features if 'code_analyzer' in globals() else False
+    ml_available = HAS_ENHANCED_ML
     
     return HealthResponse(
         status="OK",
@@ -156,17 +168,17 @@ async def get_detector_info():
         API lấy thông tin của các detector
     """
     if HAS_ENHANCED_ML:
-        model_path = get_ml_model_path()
-        analyzer = get_enhanced_analyzer(model_path)
+        # ML is deprecated; create only heuristic detector info
+        analyzer = get_enhanced_analyzer(None)
         return analyzer.get_detector_info()
     else:
         return DetectorInfoResponse(
             enhanced_ml_available=False,
-            available_detectors=["basic-rule"],
+            available_detectors=["heuristic"],
             detector_details={
-                "basic-rule": {
-                    "name": "Basic Rule-based Detector",
-                    "type": "rule",
+                "heuristic": {
+                    "name": "Heuristic Scoring Detector",
+                    "type": "heuristic",
                     "available": True
                 }
             }
@@ -192,13 +204,12 @@ async def analyze_code(request: CodeAnalysisRequest):
             raise HTTPException(status_code=400, detail="Chỉ hỗ trợ ngôn ngữ C và C++")
         
         if request.enhanced_analysis and HAS_ENHANCED_ML:
-            model_path = get_ml_model_path()
             result = analyze_code_with_enhanced_ml(
                 code=request.code,
                 language=request.language,
                 filename=request.filename,
                 detector_type=request.detector_type,
-                model_path=model_path
+                model_path=None
             )
             
             # Trả đúng định dạng
@@ -214,8 +225,8 @@ async def analyze_code(request: CodeAnalysisRequest):
         
         # NOTE: Fallback to basic analysis
         else:
-            # NOTE: Sử dụng phân tích cơ bản
-            features_dict = analyze_code_features(request.code, request.language, request.filename)
+            # NOTE: Sử dụng phân tích cơ bản (fallback nội bộ)
+            features_dict = _basic_analyze_code_features(request.code, request.language, request.filename)
             
             # NOTE: Chuyển đổi sang định dạng cơ bản
             basic_features = BasicCodeFeatures(
@@ -227,13 +238,13 @@ async def analyze_code(request: CodeAnalysisRequest):
                 blank_ratio=features_dict.get("blank_ratio", 0)
             )
             
-            prediction, confidence, reasoning = detect_ai_code(request.code, features_dict)
+            prediction, confidence, reasoning = _basic_detect_ai_code(request.code, features_dict)
             
             detection = DetectionResult(
                 prediction=prediction,
                 confidence=confidence,
                 reasoning=reasoning,
-                method_used="basic-rule"
+                method_used="heuristic-static"
             )
             
             performance = PerformanceMetrics(
@@ -244,8 +255,8 @@ async def analyze_code(request: CodeAnalysisRequest):
             
             meta = AnalysisMetadata(
                 enhanced_analysis=False,
-                detector_type="basic-rule",
-                available_detectors=["basic-rule"],
+                detector_type="heuristic",
+                available_detectors=["heuristic"],
                 feature_count=len(features_dict),
                 fallback_reason="Enhanced ML not available or disabled"
             )
@@ -263,7 +274,7 @@ async def analyze_code(request: CodeAnalysisRequest):
 
 @app.post("/analyze-code/file")
 async def analyze_code_file(file: UploadFile = File(...), 
-                           detector_type: str = "hybrid",
+                           detector_type: str = "heuristic",
                            enhanced_analysis: bool = True):
     """
         API phân tích code từ file upload

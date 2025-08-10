@@ -13,12 +13,13 @@ sys.path.append(str(src_src_path))
 
 try:
     from features.advanced_features import AdvancedFeatureExtractor, ComprehensiveFeatures
+    # Import only the heuristic detector
     from features.detection_models import create_detector, DetectionResult
     HAS_ENHANCED_ML = True
-    print("✅ Enhanced ML components imported successfully")
+    print("✅ Enhanced static components imported successfully")
 except ImportError as e:
     HAS_ENHANCED_ML = False
-    print(f"⚠️  Enhanced ML components not available: {e}")
+    print(f"⚠️  Enhanced static components not available: {e}")
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -39,34 +40,16 @@ class EnhancedMLAnalyzer:
             logger.warning("Enhanced ML features not available - using basic analysis only")
     
     def _initialize_detectors(self, model_path: Optional[str] = None):        
+        # Initialize only heuristic/static detector
         try:
-            # NOTE: Rule-based detector (luôn sử dụng)
-            self.detectors['rule_based'] = create_detector("rule")
-            logger.info("✅ Rule-based detector initialized")
+            self.detectors['heuristic'] = create_detector("heuristic")
+            logger.info("✅ Heuristic static detector initialized")
         except Exception as e:
-            logger.error(f"Failed to initialize rule-based detector: {e}")
-        
-        try:
-            # NOTE: ML detector (nếu có)
-            if model_path and Path(model_path).exists():
-                self.detectors['ml'] = create_detector("ml", model_path)
-                logger.info("✅ ML detector initialized")
-            else:
-                logger.info("📝 ML detector not available (no trained model)")
-        except Exception as e:
-            logger.error(f"Failed to initialize ML detector: {e}")
-        
-        try:
-            # NOTE: Sử dụng cả 2 detector rule-based và ml
-            hybrid_model_path = model_path if model_path and Path(model_path).exists() else None
-            self.detectors['hybrid'] = create_detector("hybrid", hybrid_model_path)
-            logger.info("✅ Hybrid detector initialized")
-        except Exception as e:
-            logger.error(f"Failed to initialize hybrid detector: {e}")
+            logger.error(f"Failed to initialize heuristic detector: {e}")
     
     def analyze_code_comprehensive(self, code: str, language: str = "cpp", 
                                  filename: Optional[str] = None,
-                                 detector_type: str = "hybrid") -> Dict[str, Any]:
+                                 detector_type: str = "heuristic") -> Dict[str, Any]:
         # NOTE: Phân tích code với enhanced features và detection
         
         if not self.has_enhanced_features:
@@ -82,7 +65,7 @@ class EnhancedMLAnalyzer:
             # NOTE: Chuyển đổi features sang dict để detection
             feature_dict = features.to_dict()
             
-            # NOTE: Chạy detection với detector đã chọn
+            # NOTE: Chạy detection với detector đã chọn (heuristic)
             detection_start = self._get_time()
             detection_result = self._run_detection(feature_dict, detector_type)
             detection_time = self._get_time() - detection_start
@@ -139,11 +122,10 @@ class EnhancedMLAnalyzer:
         detector = self.detectors.get(detector_type)
         
         if not detector:
-            # NOTE: Fallback sử dụng detector nào có sẵn
+            # NOTE: Fallback: always use heuristic detector
             if self.detectors:
-                detector_type = list(self.detectors.keys())[0]
-                detector = self.detectors[detector_type]
-                logger.warning(f"Requested detector not available, using {detector_type}")
+                detector = self.detectors.get('heuristic') or next(iter(self.detectors.values()))
+                logger.warning("Requested detector not available, using heuristic")
             else:
                 raise ValueError("No detectors available")
         
@@ -243,7 +225,7 @@ class EnhancedMLAnalyzer:
         return info
     
     def run_batch_analysis(self, code_samples: List[Tuple[str, str]], 
-                          detector_type: str = "hybrid") -> List[Dict[str, Any]]:
+                          detector_type: str = "heuristic") -> List[Dict[str, Any]]:
         
         results = []
         
@@ -280,7 +262,7 @@ def get_enhanced_analyzer(model_path: Optional[str] = None) -> EnhancedMLAnalyze
 
 def analyze_code_with_enhanced_ml(code: str, language: str = "cpp", 
                                 filename: Optional[str] = None,
-                                detector_type: str = "hybrid",
+                                detector_type: str = "heuristic",
                                 model_path: Optional[str] = None) -> Dict[str, Any]:
     """
     Convenience function cho enhanced code analysis
@@ -288,7 +270,7 @@ def analyze_code_with_enhanced_ml(code: str, language: str = "cpp",
     analyzer = get_enhanced_analyzer(model_path)
     return analyzer.analyze_code_comprehensive(code, language, filename, detector_type)
 
-# Test function
+
 def test_enhanced_integration():
     """Test function để verify enhanced integration"""
     
