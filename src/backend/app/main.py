@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from typing import List, Dict, Optional, Union
+from typing import List, Dict, Optional, Union, Any
 import time
 import tempfile
 import os
@@ -10,6 +10,14 @@ from pathlib import Path
 
 # Shared basic analysis (fallback)
 from .basic_analysis import basic_analyze_code_features, basic_detect_ai_code
+
+# New Analysis Service Integration
+try:
+    from .analysis_service import CodeAnalysisService, CodeAnalysisResult
+    HAS_ANALYSIS_SERVICE = True
+except ImportError:
+    HAS_ANALYSIS_SERVICE = False
+    print("Analysis service not available - using basic fallback")
 
 # NOTE: Kiểm tra enhanced static analyzer (không còn ML integration cũ)
 try:
@@ -105,9 +113,60 @@ class DetectorInfoResponse(BaseModel):
     available_detectors: List[str]
     detector_details: Dict[str, Dict]
 
+# New models for comprehensive analysis
+class FeatureComparisonItem(BaseModel):
+    feature_name: str
+    display_name: str
+    user_value: float
+    ai_baseline: float
+    difference: float
+    difference_percentage: float
+    category: str
+    interpretation: str
+
+class TopFeatureItem(BaseModel):
+    name: str
+    display_name: str
+    user_value: float
+    ai_baseline: float
+    importance: float
+    category: str
+
+class ChartsData(BaseModel):
+    radar_chart: Dict[str, List]
+    bar_chart: Dict[str, List]
+    category_breakdown: Dict[str, Dict]
+    distribution: Dict[str, Union[float, int]]
+
+class ComprehensiveAnalysisResponse(BaseModel):
+    code_info: Dict[str, Any]
+    classification: Dict[str, Any]
+    features: Dict[str, float]
+    feature_comparison: List[FeatureComparisonItem]
+    top_features: List[TopFeatureItem]
+    quality_metrics: Dict[str, Any]
+    charts_data: ChartsData
+
+class AIBaselineResponse(BaseModel):
+    total_features: int
+    categories: Dict[str, Dict[str, Union[int, float]]]
+    top_discriminative: List[Dict[str, Union[str, float]]]
+
 start_time = time.time()
 
-# Removed ML model path resolution (no ML in codebase)
+# Initialize Analysis Service
+analysis_service = None
+if HAS_ANALYSIS_SERVICE:
+    try:
+        # Try to load with trained model
+        model_path = Path(__file__).parent.parent.parent / "src" / "models" / "model.json"
+        if model_path.exists():
+            analysis_service = CodeAnalysisService(str(model_path))
+        else:
+            analysis_service = CodeAnalysisService()
+    except Exception as e:
+        print(f"Could not initialize analysis service: {e}")
+        analysis_service = None
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
@@ -310,6 +369,145 @@ async def analyze_code_batch(requests: List[CodeAnalysisRequest]):
         "successful": len([r for r in results if r["status"] == "success"]),
         "failed": len([r for r in results if r["status"] == "failed"])
     }
+
+@app.post("/analyze-comprehensive", response_model=ComprehensiveAnalysisResponse)
+async def analyze_comprehensive(request: CodeAnalysisRequest):
+    """
+    API phân tích comprehensive với feature comparison và charts data
+    """
+    if not analysis_service:
+        raise HTTPException(status_code=503, detail="Analysis service not available")
+    
+    try:
+        if not request.code.strip():
+            raise HTTPException(status_code=400, detail="Code không được để trống")
+        
+        if request.language not in ["c", "cpp"]:
+            raise HTTPException(status_code=400, detail="Chỉ hỗ trợ ngôn ngữ C và C++")
+        
+        # Run comprehensive analysis
+        result = analysis_service.analyze_code(
+            code=request.code,
+            filename=request.filename or f"code.{request.language}",
+            include_linting=True
+        )
+        
+        # Convert to response format
+        feature_comparison = [
+            FeatureComparisonItem(
+                feature_name=fc.feature_name,
+                display_name=analysis_service._get_feature_display_name(fc.feature_name),
+                user_value=fc.user_value,
+                ai_baseline=fc.ai_baseline,
+                difference=fc.difference,
+                difference_percentage=fc.difference_percentage,
+                category=fc.category,
+                interpretation=fc.interpretation
+            )
+            for fc in result.feature_comparison[:20]  # Top 20 for frontend
+        ]
+        
+        top_features = [
+            TopFeatureItem(**tf) for tf in result.top_features
+        ]
+        
+        charts_data = ChartsData(**result.charts_data)
+        
+        return ComprehensiveAnalysisResponse(
+            code_info=result.code_info,
+            classification=result.classification,
+            features=result.features,
+            feature_comparison=feature_comparison,
+            top_features=top_features,
+            quality_metrics=result.quality_metrics,
+            charts_data=charts_data
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi phân tích: {str(e)}")
+
+@app.post("/analyze-comprehensive/file", response_model=ComprehensiveAnalysisResponse)
+async def analyze_comprehensive_file(file: UploadFile = File(...)):
+    """
+    API phân tích comprehensive với file upload
+    """
+    if not analysis_service:
+        raise HTTPException(status_code=503, detail="Analysis service not available")
+    
+    try:
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename không hợp lệ")
+        
+        file_ext = Path(file.filename).suffix.lower()
+        if file_ext not in [".c", ".cpp", ".h", ".hpp"]:
+            raise HTTPException(status_code=400, detail="Chỉ hỗ trợ file C/C++ (.c, .cpp, .h, .hpp)")
+        
+        content = await file.read()
+        try:
+            code = content.decode('utf-8')
+        except UnicodeDecodeError:
+            raise HTTPException(status_code=400, detail="File không thể đọc được (encoding issue)")
+        
+        if not code.strip():
+            raise HTTPException(status_code=400, detail="File rỗng hoặc không có nội dung")
+        
+        # Run comprehensive analysis
+        result = analysis_service.analyze_code(
+            code=code,
+            filename=file.filename,
+            include_linting=True
+        )
+        
+        # Convert to response format
+        feature_comparison = [
+            FeatureComparisonItem(
+                feature_name=fc.feature_name,
+                display_name=analysis_service._get_feature_display_name(fc.feature_name),
+                user_value=fc.user_value,
+                ai_baseline=fc.ai_baseline,
+                difference=fc.difference,
+                difference_percentage=fc.difference_percentage,
+                category=fc.category,
+                interpretation=fc.interpretation
+            )
+            for fc in result.feature_comparison[:20]  # Top 20 for frontend
+        ]
+        
+        top_features = [
+            TopFeatureItem(**tf) for tf in result.top_features
+        ]
+        
+        charts_data = ChartsData(**result.charts_data)
+        
+        return ComprehensiveAnalysisResponse(
+            code_info=result.code_info,
+            classification=result.classification,
+            features=result.features,
+            feature_comparison=feature_comparison,
+            top_features=top_features,
+            quality_metrics=result.quality_metrics,
+            charts_data=charts_data
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi phân tích file: {str(e)}")
+
+@app.get("/ai-baseline", response_model=AIBaselineResponse)
+async def get_ai_baseline():
+    """
+    API lấy thông tin AI baseline features
+    """
+    if not analysis_service:
+        raise HTTPException(status_code=503, detail="Analysis service not available")
+    
+    try:
+        baseline_summary = analysis_service.get_ai_baseline_summary()
+        return AIBaselineResponse(**baseline_summary)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi lấy AI baseline: {str(e)}")
 
 @app.post("/submit-feedback")
 async def submit_feedback(feedback: FeedbackRequest):

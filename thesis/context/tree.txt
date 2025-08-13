@@ -46,6 +46,20 @@
 │       ├── dataset
 │       │   ├── code
 │       │   │   └── c
+│       │   │       └──ai
+│       │   │           └──problem_1
+│       │   │               submission_1.c
+│       │   │               submission_2.cpp
+│       │   │               ...
+│       │   │           └──problem_2
+│       │   │               submission_1.c
+│       │   │               submission_2.cpp
+│       │   │               ...
+│       │   │           └──...
+│       │   │       └──human
+│       │   │           └──problem_1
+│       │   │           └──problem_2
+│       │   │           └──...
 │       │   ├── ithub_oj_metadata.md
 │       │   └── metadata
 │       │       ├── evaluation.parquet

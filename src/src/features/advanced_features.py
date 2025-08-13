@@ -16,12 +16,13 @@ except ImportError:
 
 @dataclass
 class CodeRedundancyFeatures:
-    # NOTE: Đặc trưng về code redundancy và repetition
+    # NOTE: Đặc trưng về code redundancy và repetition - đã chuẩn hóa
     duplicate_lines: int = 0
-    duplicate_line_ratio: float = 0.0
+    duplicate_line_ratio: float = 0.0  # Already normalized (vs total lines)
     repeated_patterns: int = 0
-    copy_paste_score: float = 0.0
-    similar_function_ratio: float = 0.0
+    repeated_patterns_per_loc: float = 0.0  # Normalized: patterns / loc
+    copy_paste_score: float = 0.0  # Already normalized (0-1 scale)
+    similar_function_ratio: float = 0.0  # Already normalized (0-1 scale)
 
 @dataclass
 class NamingPatternFeatures:
@@ -41,11 +42,13 @@ class NamingPatternFeatures:
 
 @dataclass
 class CodeComplexityFeatures:
-    # NOTE: Đặc trưng về độ phức tạp code
+    # NOTE: Đặc trưng về độ phức tạp code - đã chuẩn hóa
     halstead_complexity: float = 0.0
-    cognitive_complexity: float = 0.0
-    maintainability_index: float = 0.0
-    code_to_comment_ratio: float = 0.0
+    halstead_per_loc: float = 0.0  # Normalized: halstead / loc
+    cognitive_complexity: float = 0.0  
+    cognitive_per_loc: float = 0.0  # Normalized: cognitive / loc
+    maintainability_index: float = 0.0  # Already normalized (0-100 scale)
+    code_to_comment_ratio: float = 0.0  # Already a ratio
     
 @dataclass
 class AIPatternFeatures:
@@ -144,12 +147,26 @@ class AdvancedFeatureExtractor:
             r'\w{4,}',              # Long names
         ]
         
-        # NOTE: Các patterns thường gặp của AI
+        # NOTE: Các patterns thường gặp của AI - tối ưu và mở rộng
         self.ai_patterns = [
+            # Comment patterns
             r'//\s*[A-Z][a-z].*',  # Comments bắt đầu bằng chữ cái viết hoa
-            r'printf\s*\(\s*".*":',  # printf có ý nghĩa
-            r'scanf\s*\(\s*".*",',  # scanf có ý nghĩa
-            r'if\s*\(.*!=.*\)',     # if có ý nghĩa
+            r'/\*\s*[A-Z][a-z].*',  # Block comments structured
+            
+            # Function call patterns
+            r'printf\s*\(\s*"[^"]*\\n"\s*\)',  # printf với newline
+            r'scanf\s*\(\s*"[^"]*",',  # scanf với format string
+            r'malloc\s*\(\s*\w+\s*\*\s*sizeof',  # Proper malloc usage
+            
+            # Error handling patterns
+            r'if\s*\(\s*\w+\s*==\s*NULL\s*\)',  # NULL checks
+            r'if\s*\(\s*!\s*\w+\s*\)',  # Negation checks
+            
+            # Memory management
+            r'free\s*\(\s*\w+\s*\)',  # Free calls
+            
+            # Structured programming
+            r'return\s+\d+\s*;',  # Return with literal
         ]
     
     def extract_all_features(self, code: str, filename: str = "") -> ComprehensiveFeatures:
@@ -184,7 +201,16 @@ class AdvancedFeatureExtractor:
         blank_lines = len([l for l in lines if not l.strip()])
         features.blank_ratio = blank_lines / len(lines) if lines else 0
         
-        # NOTE: Trích xuất các metrics nâng cao nếu có
+        # NOTE: Token count - đếm các tokens cơ bản
+        features.token_count = self._count_tokens(code)
+        
+        # NOTE: Function count - đếm số hàm
+        features.functions = self._count_functions(code)
+        
+        # NOTE: Cyclomatic complexity - tính toán dựa trên control flow
+        features.cyclomatic_complexity = self._calculate_cyclomatic_complexity(code)
+        
+        # NOTE: Thử sử dụng Lizard nếu có (để so sánh)
         if HAS_LIZARD:
             try:
                 import tempfile
@@ -194,9 +220,13 @@ class AdvancedFeatureExtractor:
                 
                 try:
                     metrics = analyze_file(Path(temp_path))
-                    features.token_count = metrics.get('token', None)
-                    features.cyclomatic_complexity = metrics.get('cyclomatic_avg', None)
-                    features.functions = metrics.get('functions', None)
+                    # Ưu tiên metrics từ Lizard nếu có
+                    if metrics.get('token'):
+                        features.token_count = metrics.get('token')
+                    if metrics.get('cyclomatic_avg'):
+                        features.cyclomatic_complexity = metrics.get('cyclomatic_avg')
+                    if metrics.get('functions'):
+                        features.functions = metrics.get('functions')
                 finally:
                     if Path(temp_path).exists():
                         Path(temp_path).unlink()
@@ -204,6 +234,56 @@ class AdvancedFeatureExtractor:
                 pass
         
         return features
+    
+    def _count_tokens(self, code: str) -> int:
+        """Đếm số tokens trong code"""
+        # Đơn giản hóa: đếm words, operators và separators
+        import re
+        
+        # Loại bỏ comments và string literals
+        clean_code = re.sub(r'//.*$', '', code, flags=re.MULTILINE)
+        clean_code = re.sub(r'/\*.*?\*/', '', clean_code, flags=re.DOTALL)
+        clean_code = re.sub(r'"[^"]*"', '""', clean_code)
+        clean_code = re.sub(r"'[^']*'", "''", clean_code)
+        
+        # Tách tokens: identifiers, numbers, operators, punctuation
+        tokens = re.findall(r'\b\w+\b|[+\-*/=<>!&|]+|[{}();,.]', clean_code)
+        return len(tokens)
+    
+    def _count_functions(self, code: str) -> int:
+        """Đếm số functions trong code"""
+        # Pattern phức tạp hơn để bắt các function definitions
+        function_pattern = re.compile(
+            r'\b(?:int|void|float|double|char|string|bool|long|short|unsigned)\s+'  # return type
+            r'(?:\*\s*)?'  # optional pointer
+            r'([a-zA-Z_][a-zA-Z0-9_]*)\s*'  # function name
+            r'\([^)]*\)\s*'  # parameters
+            r'\{'  # opening brace
+        , re.MULTILINE)
+        
+        functions = function_pattern.findall(code)
+        return len(functions)
+    
+    def _calculate_cyclomatic_complexity(self, code: str) -> float:
+        """Tính cyclomatic complexity dựa trên decision points"""
+        # Cyclomatic complexity = edges - nodes + 2*connected_components
+        # Simplified: count decision points + 1
+        
+        decision_patterns = [
+            r'\bif\s*\(',
+            r'\bwhile\s*\(',
+            r'\bfor\s*\(',
+            r'\bswitch\s*\(',
+            r'\bcase\s+',
+            r'\?.*:',  # ternary operator
+        ]
+        
+        total_decisions = 0
+        for pattern in decision_patterns:
+            total_decisions += len(re.findall(pattern, code, re.IGNORECASE))
+        
+        # Base complexity + decision points
+        return max(1.0, float(total_decisions + 1))
     
     def _extract_redundancy_features(self, code: str) -> CodeRedundancyFeatures:
         # NOTE: Trích xuất features về code redundancy
@@ -231,6 +311,8 @@ class AdvancedFeatureExtractor:
         pattern_counts = Counter(patterns)
         repeated = sum(1 for count in pattern_counts.values() if count > 1)
         features.repeated_patterns = repeated
+        # Normalize by LOC
+        features.repeated_patterns_per_loc = repeated / max(1, len(lines))
         
         # NOTE: Điểm copy-paste (heuristic dựa trên các chuỗi giống hệt nhau)
         max_sequence = 0
@@ -260,15 +342,29 @@ class AdvancedFeatureExtractor:
         if not identifiers:
             return features
         
-        # NOTE: Tên biến có ý nghĩa vs tên biến chung chung
+        # NOTE: Tên biến có ý nghĩa vs tên biến chung chung - cải thiện logic
         descriptive_vars = 0
         generic_vars = 0
         
         for var in variables:
-            if var.lower() in self.generic_vars or len(var) <= 2:
+            # Generic: tên ngắn hoặc trong danh sách generic
+            if var.lower() in self.generic_vars:
                 generic_vars += 1
+            # Single character variables (nhưng có thể có ý nghĩa trong context)
+            elif len(var) == 1:
+                # Kiểm tra context - ví dụ 'i', 'j' trong loop là OK
+                if var in ['i', 'j', 'k'] and self._is_loop_context(code, var):
+                    # Không đếm vào generic nếu đúng context
+                    pass
+                else:
+                    generic_vars += 1
+            # Very short names (2 chars) thường là generic
+            elif len(var) == 2:
+                generic_vars += 1
+            # Descriptive: tên dài và có pattern tốt
             elif len(var) >= 4 or any(re.match(pattern, var) for pattern in self.descriptive_patterns):
                 descriptive_vars += 1
+            # Medium length names (3 chars) - neutral, không đếm vào cả hai
         
         total_vars = len(variables)
         if total_vars > 0:
@@ -313,15 +409,24 @@ class AdvancedFeatureExtractor:
         
         return features
     
+    def _is_loop_context(self, code: str, var: str) -> bool:
+        """Kiểm tra xem variable có được sử dụng trong context của loop không"""
+        # Tìm patterns như "for(int i = 0" hoặc "for(i = 0"
+        loop_pattern = re.compile(rf'for\s*\(\s*(?:int\s+)?{var}\s*[=<>]', re.IGNORECASE)
+        return bool(loop_pattern.search(code))
+    
     def _extract_complexity_features(self, code: str) -> CodeComplexityFeatures:
-        # NOTE: Trích xuất features về complexity
+        # NOTE: Trích xuất features về complexity với normalization
         features = CodeComplexityFeatures()
         
         lines = code.splitlines()
         code_lines = [l for l in lines if l.strip() and not l.strip().startswith('//')]
         comment_lines = [l for l in lines if l.strip().startswith('//') or '/*' in l]
         
-        # NOTE: Tỷ lệ code to comment
+        # Safe LOC for normalization
+        safe_loc = max(1, len(code_lines))
+        
+        # NOTE: Tỷ lệ code to comment (already a ratio)
         if comment_lines:
             features.code_to_comment_ratio = len(code_lines) / len(comment_lines)
         else:
@@ -336,13 +441,17 @@ class AdvancedFeatureExtractor:
         total_operators = len(operators)
         total_operands = len(operands)
         
+        # Calculate Halstead complexity
         if unique_operators > 0 and unique_operands > 0:
             vocabulary = unique_operators + unique_operands
             length = total_operators + total_operands
             
             if vocabulary > 0 and length > 0:
                 features.halstead_complexity = length * math.log2(vocabulary)
+                # Normalize by LOC
+                features.halstead_per_loc = features.halstead_complexity / safe_loc
         
+        # Calculate cognitive complexity
         nesting_score = 0
         current_depth = 0
         
@@ -355,7 +464,10 @@ class AdvancedFeatureExtractor:
                 current_depth = max(0, current_depth - 1)
         
         features.cognitive_complexity = nesting_score
+        # Normalize by LOC
+        features.cognitive_per_loc = features.cognitive_complexity / safe_loc
         
+        # Calculate maintainability index (already 0-100 scale)
         if features.halstead_complexity > 0 and len(code_lines) > 0:
             features.maintainability_index = max(0, 171 - 5.2 * math.log(features.halstead_complexity) - 0.23 * 1 - 16.2 * math.log(len(code_lines)))
         
@@ -387,14 +499,22 @@ class AdvancedFeatureExtractor:
         
         features.boilerplate_ratio = boilerplate_lines / len(lines) if lines else 0
         
-        # NOTE: Điểm xử lý lỗi
-        error_patterns = ['if', '!=', 'NULL', 'errno', 'error', 'exception', 'try', 'catch']
-        error_score = 0
+        # NOTE: Điểm xử lý lỗi - cải thiện để tránh false positives
+        error_handling_score = 0
+        
+        # Specific error handling patterns
+        error_patterns = [
+            r'if\s*\(\s*\w+\s*==\s*NULL\s*\)',
+            r'if\s*\(\s*!\s*\w+\s*\)',
+            r'if\s*\(\s*\w+\s*!=\s*NULL\s*\)',
+            r'return\s+1\s*;',  # Error return
+            r'printf\s*\(\s*".*error.*"',  # Error messages
+        ]
         
         for pattern in error_patterns:
-            error_score += code_content.lower().count(pattern.lower())
+            error_handling_score += len(re.findall(pattern, code, re.IGNORECASE))
         
-        features.error_handling_score = error_score / len(lines) if lines else 0
+        features.error_handling_score = error_handling_score / len(lines) if lines else 0
         
         # NOTE: Điểm defensive programming
         defensive_patterns = ['assert', 'check', 'validate', 'verify', 'bounds']
