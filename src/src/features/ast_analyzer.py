@@ -74,7 +74,7 @@ class CppASTAnalyzer:
     
     def setup_patterns(self):
         # NOTE: Setup regex patterns cho việc phân tích code C/C++
-        # FIXME: Cần tối ưu chỗ này
+        # Setup regex patterns for C/C++ code analysis
 
         # Control structures
         self.if_pattern = re.compile(r'\bif\s*\(', re.IGNORECASE)

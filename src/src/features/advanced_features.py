@@ -9,10 +9,9 @@ from pathlib import Path
 # Import existing modules
 try:
     from .ast_analyzer import CppASTAnalyzer, ASTFeatures
-    from .test_parser_sample import analyze_file, basic_metrics
-    HAS_LIZARD = True
+    from .human_style_analyzer import HumanStyleAnalyzer, HumanStyleFeatures
 except ImportError:
-    HAS_LIZARD = False
+    pass
 
 @dataclass
 class CodeRedundancyFeatures:
@@ -79,6 +78,9 @@ class ComprehensiveFeatures:
     complexity: CodeComplexityFeatures = None
     ai_patterns: AIPatternFeatures = None
     
+    # Human style features
+    human_style: HumanStyleFeatures = None
+    
     def to_dict(self) -> Dict:
         # NOTE: Convert to dictionary for ML processing
         result = {}
@@ -115,6 +117,11 @@ class ComprehensiveFeatures:
             ai_dict = asdict(self.ai_patterns)
             result.update({f'ai_pattern_{k}': v for k, v in ai_dict.items()})
         
+        # Human style features
+        if self.human_style:
+            human_dict = self.human_style.to_dict()
+            result.update(human_dict)
+        
         return result
 
 class AdvancedFeatureExtractor:
@@ -122,6 +129,7 @@ class AdvancedFeatureExtractor:
     
     def __init__(self):
         self.ast_analyzer = CppASTAnalyzer() if 'CppASTAnalyzer' in globals() else None
+        self.human_style_analyzer = HumanStyleAnalyzer() if 'HumanStyleAnalyzer' in globals() else None
         self.setup_patterns()
     
     def setup_patterns(self):
@@ -186,6 +194,10 @@ class AdvancedFeatureExtractor:
         features.complexity = self._extract_complexity_features(code)
         features.ai_patterns = self._extract_ai_pattern_features(code)
         
+        # Human style features
+        if self.human_style_analyzer:
+            features.human_style = self.human_style_analyzer.analyze_code(code, filename)
+        
         return features
 
     def _extract_basic_features(self, code: str, features: ComprehensiveFeatures) -> ComprehensiveFeatures:
@@ -209,29 +221,6 @@ class AdvancedFeatureExtractor:
         
         # NOTE: Cyclomatic complexity - tính toán dựa trên control flow
         features.cyclomatic_complexity = self._calculate_cyclomatic_complexity(code)
-        
-        # NOTE: Thử sử dụng Lizard nếu có (để so sánh)
-        if HAS_LIZARD:
-            try:
-                import tempfile
-                with tempfile.NamedTemporaryFile(mode='w', suffix='.cpp', delete=False) as f:
-                    f.write(code)
-                    temp_path = f.name
-                
-                try:
-                    metrics = analyze_file(Path(temp_path))
-                    # Ưu tiên metrics từ Lizard nếu có
-                    if metrics.get('token'):
-                        features.token_count = metrics.get('token')
-                    if metrics.get('cyclomatic_avg'):
-                        features.cyclomatic_complexity = metrics.get('cyclomatic_avg')
-                    if metrics.get('functions'):
-                        features.functions = metrics.get('functions')
-                finally:
-                    if Path(temp_path).exists():
-                        Path(temp_path).unlink()
-            except Exception:
-                pass
         
         return features
     
@@ -334,7 +323,7 @@ class AdvancedFeatureExtractor:
         features = NamingPatternFeatures()
         
         # NOTE: Tìm tất cả các identifiers
-        # FIXME: Cần tối ưu chỗ này
+        # Find all identifiers for naming analysis
         identifiers = re.findall(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', code)
         variables = re.findall(r'\b(?:int|float|double|char|string|bool)\s+([a-zA-Z_][a-zA-Z0-9_]*)\b', code)
         functions = re.findall(r'\b(?:int|void|float|double|char|string|bool)\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(', code)
