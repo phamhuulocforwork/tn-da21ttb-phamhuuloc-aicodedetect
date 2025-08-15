@@ -1,0 +1,49 @@
+---
+alwaysApply: false
+---
+
+**General Instructions:**
+
+- Be up-to-date with latest technologies and best practices.
+- Prioritize technical accuracy and functionality.
+
+**Next.js Environment:**
+
+- **Default to the Next.js App Router** for new projects, routing, data fetching, and layouts (e.g., file-based routing with folders, `layout.js`, `page.js`, and `loading.js`).
+- **Prioritize Next.js Server Components** for React/Next.js work.
+- Possess knowledge of Next.js 15 features.
+- Support Next.js features like route handlers, server actions, and server/client-side Node.js modules.
+- **Do not output `package.json`**; infer npm modules from imports.
+- Support Vercel environment variables; `.env` files are not supported.
+- Environment variables are server-side only; prefix with `NEXT_PUBLIC_` for client-side use.
+- **Do not output `next.config.js`**.
+- **Hardcode colors directly in `tailwind.config.js`** (Tailwind CSS, Next.js, shadcn/ui components, Lucide React icons are pre-installed).
+- **Import shadcn components from `@/components/ui`**; do not rewrite their code unless modifications are necessary.
+- Assume imports from default paths (e.g., `@/components/ui/button`).
+- Default files (e.g., `app/layout.tsx`, `components/theme-provider.tsx`, `components/ui/*`, `lib/utils.ts`, `app/globals.css`, `tailwind.config.ts`) should not be regenerated. Create custom implementations only if existing components are insufficient.
+
+**React Component Guidelines:**
+
+- **Provide default props** for React Components, as Next.js cannot infer them.
+- Use `import type` for type imports to avoid importing libraries at runtime.
+- Use **kebab-case for file names** (e.g., `login-form.tsx`).
+- **Escape JSX special characters** (`< > { } \``) by enclosing them in strings.
+
+**Images and Media:**
+
+- Use `/placeholder.svg?height={height}&width={width}&query={query}` for placeholder images; **hardcode the query** in the URL.
+- **Use icons from the `lucide-react` package only**.
+- Support `glb`, `gltf` for 3D models and `mp3` for audio. Use native HTML elements and JavaScript for audio files.
+- Set `crossOrigin="anonymous"` for `new Image()` to avoid CORS issues.
+
+**Design Principles:**
+
+- Recreate screenshot designs and implied functionality as closely as possible if provided.
+- **Generate responsive designs**.
+- **Implement accessibility best practices**: Use semantic HTML, correct ARIA roles/attributes, `sr-only` for screen reader text, and alt text for images (unless decorative/repetitive).
+- Avoid indigo or blue colors unless specified in the user's request.
+- Possess and utilize up-to-date domain knowledge for accurate responses.
+
+The user has provided custom instructions you MUST respect and follow unless they are inappropriate or harmful. Here are the instructions:
+
+You MUST develop production-ready code. Never put placeholders or mocks, always create the full ready implementation, production-ready. NEVER write comments to explain your code.
