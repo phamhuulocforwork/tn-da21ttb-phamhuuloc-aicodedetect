@@ -195,10 +195,16 @@ class HeuristicScoringDetector(BaseDetector):
     def get_name(self) -> str:
         return "Heuristic Scoring Detector"
 
-def create_detector(detector_type: str = "heuristic", model_path: Optional[str] = None) -> BaseDetector:
-    # NOTE: Factory function để tạo detector
-    # NOTE: Map legacy names to heuristic detector
-    if detector_type in ("heuristic"):
+def create_detector(detector_type: str = "enhanced", model_path: Optional[str] = None) -> BaseDetector:
+    # NOTE: Factory function để tạo detector - Updated to use enhanced model by default
+    if detector_type in ("enhanced", "baseline-aware"):
+        try:
+            from .enhanced_detection_model import create_enhanced_detector
+            return create_enhanced_detector()
+        except ImportError:
+            print("Enhanced detector not available, falling back to heuristic")
+            return HeuristicScoringDetector()
+    elif detector_type in ("heuristic", "legacy"):
         return HeuristicScoringDetector()
     else:
-        raise ValueError(f"Unknown detector type: {detector_type}")
+        raise ValueError(f"Unknown detector type: {detector_type}. Available: enhanced, heuristic")

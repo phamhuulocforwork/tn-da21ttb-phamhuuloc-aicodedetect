@@ -2,89 +2,89 @@ FEATURE RANKING REPORT
 ==================================================
 
 Dataset: features/large_features.csv
-Total samples: 2000
-AI samples: 45
-Human samples: 1955
+Total samples: 1999
+AI samples: 41
+Human samples: 1958
 
 TOP DISCRIMINATIVE FEATURES (Cohen's d):
 --------------------------------------------------
- 1. comment_ratio                            | Cohen's d: 1.894
-    AI mean: 0.0631, Human mean: 0.0061
+ 1. comment_ratio                            | Cohen's d: 2.177
+    AI mean: 0.0655, Human mean: 0.0057
     AI > Human
 
- 2. ast_functions_per_loc                    | Cohen's d: 1.455
-    AI mean: 0.1523, Human mean: 0.0892
+ 2. naming_meaningful_names_score            | Cohen's d: 1.862
+    AI mean: 0.7149, Human mean: 0.5317
     AI > Human
 
- 3. naming_verb_function_ratio               | Cohen's d: 1.392
-    AI mean: 0.0444, Human mean: 0.0002
-    AI > Human
-
- 4. blank_ratio                              | Cohen's d: 1.365
-    AI mean: 0.1894, Human mean: 0.0679
-    AI > Human
-
- 5. naming_meaningful_names_score            | Cohen's d: 1.324
-    AI mean: 0.6605, Human mean: 0.5306
-    AI > Human
-
- 6. ast_nested_control_depth                 | Cohen's d: 1.201
-    AI mean: 0.0222, Human mean: 1.6568
+ 3. human_style_overall_score                | Cohen's d: 1.832
+    AI mean: 0.2119, Human mean: 0.6975
     Human > AI
 
- 7. complexity_maintainability_index         | Cohen's d: 1.181
-    AI mean: 110.7072, Human mean: 94.9975
+ 4. blank_ratio                              | Cohen's d: 1.477
+    AI mean: 0.2028, Human mean: 0.0692
     AI > Human
 
- 8. detection_confidence                     | Cohen's d: 1.131
-    AI mean: 0.7198, Human mean: 0.6043
+ 5. naming_verb_function_ratio               | Cohen's d: 1.475
+    AI mean: 0.0732, Human mean: 0.0010
     AI > Human
 
- 9. naming_generic_var_ratio                 | Cohen's d: 1.124
-    AI mean: 0.2207, Human mean: 0.5280
+ 6. naming_generic_var_ratio                 | Cohen's d: 1.416
+    AI mean: 0.1386, Human mean: 0.5255
     Human > AI
 
-10. complexity_code_to_comment_ratio         | Cohen's d: 1.093
-    AI mean: 644.9770, Human mean: 929.1060
-    Human > AI
-
-11. cyclomatic_complexity                    | Cohen's d: 1.049
-    AI mean: 1.0667, Human mean: 3.5253
-    Human > AI
-
-12. ast_string_literals_per_loc              | Cohen's d: 1.045
-    AI mean: 0.2696, Human mean: 0.1657
+ 7. detection_confidence                     | Cohen's d: 1.298
+    AI mean: 0.7372, Human mean: 0.6053
     AI > Human
 
-13. ast_switch_statements                    | Cohen's d: 1.005
-    AI mean: 0.0222, Human mean: 0.0000
-    AI > Human
-
-14. ast_switch_statements_per_loc            | Cohen's d: 1.005
-    AI mean: 0.0025, Human mean: 0.0000
-    AI > Human
-
-15. naming_descriptive_var_ratio             | Cohen's d: 1.000
-    AI mean: 0.7248, Human mean: 0.4448
-    AI > Human
-
-16. complexity_cognitive_per_loc             | Cohen's d: 0.964
-    AI mean: 0.0043, Human mean: 0.1825
+ 8. naming_inconsistency_naming_inconsistency_ratio | Cohen's d: 1.261
+    AI mean: 0.3955, Human mean: 1.3114
     Human > AI
 
-17. token_count                              | Cohen's d: 0.938
-    AI mean: 43.7556, Human mean: 122.5059
-    Human > AI
-
-18. ast_single_char_vars                     | Cohen's d: 0.908
-    AI mean: 0.6222, Human mean: 1.9867
-    Human > AI
-
-19. ai_pattern_template_usage_score          | Cohen's d: 0.905
-    AI mean: 0.2856, Human mean: 0.1839
+ 9. ast_functions_per_loc                    | Cohen's d: 1.226
+    AI mean: 0.1415, Human mean: 0.0896
     AI > Human
 
-20. ast_total_nodes                          | Cohen's d: 0.897
-    AI mean: 9.9111, Human mean: 22.8379
+10. complexity_code_to_comment_ratio         | Cohen's d: 1.207
+    AI mean: 610.8313, Human mean: 927.3347
+    Human > AI
+
+11. ast_avg_variable_name_length             | Cohen's d: 1.188
+    AI mean: 4.2415, Human mean: 2.7795
+    AI > Human
+
+12. naming_descriptive_var_ratio             | Cohen's d: 1.187
+    AI mean: 0.7813, Human mean: 0.4481
+    AI > Human
+
+13. ast_operator_spacing_consistency         | Cohen's d: 1.164
+    AI mean: 0.5610, Human mean: 0.9065
+    Human > AI
+
+14. spacing_spacing_issues_ratio             | Cohen's d: 1.143
+    AI mean: 0.3705, Human mean: 1.2231
+    Human > AI
+
+15. complexity_maintainability_index         | Cohen's d: 1.142
+    AI mean: 110.3799, Human mean: 95.3658
+    AI > Human
+
+16. ast_nested_control_depth                 | Cohen's d: 1.112
+    AI mean: 0.0732, Human mean: 1.6537
+    Human > AI
+
+17. spacing_missing_space_before_operator    | Cohen's d: 1.041
+    AI mean: 1.2439, Human mean: 9.4714
+    Human > AI
+
+18. ast_single_char_vars                     | Cohen's d: 1.038
+    AI mean: 0.3902, Human mean: 1.9658
+    Human > AI
+
+19. cyclomatic_complexity                    | Cohen's d: 1.037
+    AI mean: 1.0732, Human mean: 3.4934
+    Human > AI
+
+20. naming_inconsistency_unclear_abbreviations | Cohen's d: 1.010
+    AI mean: 7.7805, Human mean: 25.8243
     Human > AI
 

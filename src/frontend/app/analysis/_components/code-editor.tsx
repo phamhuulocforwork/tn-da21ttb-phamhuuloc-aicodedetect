@@ -16,6 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { AnalysisResponse, IndividualAnalysisResponse } from "@/lib/api-types";
+
 export interface CodeEditorTheme {
   base: string;
   inherit: boolean;
@@ -28,17 +30,7 @@ export interface CodeEditorTheme {
   }>;
 }
 
-export interface AnalysisResult {
-  isAiGenerated: boolean;
-  confidence: number;
-  features: {
-    complexity: number;
-    redundancy: number;
-    namingPatterns: number;
-    comments: number;
-  };
-  reasons: string[];
-}
+// Moved to @/lib/api-types.ts
 
 export interface CodeEditorProps {
   value?: string;
@@ -50,7 +42,10 @@ export interface CodeEditorProps {
   customDarkTheme?: CodeEditorTheme;
   options?: editor.IStandaloneEditorConstructionOptions;
   className?: string;
-  onSubmit?: (code: string, language: string) => Promise<AnalysisResult>;
+  onSubmit?: (
+    code: string,
+    language: string,
+  ) => Promise<AnalysisResponse | IndividualAnalysisResponse>;
   placeholder?: string;
   isSubmitting?: boolean;
 }

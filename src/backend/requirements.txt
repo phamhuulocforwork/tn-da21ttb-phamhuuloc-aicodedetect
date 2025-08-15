@@ -1,12 +1,22 @@
+# Core FastAPI dependencies
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 python-multipart==0.0.6
-lizard==1.17.10
 pydantic==2.7.1
 
-# Static analysis aux deps (no ML)
-numpy==1.26
+# Analysis dependencies
+lizard==1.17.10
+numpy==1.26.5
 pandas==2.0.3
-tqdm==4.65.0
 
-# ML dependencies removed
+# Development and testing
+requests==2.31.0
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# Optional utilities
+tqdm==4.65.0
+python-dotenv==1.0.0
+
+# Production dependencies
+gunicorn==21.2.0
