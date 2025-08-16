@@ -662,13 +662,14 @@ def create_feature_groups(features_dict: Dict[str, float]) -> Dict[str, FeatureG
             "boxplot"
         )
     
-    if 'ai_detection_metrics' in feature_categories and feature_categories['ai_detection_metrics']:
-        groups['ai_detection_metrics'] = create_group(
-            "AI Detection Metrics",
-            "Patterns thường gặp trong code của AI",
-            feature_categories['ai_detection_metrics'],
-            "boxplot"
-        )
+    # FIXME: Tạm thời cho viết báo cáo
+    # if 'ai_detection_metrics' in feature_categories and feature_categories['ai_detection_metrics']:
+    #     groups['ai_detection_metrics'] = create_group(
+    #         "AI Detection Metrics",
+    #         "Patterns thường gặp trong code của AI",
+    #         feature_categories['ai_detection_metrics'],
+    #         "boxplot"
+    #     )
     
     if not groups and features_dict:
         all_features = list(features_dict.keys())[:20]

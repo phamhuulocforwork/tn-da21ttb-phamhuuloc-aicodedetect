@@ -166,9 +166,9 @@ const RadarChartVisualization = ({ group }: { group: FeatureGroup }) => {
       const avgWeakValue =
         weakFeatures.reduce((sum, f) => sum + f.value, 0) / weakFeatures.length;
       summary = {
-        name: `Other Features (${weakFeatures.length})`,
+        name: `Đặc trưng khác (${weakFeatures.length})`,
         value: avgWeakValue,
-        description: `Average of ${weakFeatures.length} additional features`,
+        description: `Trung bình của ${weakFeatures.length} đặc trưng khác`,
       };
     }
 
@@ -223,11 +223,11 @@ const RadarChartVisualization = ({ group }: { group: FeatureGroup }) => {
   return (
     <div className='space-y-4'>
       <div className='text-xs text-muted-foreground text-center'>
-        Showing top {strongFeatures.length} features
+        Có {strongFeatures.length} đặc trưng mạnh
         {summary && ` (${summary.name.match(/\d+/)?.[0]} others grouped)`}
         {strongFeatures.some((f) => f.baseline_comparison) && (
           <span className='block mt-1'>
-            * = Strong baseline difference (AI vs Human)
+            * = Sự khác biệt code hiện tại và baseline
           </span>
         )}
       </div>
@@ -240,13 +240,13 @@ const RadarChartVisualization = ({ group }: { group: FeatureGroup }) => {
           <PolarGrid className='stroke-muted' />
           <PolarAngleAxis
             dataKey='subject'
-            className='text-xs fill-muted-foreground'
+            className='text-xs'
             tick={{ fontSize: 10 }}
           />
           <PolarRadiusAxis
             angle={90}
             domain={[0, 100]}
-            className='text-xs fill-muted-foreground'
+            className='text-xs'
             tick={{ fontSize: 9 }}
           />
           <Radar
@@ -290,7 +290,7 @@ const RadarChartVisualization = ({ group }: { group: FeatureGroup }) => {
 
       {strongFeatures.some((f) => f.baseline_comparison) && (
         <div className='mt-4 p-3 bg-muted/30 rounded-lg'>
-          <h5 className='text-xs font-medium mb-2'>Baseline Insights:</h5>
+          <h5 className='text-xs font-medium mb-2'>Nhận xét:</h5>
           <div className='grid gap-1 text-xs'>
             {strongFeatures
               .filter(
@@ -500,7 +500,7 @@ export function FeatureCharts({
       </div>
 
       <Tabs defaultValue={groupEntries[0]?.[0]} className='w-full'>
-        <TabsList className='grid grid-cols-4 w-full'>
+        <TabsList className='grid grid-cols-5 w-full'>
           {groupEntries.map(([groupName, group]) => (
             <TabsTrigger key={groupName} value={groupName} className='text-xs'>
               {group.group_name}

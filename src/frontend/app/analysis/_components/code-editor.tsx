@@ -221,7 +221,7 @@ export function CodeEditor({
               ) : (
                 <Send className='w-4 h-4 mr-1' />
               )}
-              {isSubmitting ? "Đang phân tích..." : "Phân tích mã"}
+              {isSubmitting ? "Đang phân tích..." : "Phân tích"}
             </Button>
           )}
         </div>
