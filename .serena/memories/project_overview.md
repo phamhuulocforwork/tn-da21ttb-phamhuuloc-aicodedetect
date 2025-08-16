@@ -1,43 +1,50 @@
-# AI Code Detection System - Project Overview
+# AI Code Detection Project Overview
 
-## Mục đích dự án
+## Project Purpose
 
-Hệ thống phát hiện code được tạo bởi AI, phân biệt giữa code được viết bởi con người và AI. Dự án này là luận văn tốt nghiệp với chủ đề "AI Code Detection".
+Hệ thống phân tích và phát hiện mã nguồn AI-generated vs human-written cho ngôn ngữ C/C++. Dự án bao gồm:
 
-## Kiến trúc hệ thống
+- **Feature extraction** từ source code (80+ features)
+- **Machine learning models** để classification
+- **Web interface** để interactive analysis
+- **API backend** cho integration
 
-Dự án bao gồm 3 thành phần chính:
+## Architecture Components
 
-### 1. Machine Learning Pipeline (`src/src/`)
+### 1. Core ML Engine (`src/src/`)
 
-- **Feature Extraction**: Trích xuất đặc trung từ code (AST, complexity, style metrics)
-- **Model Training**: Training binary classifier để phân loại AI vs Human code
-- **Analysis Tools**: Công cụ phân tích và visualization các features
+- **Python-based** với data science stack
+- **Feature extractors**: AST, human style, advanced patterns
+- **Model training pipeline** với dataset management
+- **Batch processing** cho large-scale analysis
 
 ### 2. Backend API (`src/backend/`)
 
-- **Framework**: FastAPI
-- **Chức năng**: REST API để phân tích code, trả về prediction và confidence score
-- **Static Analysis**: Sử dụng lizard và các công cụ khác để phân tích code
+- **FastAPI framework** với comprehensive endpoints
+- **Real-time analysis** với multiple methods
+- **File upload support** và validation
+- **Structured responses** cho frontend integration
 
-### 3. Frontend Web Interface (`src/frontend/`)
+### 3. Frontend Interface (`src/frontend/`)
 
-- **Framework**: Next.js với TypeScript
-- **UI**: Modern interface với dark/light theme, code editor
-- **Features**: Upload code, xem kết quả analysis, charts và visualizations
+- **Next.js 15** với modern React patterns
+- **Interactive code editor** (Monaco Editor)
+- **Data visualization** (Recharts, Chart.js)
+- **Responsive design** với dark/light themes
 
-## Dataset
+## Key Features
 
-- **Vị trí**: `src/src/dataset/code/c/`
-- **Cấu trúc**:
-  - `human/`: Code samples được viết bởi con người
-  - `ai/`: Code samples được generate bởi AI
-- **Metadata**: Thông tin chi tiết về dataset trong `ithub_oj_metadata.md`
+- **Multi-method analysis**: Combined, AST-only, Style-only, Advanced
+- **Real-time processing**: 1-5 seconds analysis time
+- **Interactive visualizations**: Charts, metrics, detailed reports
+- **File upload support**: .c, .cpp, .txt files (max 1MB)
+- **Export functionality**: JSON reports và raw data
+- **API-first design**: RESTful endpoints với comprehensive docs
 
-## Tech Stack
+## Tech Stack Summary
 
-- **Backend**: Python 3.12, FastAPI, Uvicorn
-- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
-- **ML/Analysis**: NumPy, Pandas, Matplotlib, Seaborn
-- **Static Analysis**: Lizard, AST analysis
-- **Development**: Make, Virtual environments
+- **Languages**: Python, TypeScript, C/C++ (analysis target)
+- **Frameworks**: FastAPI, Next.js, React
+- **ML Libraries**: NumPy, Pandas, custom feature extractors
+- **UI Components**: Shadcn/UI, Radix primitives
+- **Development**: Docker support, comprehensive Makefiles

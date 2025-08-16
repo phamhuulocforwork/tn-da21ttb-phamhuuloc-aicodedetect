@@ -1,104 +1,136 @@
-# AI Code Detection - Suggested Commands
+# Suggested Development Commands
 
-## Workflow chính (theo FLOW.txt)
+## Core ML Engine (src/src/)
+
+### Setup và Environment
 
 ```bash
-# Di chuyển vào thư mục ML pipeline và activate virtual environment
 cd src/src && source venv/bin/activate
+make setup                    # Tạo virtual environment và install dependencies
+make install                  # Update dependencies
+```
 
-# Chạy batch feature extraction để tạo dataset features mới
+### Feature Extraction và Analysis
+
+```bash
+# Batch feature extraction (tạo dataset features mới)
 python batch_feature_extraction.py --dataset dataset --max-files 2000 --output features/large_features.csv
 
-# Chạy analysis và tạo visualization
+# Analysis và visualization
 python analyze_features.py --csv features/large_features.csv --plots-dir analysis_plots
 
-# Train model mới trên dataset và lưu vào đúng thư mục backend
+# Complete pipeline training
 python complete_pipeline.py train dataset --max-files 2000 --save-model models/model.json
 ```
 
-## Backend Development Commands
+## Backend API (src/backend/)
+
+### Development Commands
 
 ```bash
 cd src/backend
+make help                     # Show all available commands
+make setup                    # Setup virtual environment
+make dev                      # Run development server (http://localhost:8000)
+make start                    # Run production server
+make clean                    # Clean up environment
 
-# Setup và cài đặt dependencies
-make setup
-make install
-
-# Development server với hot reload
-make dev
-# Server sẽ chạy tại: http://localhost:8000
-# API docs tại: http://localhost:8000/docs
-
-# Production server
-make start
-
-# Cleanup
-make clean
+# Manual setup
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
 ```
 
-## Frontend Development Commands
+### API Testing
+
+```bash
+python test_api.py           # Run API tests
+curl http://localhost:8000/health  # Health check
+```
+
+### Docker Deployment
+
+```bash
+docker-compose up --build    # Build và run với Docker
+```
+
+## Frontend (src/frontend/)
+
+### Development Commands
 
 ```bash
 cd src/frontend
-
-# Cài đặt dependencies
-npm install
-
-# Development server
-npm run dev
-# Server sẽ chạy với Turbopack
-
-# Build production
-npm run build
-npm run start
-
-# Linting và formatting
-npm run lint
-npm run format
-npm run format:check
-
-# Cleanup
-npm run clean
-npm run clean:all
+npm install                   # Install dependencies
+npm run dev                   # Start development server (http://localhost:3000)
+npm run build                 # Build for production
+npm run start                 # Start production server
+npm run lint                  # Run ESLint
+npm run format                # Format code với Prettier
 ```
 
-## ML Pipeline Commands
+### Development Utilities
 
 ```bash
-cd src/src
-
-# Setup virtual environment (nếu chưa có)
-python3.12 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-# Feature extraction
-python batch_feature_extraction.py --dataset dataset --max-files [số lượng files]
-
-# Analysis và visualization
-python analyze_features.py --csv [path-to-features.csv] --plots-dir [output-dir]
-
-# Complete pipeline (training)
-python complete_pipeline.py train dataset --max-files [số lượng] --save-model [model-path]
+npm run clean                 # Clean .next directory
+npm run clean:all            # Clean .next và node_modules
+npm run preview              # Build và preview production
 ```
 
-## Linux System Commands
+## System Commands (Linux)
+
+### Project Navigation
 
 ```bash
-# Tìm files
-find . -name "*.py" -type f
-find . -name "*.ts" -type f
-grep -r "pattern" src/
-
-# Git operations
-git status
-git add .
-git commit -m "message"
-git push origin main
-
-# Process management
-ps aux | grep python
-kill -9 [PID]
-pkill -f "uvicorn"
+ls -la                       # List files với details
+find . -name "*.py" -type f  # Find Python files
+grep -r "keyword" src/       # Search in source files
+cd src/backend && pwd        # Navigate và show current path
 ```
+
+### Process Management
+
+```bash
+lsof -ti:8000 | xargs kill -9  # Kill process on port 8000
+ps aux | grep python           # Find Python processes
+kill -9 PID                    # Kill specific process
+```
+
+### Git Operations
+
+```bash
+git status                   # Check repository status
+git add .                    # Stage all changes
+git commit -m "message"      # Commit changes
+git push origin main         # Push to remote
+git log --oneline -10        # Show recent commits
+```
+
+## Complete Development Workflow
+
+### 1. Start Full Development Environment
+
+```bash
+# Terminal 1: Backend
+cd src/backend && make dev
+
+# Terminal 2: Frontend
+cd src/frontend && npm run dev
+
+# Terminal 3: ML Core (if needed)
+cd src/src && source venv/bin/activate
+```
+
+### 2. Run Analysis Pipeline
+
+```bash
+cd src/src && source venv/bin/activate
+python batch_feature_extraction.py --dataset dataset --max-files 2000 --output features/large_features.csv
+python analyze_features.py --csv features/large_features.csv --plots-dir analysis_plots
+```
+
+### 3. Access Applications
+
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
