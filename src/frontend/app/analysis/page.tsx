@@ -13,8 +13,13 @@ import {
   apiClient,
   handleApiError,
   isAnalysisResponse,
+  isGeminiCombinedResponse,
 } from "@/lib/api-client";
-import { AnalysisResponse, IndividualAnalysisResponse } from "@/lib/api-types";
+import {
+  AnalysisResponse,
+  GeminiCombinedResponse,
+  IndividualAnalysisResponse,
+} from "@/lib/api-types";
 
 import AnalysisSelector, {
   AnalysisMode,
@@ -46,7 +51,10 @@ int main() {
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>("combined");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<
-    AnalysisResponse | IndividualAnalysisResponse | null
+    | AnalysisResponse
+    | IndividualAnalysisResponse
+    | GeminiCombinedResponse
+    | null
   >(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -76,7 +84,9 @@ int main() {
     async (
       code: string,
       language: string,
-    ): Promise<AnalysisResponse | IndividualAnalysisResponse> => {
+    ): Promise<
+      AnalysisResponse | IndividualAnalysisResponse | GeminiCombinedResponse
+    > => {
       setIsAnalyzing(true);
       setError(null);
 
@@ -87,7 +97,10 @@ int main() {
           language,
         };
 
-        let response: AnalysisResponse | IndividualAnalysisResponse;
+        let response:
+          | AnalysisResponse
+          | IndividualAnalysisResponse
+          | GeminiCombinedResponse;
 
         switch (analysisMode) {
           case "combined":
@@ -102,6 +115,9 @@ int main() {
           case "advanced":
             response = await apiClient.analyzeAdvanced(request);
             break;
+          case "gemini":
+            response = await apiClient.analyzeGemini(request);
+            break;
           default:
             throw new Error(`Unsupported analysis mode: ${analysisMode}`);
         }
@@ -109,7 +125,19 @@ int main() {
         setResult(response);
 
         const isComprehensive = isAnalysisResponse(response);
-        if (isComprehensive) {
+        const isGemini = isGeminiCombinedResponse(response);
+
+        if (isGemini) {
+          const geminiResponse = response as GeminiCombinedResponse;
+          const prediction =
+            geminiResponse.gemini_analysis.ai_analysis?.prediction || "Unknown";
+          const confidence =
+            geminiResponse.gemini_analysis.ai_analysis?.confidence || 0;
+
+          toast.success("Gemini AI Analysis hoàn tất", {
+            description: `Prediction: ${prediction} (${Math.round(confidence * 100)}% confidence)`,
+          });
+        } else if (isComprehensive) {
           toast.success("Phân tích hoàn tất, có", {
             description: `Điểm tổng: ${Math.round(
               (response as AnalysisResponse).assessment.overall_score * 100,

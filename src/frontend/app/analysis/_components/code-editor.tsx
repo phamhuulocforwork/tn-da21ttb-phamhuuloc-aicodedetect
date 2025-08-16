@@ -16,7 +16,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { AnalysisResponse, IndividualAnalysisResponse } from "@/lib/api-types";
+import {
+  AnalysisResponse,
+  GeminiCombinedResponse,
+  IndividualAnalysisResponse,
+} from "@/lib/api-types";
 
 export interface CodeEditorTheme {
   base: string;
@@ -43,7 +47,9 @@ export interface CodeEditorProps {
   onSubmit?: (
     code: string,
     language: string,
-  ) => Promise<AnalysisResponse | IndividualAnalysisResponse>;
+  ) => Promise<
+    AnalysisResponse | IndividualAnalysisResponse | GeminiCombinedResponse
+  >;
   placeholder?: string;
   isSubmitting?: boolean;
 }

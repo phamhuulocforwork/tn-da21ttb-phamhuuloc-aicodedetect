@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { BarChart3, Brain, Clock, Layers, Zap } from "lucide-react";
+import { BarChart3, Brain, Clock, Layers, Sparkles, Zap } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -19,7 +19,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { apiClient, handleApiError } from "@/lib/api-client";
 import { AnalysisMethodsResponse } from "@/lib/api-types";
 
-export type AnalysisMode = "combined" | "ast" | "human-style" | "advanced";
+export type AnalysisMode =
+  | "combined"
+  | "ast"
+  | "human-style"
+  | "advanced"
+  | "gemini";
 
 interface AnalysisSelectorProps {
   value: AnalysisMode;
@@ -40,14 +45,13 @@ const ANALYSIS_MODES: Record<
 > = {
   combined: {
     icon: Layers,
-    title: "Phân tích sâu",
-    description:
-      "Phân tích toàn diện sử dụng tất cả phương pháp (80+ đặc trưng)",
+    title: "Phân tích đặc trưng",
+    description: "Phân tích đặc trưng code và so sánh với baseline dataset",
     features: [
-      "AST Analysis",
-      "Human Style",
-      "Advanced Features",
-      "AI Detection",
+      "Structure Analysis",
+      "Style Analysis",
+      "Complexity Analysis",
+      "Baseline Comparison",
     ],
     timeEstimate: "2-5 giây",
   },
@@ -86,6 +90,20 @@ const ANALYSIS_MODES: Record<
       "Maintainability",
     ],
     timeEstimate: "2-3 giây",
+  },
+  gemini: {
+    icon: Sparkles,
+    title: "Gemini AI Analysis",
+    description:
+      "Phân tích bằng Google Gemini AI với khả năng phát hiện patterns",
+    features: [
+      "AI Code Detection",
+      "Probability Analysis",
+      "Pattern Recognition",
+      "Detailed Reasoning",
+    ],
+    timeEstimate: "3-8 giây",
+    badge: "NEW",
   },
 };
 

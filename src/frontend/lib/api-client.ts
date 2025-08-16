@@ -5,6 +5,7 @@ import {
   ApiEndpoints,
   ApiError,
   CodeAnalysisRequest,
+  GeminiCombinedResponse,
   IndividualAnalysisResponse,
 } from "./api-types";
 
@@ -115,12 +116,29 @@ export class ApiClient {
     });
   }
 
+  // Gemini AI analysis (combined with ML)
+  async analyzeGemini(
+    request: CodeAnalysisRequest,
+  ): Promise<GeminiCombinedResponse> {
+    return this.request(ApiEndpoints.GEMINI_ANALYSIS, {
+      method: "POST",
+      body: JSON.stringify(request),
+    });
+  }
+
   // File upload analysis
   async analyzeFile(
     file: File,
-    analysisType: "combined" | "ast" | "human-style" | "advanced" = "combined",
+    analysisType:
+      | "combined"
+      | "ast"
+      | "human-style"
+      | "advanced"
+      | "gemini" = "combined",
     language: string = "c",
-  ): Promise<AnalysisResponse | IndividualAnalysisResponse> {
+  ): Promise<
+    AnalysisResponse | IndividualAnalysisResponse | GeminiCombinedResponse
+  > {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("analysis_type", analysisType);
@@ -138,8 +156,15 @@ export class ApiClient {
   // Generic analysis method
   async analyze(
     request: CodeAnalysisRequest,
-    method: "combined" | "ast" | "human-style" | "advanced" = "combined",
-  ): Promise<AnalysisResponse | IndividualAnalysisResponse> {
+    method:
+      | "combined"
+      | "ast"
+      | "human-style"
+      | "advanced"
+      | "gemini" = "combined",
+  ): Promise<
+    AnalysisResponse | IndividualAnalysisResponse | GeminiCombinedResponse
+  > {
     switch (method) {
       case "combined":
         return this.analyzeCombined(request);
@@ -149,6 +174,8 @@ export class ApiClient {
         return this.analyzeHumanStyle(request);
       case "advanced":
         return this.analyzeAdvanced(request);
+      case "gemini":
+        return this.analyzeGemini(request);
       default:
         throw new Error(`Unknown analysis method: ${method}`);
     }
@@ -160,15 +187,38 @@ export const apiClient = new ApiClient();
 
 // Utility functions
 export const isAnalysisResponse = (
-  response: AnalysisResponse | IndividualAnalysisResponse,
+  response:
+    | AnalysisResponse
+    | IndividualAnalysisResponse
+    | GeminiCombinedResponse,
 ): response is AnalysisResponse => {
   return "feature_groups" in response && "assessment" in response;
 };
 
 export const isIndividualAnalysisResponse = (
-  response: AnalysisResponse | IndividualAnalysisResponse,
+  response:
+    | AnalysisResponse
+    | IndividualAnalysisResponse
+    | GeminiCombinedResponse,
 ): response is IndividualAnalysisResponse => {
-  return "analysis_type" in response && "features" in response;
+  return (
+    "analysis_type" in response &&
+    "features" in response &&
+    !("gemini_analysis" in response)
+  );
+};
+
+export const isGeminiCombinedResponse = (
+  response:
+    | AnalysisResponse
+    | IndividualAnalysisResponse
+    | GeminiCombinedResponse,
+): response is GeminiCombinedResponse => {
+  return (
+    "gemini_analysis" in response &&
+    "analysis_type" in response &&
+    (response as GeminiCombinedResponse).analysis_type === "gemini_combined"
+  );
 };
 
 // Error handling utilities
@@ -192,7 +242,10 @@ export const isApiError = (error: unknown): error is Error => {
 // Local storage utilities for caching
 export const cacheAnalysisResult = (
   key: string,
-  result: AnalysisResponse | IndividualAnalysisResponse,
+  result:
+    | AnalysisResponse
+    | IndividualAnalysisResponse
+    | GeminiCombinedResponse,
 ): void => {
   try {
     const cached = {
@@ -208,7 +261,11 @@ export const cacheAnalysisResult = (
 
 export const getCachedAnalysisResult = (
   key: string,
-): AnalysisResponse | IndividualAnalysisResponse | null => {
+):
+  | AnalysisResponse
+  | IndividualAnalysisResponse
+  | GeminiCombinedResponse
+  | null => {
   try {
     const cached = localStorage.getItem(`analysis_${key}`);
     if (!cached) return null;

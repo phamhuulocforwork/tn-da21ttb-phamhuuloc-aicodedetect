@@ -11,6 +11,7 @@ import {
   FileText,
   Info,
   Loader2,
+  Sparkles,
   TrendingUp,
   Zap,
 } from "lucide-react";
@@ -29,14 +30,23 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { isAnalysisResponse } from "@/lib/api-client";
-import { AnalysisResponse, IndividualAnalysisResponse } from "@/lib/api-types";
+import { isAnalysisResponse, isGeminiCombinedResponse } from "@/lib/api-client";
+import {
+  AnalysisResponse,
+  GeminiCombinedResponse,
+  IndividualAnalysisResponse,
+} from "@/lib/api-types";
 
 import BaselineComparisonView from "./baseline-comparison";
 import FeatureCharts from "./feature-charts";
+import GeminiAnalysis from "./gemini-analysis";
 
 interface ResultsDashboardProps {
-  result: AnalysisResponse | IndividualAnalysisResponse | null;
+  result:
+    | AnalysisResponse
+    | IndividualAnalysisResponse
+    | GeminiCombinedResponse
+    | null;
   loading?: boolean;
   error?: string | null;
   onRetry?: () => void;
@@ -137,6 +147,7 @@ export function ResultsDashboard({
   }
 
   const isComprehensive = isAnalysisResponse(result);
+  const isGeminiAnalysis = isGeminiCombinedResponse(result);
 
   return (
     <div className='space-y-6'>
@@ -166,7 +177,12 @@ export function ResultsDashboard({
           {isComprehensive && (
             <div className='mt-4 p-4 bg-muted/50 rounded-lg'>
               <div className='flex items-center justify-between mb-3'>
-                <h4 className='font-semibold'>Đánh giá tổng quan</h4>
+                <div>
+                  <h4 className='font-semibold'>Đánh giá Feature Analysis</h4>
+                  <p className='text-xs text-muted-foreground'>
+                    Kết quả từ phân tích đặc trưng và so sánh baseline dataset
+                  </p>
+                </div>
                 <Badge variant='outline'>
                   Độ tin cậy: {Math.round(result.assessment.confidence * 100)}%
                 </Badge>
@@ -192,29 +208,43 @@ export function ResultsDashboard({
                 </div>
 
                 {result.assessment.baseline_summary && (
-                  <div className='grid gap-3 md:grid-cols-2 p-3 bg-background/50 rounded-lg border'>
-                    <div className='text-center'>
-                      <div className='text-sm font-medium text-red-600 dark:text-red-400'>
-                        {Math.round(
+                  <div className='p-3 bg-background/50 rounded-lg border'>
+                    <div className='flex items-center justify-between mb-2'>
+                      <h5 className='text-xs font-medium text-muted-foreground'>
+                        So sánh với Dataset Baseline:
+                      </h5>
+                      <Badge variant='secondary' className='text-xs'>
+                        {
                           result.assessment.baseline_summary
-                            .overall_ai_similarity * 100,
-                        )}
-                        %
-                      </div>
-                      <div className='text-xs text-muted-foreground'>
-                        Độ tương đồng với AI
-                      </div>
+                            .total_features_compared
+                        }{" "}
+                        features
+                      </Badge>
                     </div>
-                    <div className='text-center'>
-                      <div className='text-sm font-medium text-green-600 dark:text-green-400'>
-                        {Math.round(
-                          result.assessment.baseline_summary
-                            .overall_human_similarity * 100,
-                        )}
-                        %
+                    <div className='grid gap-3 md:grid-cols-2'>
+                      <div className='text-center'>
+                        <div className='text-sm font-medium text-red-600 dark:text-red-400'>
+                          {Math.round(
+                            result.assessment.baseline_summary
+                              .overall_ai_similarity * 100,
+                          )}
+                          %
+                        </div>
+                        <div className='text-xs text-muted-foreground'>
+                          Tương đồng với AI samples
+                        </div>
                       </div>
-                      <div className='text-xs text-muted-foreground'>
-                        Độ tương đồng với người
+                      <div className='text-center'>
+                        <div className='text-sm font-medium text-green-600 dark:text-green-400'>
+                          {Math.round(
+                            result.assessment.baseline_summary
+                              .overall_human_similarity * 100,
+                          )}
+                          %
+                        </div>
+                        <div className='text-xs text-muted-foreground'>
+                          Tương đồng với Human samples
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -246,13 +276,25 @@ export function ResultsDashboard({
       </Card>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className='grid w-full grid-cols-6'>
+        <TabsList
+          className={`grid w-full ${isGeminiAnalysis ? "grid-cols-4" : "grid-cols-6"}`}
+        >
           <TabsTrigger value='overview'>Tổng quan</TabsTrigger>
-          <TabsTrigger value='features'>Đặc trưng</TabsTrigger>
-          <TabsTrigger value='baseline'>So sánh baseline</TabsTrigger>
-          <TabsTrigger value='charts'>Biểu đồ</TabsTrigger>
-          <TabsTrigger value='details'>Chi tiết</TabsTrigger>
-          <TabsTrigger value='raw'>Dữ liệu thô</TabsTrigger>
+          {isGeminiAnalysis ? (
+            <>
+              <TabsTrigger value='gemini'>Gemini AI</TabsTrigger>
+              <TabsTrigger value='details'>Chi tiết</TabsTrigger>
+              <TabsTrigger value='raw'>Dữ liệu thô</TabsTrigger>
+            </>
+          ) : (
+            <>
+              <TabsTrigger value='features'>Đặc trưng</TabsTrigger>
+              <TabsTrigger value='baseline'>So sánh baseline</TabsTrigger>
+              <TabsTrigger value='charts'>Biểu đồ</TabsTrigger>
+              <TabsTrigger value='details'>Chi tiết</TabsTrigger>
+              <TabsTrigger value='raw'>Dữ liệu thô</TabsTrigger>
+            </>
+          )}
         </TabsList>
 
         <TabsContent value='overview' className='space-y-6'>
@@ -324,10 +366,18 @@ export function ResultsDashboard({
                 <div className='grid gap-4 md:grid-cols-3'>
                   <div className='text-center p-4 bg-muted/50 rounded-lg'>
                     <div className='text-2xl font-bold text-primary'>
-                      {Object.keys(result.features).length}
+                      {isGeminiAnalysis
+                        ? result.gemini_analysis.ai_analysis
+                          ? "Gemini"
+                          : "N/A"
+                        : Object.keys(
+                            (result as IndividualAnalysisResponse).features,
+                          ).length}
                     </div>
                     <div className='text-sm text-muted-foreground'>
-                      Đặc trưng đã trích xuất
+                      {isGeminiAnalysis
+                        ? "AI Analysis"
+                        : "Đặc trưng đã trích xuất"}
                     </div>
                   </div>
 
@@ -472,23 +522,55 @@ export function ResultsDashboard({
               <CardHeader>
                 <CardTitle>Extracted Đặc trưng</CardTitle>
                 <CardDescription>
-                  Tất cả {Object.keys(result.features).length} đặc trưng từ{" "}
-                  {result.analysis_type} phân tích
+                  {isGeminiAnalysis
+                    ? "Gemini AI Analysis Results"
+                    : `Tất cả ${Object.keys((result as IndividualAnalysisResponse).features).length} đặc trưng từ ${(result as IndividualAnalysisResponse).analysis_type} phân tích`}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className='grid gap-3 md:grid-cols-2'>
-                  {Object.entries(result.features).map(([name, value]) => (
-                    <div
-                      key={name}
-                      className='flex items-center justify-between p-3 bg-muted/50 rounded-lg'
-                    >
-                      <span className='font-medium text-sm'>{name}</span>
-                      <span className='font-mono text-sm'>
-                        {typeof value === "number" ? value.toFixed(3) : value}
-                      </span>
+                  {isGeminiAnalysis ? (
+                    <div className='col-span-2 text-center text-muted-foreground'>
+                      Gemini analysis không có raw features. Xem tab Gemini AI
+                      để biết chi tiết.
                     </div>
-                  ))}
+                  ) : (
+                    Object.entries(
+                      (result as IndividualAnalysisResponse).features,
+                    ).map(([name, value]) => (
+                      <div
+                        key={name}
+                        className='flex items-center justify-between p-3 bg-muted/50 rounded-lg'
+                      >
+                        <span className='font-medium text-sm'>{name}</span>
+                        <span className='font-mono text-sm'>
+                          {typeof value === "number"
+                            ? value.toFixed(3)
+                            : String(value)}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value='gemini' className='space-y-6'>
+          {isGeminiAnalysis ? (
+            <GeminiAnalysis result={result} />
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Gemini AI Analysis</CardTitle>
+                <CardDescription>
+                  Phân tích Gemini AI chỉ có sẵn cho loại phân tích Gemini
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className='flex items-center justify-center py-8 text-muted-foreground'>
+                  <Sparkles className='h-12 w-12 mb-4' />
                 </div>
               </CardContent>
             </Card>

@@ -85,6 +85,58 @@ export interface IndividualAnalysisResponse {
   summary: string;
 }
 
+// Gemini AI Analysis Types
+export interface GeminiProbabilityAnalysis {
+  ai_likelihood: number;
+  human_likelihood: number;
+  uncertainty_level: number;
+}
+
+export interface GeminiDetailedAnalysis {
+  style_assessment: string;
+  structure_assessment: string;
+  syntax_assessment: string;
+  overall_assessment: string;
+}
+
+export interface GeminiAnalysisResult {
+  prediction: "AI-generated" | "Human-written";
+  confidence: number;
+  probability_analysis: GeminiProbabilityAnalysis;
+  reasoning: string[];
+  key_indicators: string[];
+  ai_patterns_detected: string[];
+  human_patterns_detected: string[];
+  detailed_analysis: GeminiDetailedAnalysis;
+  confidence_explanation: string;
+  additional_notes: string;
+}
+
+export interface GeminiResponse {
+  success: boolean;
+  ai_analysis?: GeminiAnalysisResult;
+  raw_response?: string;
+  model?: string;
+  error?: string;
+  fallback_analysis?: GeminiAnalysisResult;
+}
+
+export interface GeminiCombinedResponse {
+  success: boolean;
+  analysis_id: string;
+  timestamp: string;
+  analysis_type: "gemini_combined";
+  code_info: CodeInfo;
+  feature_analysis?: {
+    feature_groups: Record<string, FeatureGroup>;
+    assessment: AssessmentResult;
+    raw_features: Record<string, number>;
+  };
+  gemini_analysis: GeminiResponse;
+  combined_assessment?: AssessmentResult;
+  summary: string;
+}
+
 export interface AnalysisMethod {
   id: string;
   name: string;
@@ -111,6 +163,7 @@ export enum ApiEndpoints {
   AST_ANALYSIS = "/api/analysis/ast-analysis",
   HUMAN_STYLE = "/api/analysis/human-style",
   ADVANCED_FEATURES = "/api/analysis/advanced-features",
+  GEMINI_ANALYSIS = "/api/analysis/gemini-analysis",
   UPLOAD_FILE = "/api/analysis/upload-file",
   METHODS = "/api/analysis/methods",
 }

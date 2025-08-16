@@ -1,7 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
+import { BoxAndWiskers, BoxPlotChart } from "@sgratzl/chartjs-chart-boxplot";
+import {
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Tooltip as ChartTooltip,
+  Legend,
+  LinearScale,
+  Title,
+} from "chart.js";
 import {
   Bar,
   BarChart,
@@ -30,6 +40,16 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { FeatureGroup } from "@/lib/api-types";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  ChartTooltip,
+  Legend,
+  BoxAndWiskers,
+);
 
 interface FeatureChartsProps {
   featureGroups: Record<string, FeatureGroup>;
@@ -118,42 +138,188 @@ const BarChartVisualization = ({ group }: { group: FeatureGroup }) => {
 };
 
 const RadarChartVisualization = ({ group }: { group: FeatureGroup }) => {
-  const data = prepareDataForVisualization(group);
+  const { strongFeatures, summary } = useMemo(() => {
+    const sortedFeatures = [...group.features].sort((a, b) => {
+      const aScore = a.baseline_comparison
+        ? Math.abs(
+            a.baseline_comparison.ai_similarity -
+              a.baseline_comparison.human_similarity,
+          ) * a.baseline_comparison.confidence
+        : Math.abs(a.value);
+      const bScore = b.baseline_comparison
+        ? Math.abs(
+            b.baseline_comparison.ai_similarity -
+              b.baseline_comparison.human_similarity,
+          ) * b.baseline_comparison.confidence
+        : Math.abs(b.value);
+      return bScore - aScore;
+    });
+
+    const strongFeatures = sortedFeatures.slice(
+      0,
+      Math.min(8, sortedFeatures.length),
+    );
+    const weakFeatures = sortedFeatures.slice(8);
+
+    let summary = null;
+    if (weakFeatures.length > 0) {
+      const avgWeakValue =
+        weakFeatures.reduce((sum, f) => sum + f.value, 0) / weakFeatures.length;
+      summary = {
+        name: `Other Features (${weakFeatures.length})`,
+        value: avgWeakValue,
+        description: `Average of ${weakFeatures.length} additional features`,
+      };
+    }
+
+    return { strongFeatures, summary };
+  }, [group.features]);
+
+  const radarData = useMemo(() => {
+    const data = strongFeatures.map((feature) => {
+      let subjectName = feature.name
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase())
+        .replace(/Ratio$/, "")
+        .replace(/Score$/, "")
+        .replace(/Consistency$/, "Cons.");
+
+      if (
+        feature.baseline_comparison &&
+        Math.abs(
+          feature.baseline_comparison.ai_similarity -
+            feature.baseline_comparison.human_similarity,
+        ) > 0.3
+      ) {
+        subjectName += " *";
+      }
+
+      return {
+        subject: subjectName,
+        value: feature.normalized
+          ? feature.value * 100
+          : Math.min(feature.value * 100, 100),
+        originalValue: feature.value,
+        fullMark: 100,
+        baseline: feature.baseline_comparison,
+        interpretation: feature.interpretation,
+      };
+    });
+
+    if (summary) {
+      data.push({
+        subject: summary.name,
+        value: summary.value * 100,
+        originalValue: summary.value,
+        fullMark: 100,
+        baseline: undefined,
+        interpretation: summary.description,
+      });
+    }
+
+    return data;
+  }, [strongFeatures, summary]);
 
   return (
-    <ResponsiveContainer width='100%' height={300}>
-      <RadarChart
-        data={data}
-        margin={{ top: 20, right: 30, bottom: 20, left: 30 }}
-      >
-        <PolarGrid className='stroke-muted' />
-        <PolarAngleAxis
-          dataKey='subject'
-          className='text-xs fill-muted-foreground'
-          tick={{ fontSize: 12 }}
-        />
-        <PolarRadiusAxis
-          angle={90}
-          domain={[0, 100]}
-          className='text-xs fill-muted-foreground'
-        />
-        <Radar
-          name={group.group_name}
-          dataKey='value'
-          stroke={CHART_COLORS.primary}
-          fill={CHART_COLORS.primary}
-          fillOpacity={0.2}
-          strokeWidth={2}
-        />
-        <Tooltip
-          contentStyle={{
-            backgroundColor: "hsl(var(--background))",
-            border: "1px solid hsl(var(--border))",
-            borderRadius: "6px",
-          }}
-        />
-      </RadarChart>
-    </ResponsiveContainer>
+    <div className='space-y-4'>
+      <div className='text-xs text-muted-foreground text-center'>
+        Showing top {strongFeatures.length} features
+        {summary && ` (${summary.name.match(/\d+/)?.[0]} others grouped)`}
+        {strongFeatures.some((f) => f.baseline_comparison) && (
+          <span className='block mt-1'>
+            * = Strong baseline difference (AI vs Human)
+          </span>
+        )}
+      </div>
+
+      <ResponsiveContainer width='100%' height={320}>
+        <RadarChart
+          data={radarData}
+          margin={{ top: 20, right: 40, bottom: 20, left: 40 }}
+        >
+          <PolarGrid className='stroke-muted' />
+          <PolarAngleAxis
+            dataKey='subject'
+            className='text-xs fill-muted-foreground'
+            tick={{ fontSize: 10 }}
+          />
+          <PolarRadiusAxis
+            angle={90}
+            domain={[0, 100]}
+            className='text-xs fill-muted-foreground'
+            tick={{ fontSize: 9 }}
+          />
+          <Radar
+            name={group.group_name}
+            dataKey='value'
+            stroke={CHART_COLORS.primary}
+            fill={CHART_COLORS.primary}
+            fillOpacity={0.2}
+            strokeWidth={2}
+            dot={{ fill: CHART_COLORS.primary, strokeWidth: 2, r: 3 }}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "hsl(var(--background))",
+              border: "1px solid hsl(var(--border))",
+              borderRadius: "6px",
+            }}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            formatter={(value: number, name: string, props: any) => {
+              const data = props.payload;
+              const lines = [
+                `Value: ${data.originalValue?.toFixed(3)}`,
+                `Normalized: ${value.toFixed(1)}%`,
+              ];
+
+              if (data.baseline && data.baseline.verdict !== "neutral") {
+                lines.push(
+                  `Baseline: ${data.baseline.verdict} (${(data.baseline.confidence * 100).toFixed(0)}%)`,
+                );
+              }
+
+              if (data.interpretation) {
+                lines.push(`Info: ${data.interpretation}`);
+              }
+
+              return [lines.join("\n"), name];
+            }}
+          />
+        </RadarChart>
+      </ResponsiveContainer>
+
+      {strongFeatures.some((f) => f.baseline_comparison) && (
+        <div className='mt-4 p-3 bg-muted/30 rounded-lg'>
+          <h5 className='text-xs font-medium mb-2'>Baseline Insights:</h5>
+          <div className='grid gap-1 text-xs'>
+            {strongFeatures
+              .filter(
+                (f) =>
+                  f.baseline_comparison &&
+                  f.baseline_comparison.verdict !== "neutral",
+              )
+              .slice(0, 3)
+              .map((feature, index) => (
+                <div key={index} className='flex justify-between'>
+                  <span className='truncate'>
+                    {feature.name.replace(/_/g, " ")}
+                  </span>
+                  <Badge
+                    variant={
+                      feature.baseline_comparison!.verdict === "ai-like"
+                        ? "destructive"
+                        : "secondary"
+                    }
+                    className='text-xs h-4'
+                  >
+                    {feature.baseline_comparison!.verdict}
+                  </Badge>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -196,51 +362,89 @@ const LineChartVisualization = ({ group }: { group: FeatureGroup }) => {
 };
 
 const BoxPlotVisualization = ({ group }: { group: FeatureGroup }) => {
-  const stats = useMemo(() => {
-    const values = group.features.map((f) => f.value);
-    values.sort((a, b) => a - b);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chartRef = useRef<BoxPlotChart | null>(null);
 
-    const q1 = values[Math.floor(values.length * 0.25)];
-    const median = values[Math.floor(values.length * 0.5)];
-    const q3 = values[Math.floor(values.length * 0.75)];
-    const min = values[0];
-    const max = values[values.length - 1];
+  const chartData = useMemo(() => {
+    const features = group.features.filter(
+      (f) => f.value !== null && f.value !== undefined,
+    );
 
-    return { min, q1, median, q3, max };
-  }, [group.features]);
+    return {
+      labels: [group.group_name],
+      datasets: [
+        {
+          label: "Feature Values",
+          data: [features.map((f) => f.value)], // Array of arrays as required by the library
+          backgroundColor: "rgba(59, 130, 246, 0.5)",
+          borderColor: "rgb(59, 130, 246)",
+          borderWidth: 1,
+          outlierColor: "rgb(239, 68, 68)",
+          padding: 10,
+          itemRadius: 2,
+        },
+      ],
+    };
+  }, [group.features, group.group_name]);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+
+    if (chartRef.current) {
+      chartRef.current.destroy();
+    }
+
+    chartRef.current = new BoxPlotChart(canvasRef.current, {
+      data: chartData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: `${group.group_name} - Feature Distribution`,
+          },
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              title: () => group.group_name,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              label: (context: any) => {
+                const stats = context.parsed;
+                return [
+                  `Min: ${stats.min?.toFixed(3)}`,
+                  `Q1: ${stats.q1?.toFixed(3)}`,
+                  `Median: ${stats.median?.toFixed(3)}`,
+                  `Q3: ${stats.q3?.toFixed(3)}`,
+                  `Max: ${stats.max?.toFixed(3)}`,
+                ].join("\n");
+              },
+            },
+          },
+        },
+        scales: {
+          y: {
+            title: {
+              display: true,
+              text: "Feature Values",
+            },
+          },
+        },
+      },
+    });
+
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.destroy();
+      }
+    };
+  }, [chartData, group.group_name]);
 
   return (
-    <div className='h-[300px] flex items-center justify-center'>
-      <div className='text-center space-y-4'>
-        <div className='grid grid-cols-5 gap-4 text-sm'>
-          <div className='space-y-1'>
-            <div className='font-medium'>Min</div>
-            <div className='text-muted-foreground'>{stats.min.toFixed(3)}</div>
-          </div>
-          <div className='space-y-1'>
-            <div className='font-medium'>Q1</div>
-            <div className='text-muted-foreground'>{stats.q1.toFixed(3)}</div>
-          </div>
-          <div className='space-y-1'>
-            <div className='font-medium'>Median</div>
-            <div className='text-muted-foreground'>
-              {stats.median.toFixed(3)}
-            </div>
-          </div>
-          <div className='space-y-1'>
-            <div className='font-medium'>Q3</div>
-            <div className='text-muted-foreground'>{stats.q3.toFixed(3)}</div>
-          </div>
-          <div className='space-y-1'>
-            <div className='font-medium'>Max</div>
-            <div className='text-muted-foreground'>{stats.max.toFixed(3)}</div>
-          </div>
-        </div>
-
-        <div className='text-xs text-muted-foreground'>
-          Box plot visualization coming soon with Chart.js integration
-        </div>
-      </div>
+    <div className='h-[300px] w-full'>
+      <canvas ref={canvasRef} />
     </div>
   );
 };
