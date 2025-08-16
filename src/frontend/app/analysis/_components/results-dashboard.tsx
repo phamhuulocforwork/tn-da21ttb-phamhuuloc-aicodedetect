@@ -31,6 +31,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { isAnalysisResponse } from "@/lib/api-client";
 import { AnalysisResponse, IndividualAnalysisResponse } from "@/lib/api-types";
+
+import BaselineComparisonView from "./baseline-comparison";
 import FeatureCharts from "./feature-charts";
 
 interface ResultsDashboardProps {
@@ -41,18 +43,16 @@ interface ResultsDashboardProps {
   onExportReport?: () => void;
 }
 
-// Helper function to get score color
 const getScoreColor = (score: number): string => {
   if (score <= 0.3) return "text-green-600 dark:text-green-400";
   if (score <= 0.6) return "text-yellow-600 dark:text-yellow-400";
   return "text-red-600 dark:text-red-400";
 };
 
-// Helper function to get score label
 const getScoreLabel = (score: number): string => {
-  if (score <= 0.3) return "Human-like";
-  if (score <= 0.6) return "Mixed";
-  return "AI-like";
+  if (score <= 0.3) return "Giống human";
+  if (score <= 0.6) return "Hỗn hợp";
+  return "Giống AI";
 };
 
 export function ResultsDashboard({
@@ -64,24 +64,23 @@ export function ResultsDashboard({
 }: ResultsDashboardProps) {
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Loading state
   if (loading) {
     return (
       <Card>
         <CardHeader>
           <div className='flex items-center gap-2'>
             <Loader2 className='h-5 w-5 animate-spin' />
-            <CardTitle>Analyzing Code...</CardTitle>
+            <CardTitle>Đang phân tích...</CardTitle>
           </div>
           <CardDescription>
-            Please wait while we analyze your code for AI-generated patterns.
+            Vui lòng chờ trong khi hệ thống phân tích
           </CardDescription>
         </CardHeader>
         <CardContent className='space-y-4'>
           <div className='space-y-2'>
             <div className='flex justify-between text-sm'>
-              <span>Processing...</span>
-              <span>Please wait</span>
+              <span>Đang xử lý...</span>
+              <span>Vui lòng chờ</span>
             </div>
             <Progress value={65} className='h-2' />
           </div>
@@ -101,12 +100,11 @@ export function ResultsDashboard({
     );
   }
 
-  // Error state
   if (error) {
     return (
       <Alert variant='destructive'>
         <AlertCircle className='h-4 w-4' />
-        <AlertTitle>Analysis Failed</AlertTitle>
+        <AlertTitle>Phân tích thất bại</AlertTitle>
         <AlertDescription className='mt-2'>
           {error}
           {onRetry && (
@@ -116,7 +114,7 @@ export function ResultsDashboard({
               onClick={onRetry}
               className='ml-4'
             >
-              Try Again
+              Thử lại
             </Button>
           )}
         </AlertDescription>
@@ -124,47 +122,43 @@ export function ResultsDashboard({
     );
   }
 
-  // No result state
   if (!result) {
     return (
       <Card className='border-dashed'>
         <CardContent className='flex flex-col items-center justify-center py-12 text-center'>
           <BarChart3 className='h-12 w-12 text-muted-foreground mb-4' />
-          <h3 className='text-lg font-semibold mb-2'>No Analysis Yet</h3>
+          <h3 className='text-lg font-semibold mb-2'>Chưa có phân tích</h3>
           <p className='text-muted-foreground max-w-md'>
-            Choose an analysis method and submit your code to see detailed
-            results and insights.
+            Chọn phương thức phân tích và gửi mã để xem kết quả chi tiết.
           </p>
         </CardContent>
       </Card>
     );
   }
 
-  // Check if it's a comprehensive analysis or individual analysis
   const isComprehensive = isAnalysisResponse(result);
 
   return (
     <div className='space-y-6'>
-      {/* Header with overall assessment */}
       <Card>
         <CardHeader>
           <div className='flex items-start justify-between'>
             <div>
               <CardTitle className='flex items-center gap-2'>
                 <FileText className='h-5 w-5' />
-                Analysis Results
+                Kết quả phân tích
               </CardTitle>
               <CardDescription>
                 {result.code_info.filename} •{" "}
                 {result.code_info.language.toUpperCase()} •{" "}
-                {result.code_info.loc} lines
+                {result.code_info.loc} dòng
               </CardDescription>
             </div>
 
             {onExportReport && (
               <Button variant='outline' size='sm' onClick={onExportReport}>
                 <Download className='h-4 w-4 mr-2' />
-                Export Report
+                Xuất báo cáo
               </Button>
             )}
           </div>
@@ -172,9 +166,9 @@ export function ResultsDashboard({
           {isComprehensive && (
             <div className='mt-4 p-4 bg-muted/50 rounded-lg'>
               <div className='flex items-center justify-between mb-3'>
-                <h4 className='font-semibold'>Overall Assessment</h4>
+                <h4 className='font-semibold'>Đánh giá tổng quan</h4>
                 <Badge variant='outline'>
-                  Confidence: {Math.round(result.assessment.confidence * 100)}%
+                  Độ tin cậy: {Math.round(result.assessment.confidence * 100)}%
                 </Badge>
               </div>
 
@@ -182,7 +176,7 @@ export function ResultsDashboard({
                 <div>
                   <div className='flex items-center justify-between mb-2'>
                     <span className='text-sm font-medium'>
-                      AI Likelihood Score
+                      Điểm khả năng giống AI
                     </span>
                     <span
                       className={`text-lg font-bold ${getScoreColor(result.assessment.overall_score)}`}
@@ -196,6 +190,35 @@ export function ResultsDashboard({
                     className='h-2'
                   />
                 </div>
+
+                {result.assessment.baseline_summary && (
+                  <div className='grid gap-3 md:grid-cols-2 p-3 bg-background/50 rounded-lg border'>
+                    <div className='text-center'>
+                      <div className='text-sm font-medium text-red-600 dark:text-red-400'>
+                        {Math.round(
+                          result.assessment.baseline_summary
+                            .overall_ai_similarity * 100,
+                        )}
+                        %
+                      </div>
+                      <div className='text-xs text-muted-foreground'>
+                        Độ tương đồng với AI
+                      </div>
+                    </div>
+                    <div className='text-center'>
+                      <div className='text-sm font-medium text-green-600 dark:text-green-400'>
+                        {Math.round(
+                          result.assessment.baseline_summary
+                            .overall_human_similarity * 100,
+                        )}
+                        %
+                      </div>
+                      <div className='text-xs text-muted-foreground'>
+                        Độ tương đồng với người
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <p className='text-sm text-muted-foreground'>
                   {result.assessment.summary}
@@ -222,20 +245,18 @@ export function ResultsDashboard({
         </CardHeader>
       </Card>
 
-      {/* Tabs for different views */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className='grid w-full grid-cols-5'>
-          <TabsTrigger value='overview'>Overview</TabsTrigger>
-          <TabsTrigger value='features'>Features</TabsTrigger>
-          <TabsTrigger value='charts'>Charts</TabsTrigger>
-          <TabsTrigger value='details'>Details</TabsTrigger>
-          <TabsTrigger value='raw'>Raw Data</TabsTrigger>
+        <TabsList className='grid w-full grid-cols-6'>
+          <TabsTrigger value='overview'>Tổng quan</TabsTrigger>
+          <TabsTrigger value='features'>Đặc trưng</TabsTrigger>
+          <TabsTrigger value='baseline'>So sánh baseline</TabsTrigger>
+          <TabsTrigger value='charts'>Biểu đồ</TabsTrigger>
+          <TabsTrigger value='details'>Chi tiết</TabsTrigger>
+          <TabsTrigger value='raw'>Dữ liệu thô</TabsTrigger>
         </TabsList>
 
-        {/* Overview Tab */}
         <TabsContent value='overview' className='space-y-6'>
           {isComprehensive ? (
-            // Comprehensive analysis overview
             <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
               {Object.entries(result.feature_groups).map(
                 ([groupName, group]) => {
@@ -269,7 +290,7 @@ export function ResultsDashboard({
                               {Math.round(group.group_score * 100)}%
                             </span>
                             <Badge variant='outline' className='text-xs'>
-                              {group.features.length} features
+                              {group.features.length} đặc trưng
                             </Badge>
                           </div>
 
@@ -289,14 +310,13 @@ export function ResultsDashboard({
               )}
             </div>
           ) : (
-            // Individual analysis overview
             <Card>
               <CardHeader>
                 <CardTitle>
                   {result.analysis_type
                     .replace("_", " ")
                     .replace(/\b\w/g, (l) => l.toUpperCase())}{" "}
-                  Analysis
+                  Phân tích
                 </CardTitle>
                 <CardDescription>{result.summary}</CardDescription>
               </CardHeader>
@@ -307,7 +327,7 @@ export function ResultsDashboard({
                       {Object.keys(result.features).length}
                     </div>
                     <div className='text-sm text-muted-foreground'>
-                      Features Extracted
+                      Đặc trưng đã trích xuất
                     </div>
                   </div>
 
@@ -315,9 +335,7 @@ export function ResultsDashboard({
                     <div className='text-2xl font-bold text-primary'>
                       {result.code_info.loc}
                     </div>
-                    <div className='text-sm text-muted-foreground'>
-                      Lines of Code
-                    </div>
+                    <div className='text-sm text-muted-foreground'>Số dòng</div>
                   </div>
 
                   <div className='text-center p-4 bg-muted/50 rounded-lg'>
@@ -327,7 +345,7 @@ export function ResultsDashboard({
                       KB
                     </div>
                     <div className='text-sm text-muted-foreground'>
-                      File Size
+                      Kích thước
                     </div>
                   </div>
                 </div>
@@ -336,10 +354,34 @@ export function ResultsDashboard({
           )}
         </TabsContent>
 
-        {/* Features Tab */}
+        <TabsContent value='baseline' className='space-y-6'>
+          {isComprehensive ? (
+            <BaselineComparisonView
+              baselineSummary={result.assessment.baseline_summary}
+              featuresWithComparison={Object.values(result.feature_groups)
+                .flatMap((group) => group.features)
+                .filter((feature) => feature.baseline_comparison)}
+            />
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Không có so sánh Baseline</CardTitle>
+                <CardDescription>
+                  So sánh baseline không có sẵn cho phức phân tích đang được
+                  chọn
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className='flex items-center justify-center py-8 text-muted-foreground'>
+                  <TrendingUp className='h-12 w-12 mb-4' />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
         <TabsContent value='features' className='space-y-6'>
           {isComprehensive ? (
-            // Feature groups for comprehensive analysis
             <div className='space-y-6'>
               {Object.entries(result.feature_groups).map(
                 ([groupName, group]) => (
@@ -358,33 +400,64 @@ export function ResultsDashboard({
                         {group.features.slice(0, 5).map((feature, index) => (
                           <div
                             key={index}
-                            className='flex items-center justify-between p-3 bg-muted/50 rounded-lg'
+                            className='p-3 bg-muted/50 rounded-lg space-y-2'
                           >
-                            <div>
-                              <div className='font-medium text-sm'>
-                                {feature.name}
+                            <div className='flex items-center justify-between'>
+                              <div>
+                                <div className='font-medium text-sm'>
+                                  {feature.name}
+                                </div>
+                                <div className='text-xs text-muted-foreground'>
+                                  {feature.interpretation}
+                                </div>
                               </div>
-                              <div className='text-xs text-muted-foreground'>
-                                {feature.interpretation}
+                              <div className='text-right'>
+                                <div className='font-bold'>
+                                  {feature.value.toFixed(3)}
+                                </div>
                               </div>
                             </div>
-                            <div className='text-right'>
-                              <div className='font-bold'>
-                                {feature.value.toFixed(3)}
+
+                            {feature.baseline_comparison && (
+                              <div className='pt-2 border-t space-y-1'>
+                                <div className='flex items-center justify-between text-xs'>
+                                  <span className='text-muted-foreground'>
+                                    So sánh với baseline:
+                                  </span>
+                                  <Badge
+                                    variant='outline'
+                                    className={`text-xs ${
+                                      feature.baseline_comparison.verdict ===
+                                      "ai-like"
+                                        ? "text-red-600 dark:text-red-400"
+                                        : feature.baseline_comparison
+                                              .verdict === "human-like"
+                                          ? "text-green-600 dark:text-green-400"
+                                          : "text-yellow-600 dark:text-yellow-400"
+                                    }`}
+                                  >
+                                    {feature.baseline_comparison.verdict}
+                                  </Badge>
+                                </div>
+                                <div className='text-xs text-muted-foreground'>
+                                  AI:{" "}
+                                  {feature.baseline_comparison.ai_baseline.toFixed(
+                                    3,
+                                  )}{" "}
+                                  | Human:{" "}
+                                  {feature.baseline_comparison.human_baseline.toFixed(
+                                    3,
+                                  )}
+                                </div>
                               </div>
-                              {feature.normalized && (
-                                <Badge variant='secondary' className='text-xs'>
-                                  Normalized
-                                </Badge>
-                              )}
-                            </div>
+                            )}
                           </div>
                         ))}
 
                         {group.features.length > 5 && (
                           <div className='text-center'>
                             <Badge variant='outline'>
-                              +{group.features.length - 5} more features
+                              +{group.features.length - 5} đặc trưng khác
                             </Badge>
                           </div>
                         )}
@@ -395,13 +468,12 @@ export function ResultsDashboard({
               )}
             </div>
           ) : (
-            // Individual features
             <Card>
               <CardHeader>
-                <CardTitle>Extracted Features</CardTitle>
+                <CardTitle>Extracted Đặc trưng</CardTitle>
                 <CardDescription>
-                  All {Object.keys(result.features).length} features from{" "}
-                  {result.analysis_type} analysis
+                  Tất cả {Object.keys(result.features).length} đặc trưng từ{" "}
+                  {result.analysis_type} phân tích
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -423,17 +495,15 @@ export function ResultsDashboard({
           )}
         </TabsContent>
 
-        {/* Charts Tab */}
         <TabsContent value='charts' className='space-y-6'>
           {isComprehensive ? (
             <FeatureCharts featureGroups={result.feature_groups} />
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle>Visualization Not Available</CardTitle>
+                <CardTitle>Không có trực quan hóa</CardTitle>
                 <CardDescription>
-                  Charts are only available for comprehensive analysis. Use
-                  Combined Analysis to see feature visualizations.
+                  Biểu đồ chỉ không có sẵn cho phân tích đang được chọn
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -445,21 +515,19 @@ export function ResultsDashboard({
           )}
         </TabsContent>
 
-        {/* Details Tab */}
         <TabsContent value='details' className='space-y-6'>
           <div className='grid gap-6 md:grid-cols-2'>
-            {/* Analysis Info */}
             <Card>
               <CardHeader>
                 <CardTitle className='flex items-center gap-2'>
                   <Info className='h-4 w-4' />
-                  Analysis Information
+                  Thông tin phân tích
                 </CardTitle>
               </CardHeader>
               <CardContent className='space-y-3'>
                 <div className='flex justify-between'>
                   <span className='text-sm text-muted-foreground'>
-                    Analysis ID:
+                    ID phân tích:
                   </span>
                   <span className='font-mono text-sm'>
                     {result.analysis_id}
@@ -468,7 +536,7 @@ export function ResultsDashboard({
                 <Separator />
                 <div className='flex justify-between'>
                   <span className='text-sm text-muted-foreground'>
-                    Timestamp:
+                    Thời gian:
                   </span>
                   <span className='text-sm'>
                     {new Date(result.timestamp).toLocaleString()}
@@ -477,7 +545,7 @@ export function ResultsDashboard({
                 <Separator />
                 <div className='flex justify-between'>
                   <span className='text-sm text-muted-foreground'>
-                    Analysis Type:
+                    Loại phân tích:
                   </span>
                   <Badge variant='outline'>
                     {isComprehensive ? "Combined" : result.analysis_type}
@@ -486,7 +554,7 @@ export function ResultsDashboard({
                 <Separator />
                 <div className='flex justify-between'>
                   <span className='text-sm text-muted-foreground'>
-                    Success:
+                    Thành công:
                   </span>
                   <Badge variant={result.success ? "default" : "destructive"}>
                     {result.success ? "Yes" : "No"}
@@ -495,18 +563,17 @@ export function ResultsDashboard({
               </CardContent>
             </Card>
 
-            {/* Code Info */}
             <Card>
               <CardHeader>
                 <CardTitle className='flex items-center gap-2'>
                   <FileText className='h-4 w-4' />
-                  Code Information
+                  Thông tin code
                 </CardTitle>
               </CardHeader>
               <CardContent className='space-y-3'>
                 <div className='flex justify-between'>
                   <span className='text-sm text-muted-foreground'>
-                    Filename:
+                    Tên file:
                   </span>
                   <span className='font-mono text-sm'>
                     {result.code_info.filename}
@@ -515,7 +582,7 @@ export function ResultsDashboard({
                 <Separator />
                 <div className='flex justify-between'>
                   <span className='text-sm text-muted-foreground'>
-                    Language:
+                    Ngôn ngữ:
                   </span>
                   <Badge variant='secondary'>
                     {result.code_info.language.toUpperCase()}
@@ -524,14 +591,14 @@ export function ResultsDashboard({
                 <Separator />
                 <div className='flex justify-between'>
                   <span className='text-sm text-muted-foreground'>
-                    Lines of Code:
+                    Số dòng:
                   </span>
                   <span className='font-bold'>{result.code_info.loc}</span>
                 </div>
                 <Separator />
                 <div className='flex justify-between'>
                   <span className='text-sm text-muted-foreground'>
-                    File Size:
+                    Kích thước:
                   </span>
                   <span className='text-sm'>
                     {Math.round((result.code_info.file_size / 1024) * 10) / 10}{" "}
@@ -543,13 +610,12 @@ export function ResultsDashboard({
           </div>
         </TabsContent>
 
-        {/* Raw Data Tab */}
         <TabsContent value='raw' className='space-y-6'>
           <Card>
             <CardHeader>
-              <CardTitle>Raw Analysis Data</CardTitle>
+              <CardTitle>Dữ liệu phân tích</CardTitle>
               <CardDescription>
-                Complete JSON response from the analysis API
+                JSON đầy đủ trả về từ API phân tích
               </CardDescription>
             </CardHeader>
             <CardContent>

@@ -19,12 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { apiClient, handleApiError } from "@/lib/api-client";
 import { AnalysisMethodsResponse } from "@/lib/api-types";
 
-export type AnalysisMode =
-  | "combined"
-  | "ast"
-  | "human-style"
-  | "advanced"
-  | "custom";
+export type AnalysisMode = "combined" | "ast" | "human-style" | "advanced";
 
 interface AnalysisSelectorProps {
   value: AnalysisMode;
@@ -32,7 +27,6 @@ interface AnalysisSelectorProps {
   disabled?: boolean;
 }
 
-// Predefined analysis modes với descriptions
 const ANALYSIS_MODES: Record<
   AnalysisMode,
   {
@@ -46,60 +40,52 @@ const ANALYSIS_MODES: Record<
 > = {
   combined: {
     icon: Layers,
-    title: "Deep Analysis",
+    title: "Phân tích sâu",
     description:
-      "Comprehensive analysis using all available methods (80+ features)",
+      "Phân tích toàn diện sử dụng tất cả phương pháp (80+ đặc trưng)",
     features: [
       "AST Analysis",
       "Human Style",
       "Advanced Features",
       "AI Detection",
     ],
-    timeEstimate: "2-5 seconds",
-    badge: "Recommended",
+    timeEstimate: "2-5 giây",
   },
   ast: {
     icon: BarChart3,
-    title: "Structure Analysis",
-    description: "Code structure, control flow, and naming pattern analysis",
+    title: "Phân tích cấu trúc",
+    description: "Cấu trúc mã, luồng điều khiển và mẫu đặt tên",
     features: [
       "Structure metrics",
       "Control flow",
       "Function analysis",
       "Variable naming",
     ],
-    timeEstimate: "1-2 seconds",
+    timeEstimate: "1-2 giây",
   },
   "human-style": {
     icon: Brain,
-    title: "Style Analysis",
-    description: "Coding style and human-like inconsistency detection",
+    title: "Phân tích phong cách",
+    description: "Phong cách mã và các điểm không nhất quán kiểu human",
     features: [
       "Spacing issues",
       "Indentation consistency",
       "Naming patterns",
       "Formatting",
     ],
-    timeEstimate: "1-2 seconds",
+    timeEstimate: "1-2 giây",
   },
   advanced: {
     icon: Zap,
-    title: "Complexity Analysis",
-    description: "Code complexity, redundancy, and AI pattern detection",
+    title: "Phân tích độ phức tạp",
+    description: "Độ phức tạp mã, dư thừa, và phát hiện mẫu AI",
     features: [
       "Complexity metrics",
       "Code redundancy",
       "AI patterns",
       "Maintainability",
     ],
-    timeEstimate: "2-3 seconds",
-  },
-  custom: {
-    icon: Layers,
-    title: "Custom Analysis",
-    description: "Select specific analysis methods to combine",
-    features: ["Choose your own", "Multiple methods", "Flexible options"],
-    timeEstimate: "Variable",
+    timeEstimate: "2-3 giây",
   },
 };
 
@@ -171,13 +157,14 @@ export function AnalysisSelector({
       <Card className='border-destructive'>
         <CardHeader>
           <CardTitle className='text-destructive'>
-            Failed to Load Analysis Methods
+            Không thể tải danh sách phương thức phân tích
           </CardTitle>
           <CardDescription>{error}</CardDescription>
         </CardHeader>
         <CardContent>
           <p className='text-sm text-muted-foreground'>
-            Using default analysis modes. Some features may not be available.
+            Đang sử dụng các chế độ phân tích mặc định. Một số tính năng có thể
+            không hoạt động.
           </p>
         </CardContent>
       </Card>
@@ -188,18 +175,15 @@ export function AnalysisSelector({
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
         <div>
-          <h3 className='text-lg font-semibold'>Analysis Method</h3>
-          <p className='text-sm text-muted-foreground'>
-            Choose how you want to analyze your code
-          </p>
+          <h3 className='text-lg font-semibold'>Phương thức phân tích</h3>
         </div>
 
         {methods && (
           <div className='text-right text-sm text-muted-foreground'>
             <div>
-              Languages: {methods.supported_languages.join(", ").toUpperCase()}
+              Ngôn ngữ: {methods.supported_languages.join(", ").toUpperCase()}
             </div>
-            <div>Max size: {methods.max_file_size}</div>
+            <div>Kích thước tối đa: {methods.max_file_size}</div>
           </div>
         )}
       </div>
@@ -269,7 +253,7 @@ export function AnalysisSelector({
                     <div className='space-y-3'>
                       <div>
                         <p className='text-xs font-medium text-muted-foreground mb-2'>
-                          Features included:
+                          Gồm các phương pháp:
                         </p>
                         <div className='flex flex-wrap gap-1'>
                           {config.features.map((feature, index) => (
@@ -284,7 +268,6 @@ export function AnalysisSelector({
                         </div>
                       </div>
 
-                      {/* Show method details from API if available */}
                       {methods && mode !== "custom" && (
                         <div className='text-xs text-muted-foreground'>
                           {methods.methods.find((m) => m.id === mode)
@@ -299,32 +282,6 @@ export function AnalysisSelector({
           );
         })}
       </RadioGroup>
-
-      {/* Quick analysis info */}
-      {value !== "custom" && (
-        <Card className='bg-muted/50'>
-          <CardContent className='pt-4'>
-            <div className='flex items-start gap-3'>
-              <div className='p-2 rounded-md bg-primary/10'>
-                <Zap className='h-4 w-4 text-primary' />
-              </div>
-              <div className='flex-1'>
-                <h4 className='font-medium text-sm'>Quick Start</h4>
-                <p className='text-xs text-muted-foreground mt-1'>
-                  {value === "combined" &&
-                    "Get the most comprehensive analysis with all features combined. Best for detailed code review."}
-                  {value === "ast" &&
-                    "Focus on code structure and organization. Good for checking algorithmic complexity."}
-                  {value === "human-style" &&
-                    "Detect human coding patterns and inconsistencies. Useful for style analysis."}
-                  {value === "advanced" &&
-                    "Advanced metrics and AI pattern detection. Best for detecting sophisticated generation."}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

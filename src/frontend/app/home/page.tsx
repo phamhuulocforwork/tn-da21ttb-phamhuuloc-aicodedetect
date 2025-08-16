@@ -1,5 +1,5 @@
 import React from "react";
 
 export default function page() {
-  return <div>Page</div>;
+  return <div>Trang chủ</div>;
 }

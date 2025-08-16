@@ -1,10 +1,20 @@
-// API Types for AI Code Detection Backend
-// Based on backend API specification
-
 export interface CodeAnalysisRequest {
   code: string;
   filename?: string;
   language: string;
+}
+
+export interface BaselineComparison {
+  ai_baseline: number;
+  human_baseline: number;
+  current_value: number;
+  deviation_from_ai: number;
+  deviation_from_human: number;
+  ai_similarity: number;
+  human_similarity: number;
+  verdict: "ai-like" | "human-like" | "neutral";
+  confidence: number;
+  explanation: string;
 }
 
 export interface FeatureInfo {
@@ -13,6 +23,7 @@ export interface FeatureInfo {
   normalized: boolean;
   interpretation: string;
   weight: number;
+  baseline_comparison?: BaselineComparison;
 }
 
 export interface FeatureGroup {
@@ -20,14 +31,26 @@ export interface FeatureGroup {
   description: string;
   features: FeatureInfo[];
   group_score: number;
-  visualization_type: 'bar' | 'radar' | 'boxplot' | 'line';
+  visualization_type: "bar" | "radar" | "boxplot" | "line";
+}
+
+export interface BaselineSummary {
+  total_features_compared: number;
+  ai_like_features: number;
+  human_like_features: number;
+  neutral_features: number;
+  strongest_ai_indicators: string[];
+  strongest_human_indicators: string[];
+  overall_ai_similarity: number;
+  overall_human_similarity: number;
 }
 
 export interface AssessmentResult {
-  overall_score: number; // 0=human-like, 1=AI-like
-  confidence: number;    // confidence level
+  overall_score: number;
+  confidence: number;
   key_indicators: string[];
   summary: string;
+  baseline_summary?: BaselineSummary;
 }
 
 export interface CodeInfo {
@@ -52,7 +75,6 @@ export interface AnalysisResponse {
   raw_features?: Record<string, number>;
 }
 
-// Individual analysis response types
 export interface IndividualAnalysisResponse {
   success: boolean;
   analysis_id: string;
@@ -63,7 +85,6 @@ export interface IndividualAnalysisResponse {
   summary: string;
 }
 
-// Analysis methods info
 export interface AnalysisMethod {
   id: string;
   name: string;
@@ -80,18 +101,16 @@ export interface AnalysisMethodsResponse {
   max_code_length: number;
 }
 
-// Error response
 export interface ApiError {
   detail: string;
 }
 
-// API endpoints enum
 export enum ApiEndpoints {
-  HEALTH = '/health',
-  COMBINED_ANALYSIS = '/api/analysis/combined-analysis',
-  AST_ANALYSIS = '/api/analysis/ast-analysis',
-  HUMAN_STYLE = '/api/analysis/human-style',
-  ADVANCED_FEATURES = '/api/analysis/advanced-features',
-  UPLOAD_FILE = '/api/analysis/upload-file',
-  METHODS = '/api/analysis/methods'
+  HEALTH = "/health",
+  COMBINED_ANALYSIS = "/api/analysis/combined-analysis",
+  AST_ANALYSIS = "/api/analysis/ast-analysis",
+  HUMAN_STYLE = "/api/analysis/human-style",
+  ADVANCED_FEATURES = "/api/analysis/advanced-features",
+  UPLOAD_FILE = "/api/analysis/upload-file",
+  METHODS = "/api/analysis/methods",
 }

@@ -25,7 +25,7 @@ export function ThemeToggle({
   if (!mounted) {
     return (
       <Button variant='outline' size='icon' {...props}>
-        <span className='sr-only'>Toggle Theme</span>
+        <span className='sr-only'>Đổi giao diện</span>
       </Button>
     );
   }
@@ -37,7 +37,7 @@ export function ThemeToggle({
       ) : (
         <MoonStar className='size-5' />
       )}
-      <span className='sr-only'>Toggle Theme</span>
+      <span className='sr-only'>Đổi giao diện</span>
     </Button>
   );
 }

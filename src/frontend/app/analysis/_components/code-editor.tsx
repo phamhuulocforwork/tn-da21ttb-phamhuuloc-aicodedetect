@@ -30,8 +30,6 @@ export interface CodeEditorTheme {
   }>;
 }
 
-// Moved to @/lib/api-types.ts
-
 export interface CodeEditorProps {
   value?: string;
   onChange?: (value: string | undefined) => void;
@@ -53,10 +51,6 @@ export interface CodeEditorProps {
 const SUPPORTED_LANGUAGES = [
   { id: "c", name: "C", extensions: [".c"] },
   { id: "cpp", name: "C++", extensions: [".cpp", ".cxx", ".cc"] },
-  { id: "java", name: "Java", extensions: [".java"] },
-  { id: "python", name: "Python", extensions: [".py"] },
-  { id: "javascript", name: "JavaScript", extensions: [".js"] },
-  { id: "typescript", name: "TypeScript", extensions: [".ts"] },
 ];
 
 export function CodeEditor({
@@ -197,7 +191,7 @@ export function CodeEditor({
             onValueChange={(value) => setSelectedLanguage(value)}
           >
             <SelectTrigger className='w-[180px]'>
-              <SelectValue placeholder='Language' />
+              <SelectValue placeholder='Ngôn ngữ' />
             </SelectTrigger>
             <SelectContent>
               {SUPPORTED_LANGUAGES.map((lang) => (
@@ -221,7 +215,7 @@ export function CodeEditor({
               ) : (
                 <Send className='w-4 h-4 mr-1' />
               )}
-              {isSubmitting ? "Analyzing..." : "Analyze Code"}
+              {isSubmitting ? "Đang phân tích..." : "Phân tích mã"}
             </Button>
           )}
         </div>
@@ -240,7 +234,7 @@ export function CodeEditor({
           loading={
             <div className='flex h-full items-center justify-center text-sm text-muted-foreground'>
               <Loader2 className='w-5 h-5 animate-spin mr-2' />
-              Loading editor...
+              Đang tải...
             </div>
           }
           {...props}

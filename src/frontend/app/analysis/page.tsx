@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 
+import { Repeat } from "lucide-react";
 import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -24,7 +25,6 @@ import oneDarkPro from "./_components/onedarkpro.json";
 import ResultsDashboard from "./_components/results-dashboard";
 
 export default function AnalysisPage() {
-  // State management
   const [code, setCode] = useState(`#include <stdio.h>
 #include <stdlib.h>
 
@@ -50,12 +50,10 @@ int main() {
   >(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Handle code change
   const handleCodeChange = useCallback(
     (value: string | undefined) => {
       if (value !== undefined) {
         setCode(value);
-        // Clear previous results when code changes
         if (result) {
           setResult(null);
         }
@@ -64,11 +62,9 @@ int main() {
     [result],
   );
 
-  // Handle analysis mode change
   const handleAnalysisModeChange = useCallback(
     (mode: AnalysisMode) => {
       setAnalysisMode(mode);
-      // Clear previous results when mode changes
       if (result) {
         setResult(null);
       }
@@ -76,7 +72,6 @@ int main() {
     [result],
   );
 
-  // Handle code submission
   const handleSubmitCode = useCallback(
     async (
       code: string,
@@ -86,14 +81,12 @@ int main() {
       setError(null);
 
       try {
-        // Prepare request
         const request = {
           code,
           filename: `code.${language}`,
           language,
         };
 
-        // Call appropriate API endpoint based on analysis mode
         let response: AnalysisResponse | IndividualAnalysisResponse;
 
         switch (analysisMode) {
@@ -115,20 +108,19 @@ int main() {
 
         setResult(response);
 
-        // Show success toast
         const isComprehensive = isAnalysisResponse(response);
         if (isComprehensive) {
-          toast.success("Analysis Complete", {
-            description: `Overall score: ${Math.round(
+          toast.success("Phân tích hoàn tất, có", {
+            description: `Điểm tổng: ${Math.round(
               (response as AnalysisResponse).assessment.overall_score * 100,
-            )}% AI-like`,
+            )}% giống AI`,
           });
         } else {
-          toast.success("Analysis Complete", {
+          toast.success("Phân tích hoàn tất, có", {
             description: `${
               Object.keys((response as IndividualAnalysisResponse).features)
                 .length
-            } features extracted`,
+            } đặc trưng đã được trích xuất`,
           });
         }
 
@@ -137,8 +129,7 @@ int main() {
         const errorMessage = handleApiError(err);
         setError(errorMessage);
 
-        // Show error toast
-        toast.error("Analysis Failed", {
+        toast.error("Không thể phân tích", {
           description: errorMessage,
         });
 
@@ -150,14 +141,12 @@ int main() {
     [analysisMode],
   );
 
-  // Handle retry
   const handleRetry = useCallback(() => {
     if (code.trim()) {
       handleSubmitCode(code, "c");
     }
   }, [code, handleSubmitCode]);
 
-  // Handle export report
   const handleExportReport = useCallback(() => {
     if (!result) return;
 
@@ -181,12 +170,12 @@ int main() {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      toast.success("Report Exported", {
-        description: "Analysis report downloaded successfully",
+      toast.success("Đã xuất báo cáo", {
+        description: "Tải xuống báo cáo phân tích thành công",
       });
     } catch {
-      toast.error("Export Failed", {
-        description: "Failed to export analysis report",
+      toast.error("Không thể xuất báo cáo", {
+        description: "Không thể xuất báo cáo phân tích",
       });
     }
   }, [result]);
@@ -195,20 +184,8 @@ int main() {
     <div className='min-h-screen bg-background'>
       <Header />
 
-      <div className='container mx-auto p-4 space-y-6'>
-        {/* Analysis Configuration */}
+      <div id='analysis' className='container mx-auto p-4 space-y-6'>
         <div className='space-y-6'>
-          <div>
-            <h2 className='text-2xl font-bold tracking-tight mb-2'>
-              AI Code Detection Analysis
-            </h2>
-            <p className='text-muted-foreground'>
-              Analyze your code to detect AI-generated patterns and assess
-              coding style characteristics.
-            </p>
-          </div>
-
-          {/* Analysis Method Selector */}
           <AnalysisSelector
             value={analysisMode}
             onChange={handleAnalysisModeChange}
@@ -217,13 +194,12 @@ int main() {
 
           <Separator />
 
-          {/* Code Editor */}
           <div className='space-y-4'>
             <div className='flex items-center justify-between'>
-              <h3 className='text-lg font-semibold'>Code Input</h3>
+              <h3 className='text-lg font-semibold'>Mã nguồn</h3>
               {code.trim() && (
                 <div className='text-sm text-muted-foreground'>
-                  {code.split("\n").length} lines •{" "}
+                  {code.split("\n").length} dòng • Kích thước:{" "}
                   {Math.round((code.length / 1024) * 10) / 10} KB
                 </div>
               )}
@@ -235,7 +211,7 @@ int main() {
               onChange={handleCodeChange}
               onSubmit={handleSubmitCode}
               isSubmitting={isAnalyzing}
-              placeholder='Paste your C/C++ code here to analyze for AI-generated patterns...'
+              placeholder='Dán mã C/C++ vào đây để phân tích...'
               customDarkTheme={{
                 base: "vs-dark",
                 inherit: true,
@@ -247,10 +223,9 @@ int main() {
 
         <Separator />
 
-        {/* Results Section */}
-        <div className='space-y-4'>
+        <div id='results' className='space-y-4'>
           <div className='flex items-center justify-between'>
-            <h3 className='text-lg font-semibold'>Analysis Results</h3>
+            <h3 className='text-lg font-semibold'>Kết quả phân tích</h3>
 
             {result && !isAnalyzing && (
               <div className='flex items-center gap-2'>
@@ -260,27 +235,26 @@ int main() {
                   onClick={handleRetry}
                   disabled={!code.trim()}
                 >
-                  Re-analyze
+                  <Repeat />
+                  Phân tích lại
                 </Button>
               </div>
             )}
           </div>
 
-          {/* API Error Alert */}
           {error && (
             <Alert variant='destructive'>
               <AlertDescription>
-                <strong>Connection Error:</strong> {error}
+                <strong>Lỗi kết nối:</strong> {error}
                 <br />
                 <span className='text-sm mt-1 block'>
-                  Make sure the backend server is running at
-                  http://localhost:8000
+                  Hãy đảm bảo backend server đang chạy tại{" "}
+                  {process.env.NEXT_PUBLIC_API_URL}
                 </span>
               </AlertDescription>
             </Alert>
           )}
 
-          {/* Results Dashboard */}
           <ResultsDashboard
             result={result}
             loading={isAnalyzing}
