@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { BarChart3, Brain, Clock, Layers, Sparkles, Zap } from "lucide-react";
+import { Clock, Layers, Sparkles } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,9 +21,9 @@ import { AnalysisMethodsResponse } from "@/lib/api-types";
 
 export type AnalysisMode =
   | "combined"
-  | "ast"
-  | "human-style"
-  | "advanced"
+  // | "ast"
+  // | "human-style"
+  // | "advanced"
   | "gemini";
 
 interface AnalysisSelectorProps {
@@ -55,42 +55,42 @@ const ANALYSIS_MODES: Record<
     ],
     timeEstimate: "2-5 giây",
   },
-  ast: {
-    icon: BarChart3,
-    title: "Phân tích cấu trúc",
-    description: "Cấu trúc mã, luồng điều khiển và mẫu đặt tên",
-    features: [
-      "Structure metrics",
-      "Control flow",
-      "Function analysis",
-      "Variable naming",
-    ],
-    timeEstimate: "1-2 giây",
-  },
-  "human-style": {
-    icon: Brain,
-    title: "Phân tích phong cách",
-    description: "Phong cách mã và các điểm không nhất quán kiểu human",
-    features: [
-      "Spacing issues",
-      "Indentation consistency",
-      "Naming patterns",
-      "Formatting",
-    ],
-    timeEstimate: "1-2 giây",
-  },
-  advanced: {
-    icon: Zap,
-    title: "Phân tích độ phức tạp",
-    description: "Độ phức tạp mã, dư thừa, và phát hiện mẫu AI",
-    features: [
-      "Complexity metrics",
-      "Code redundancy",
-      "AI patterns",
-      "Maintainability",
-    ],
-    timeEstimate: "2-3 giây",
-  },
+  // ast: {
+  //   icon: BarChart3,
+  //   title: "Phân tích cấu trúc",
+  //   description: "Cấu trúc mã, luồng điều khiển và mẫu đặt tên",
+  //   features: [
+  //     "Structure metrics",
+  //     "Control flow",
+  //     "Function analysis",
+  //     "Variable naming",
+  //   ],
+  //   timeEstimate: "1-2 giây",
+  // },
+  // "human-style": {
+  //   icon: Brain,
+  //   title: "Phân tích phong cách",
+  //   description: "Phong cách mã và các điểm không nhất quán kiểu human",
+  //   features: [
+  //     "Spacing issues",
+  //     "Indentation consistency",
+  //     "Naming patterns",
+  //     "Formatting",
+  //   ],
+  //   timeEstimate: "1-2 giây",
+  // },
+  // advanced: {
+  //   icon: Zap,
+  //   title: "Phân tích độ phức tạp",
+  //   description: "Độ phức tạp mã, dư thừa, và phát hiện mẫu AI",
+  //   features: [
+  //     "Complexity metrics",
+  //     "Code redundancy",
+  //     "AI patterns",
+  //     "Maintainability",
+  //   ],
+  //   timeEstimate: "2-3 giây",
+  // },
   gemini: {
     icon: Sparkles,
     title: "Gemini AI Analysis",
@@ -103,7 +103,6 @@ const ANALYSIS_MODES: Record<
       "Detailed Reasoning",
     ],
     timeEstimate: "3-8 giây",
-    badge: "NEW",
   },
 };
 
