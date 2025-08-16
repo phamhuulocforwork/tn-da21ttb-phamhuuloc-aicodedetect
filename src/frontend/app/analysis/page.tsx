@@ -44,7 +44,7 @@ int main() {
         sum += i;
     }
     
-    printf("Sum = %d\n", sum);
+    printf("Sum = %d", sum);
     return 0;
 }`);
 
