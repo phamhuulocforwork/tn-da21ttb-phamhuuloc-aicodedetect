@@ -1,11 +1,11 @@
 // API Client for AI Code Detection Backend
 import {
+  AIMDXResponse,
   AnalysisMethodsResponse,
   AnalysisResponse,
   ApiEndpoints,
   ApiError,
   CodeAnalysisRequest,
-  GeminiCombinedResponse,
   IndividualAnalysisResponse,
 } from "./api-types";
 
@@ -116,11 +116,9 @@ export class ApiClient {
     });
   }
 
-  // Gemini AI analysis (combined with ML)
-  async analyzeGemini(
-    request: CodeAnalysisRequest,
-  ): Promise<GeminiCombinedResponse> {
-    return this.request(ApiEndpoints.GEMINI_ANALYSIS, {
+  // AI analysis with MDX output
+  async analyzeAI(request: CodeAnalysisRequest): Promise<AIMDXResponse> {
+    return this.request(ApiEndpoints.AI_ANALYSIS, {
       method: "POST",
       body: JSON.stringify(request),
     });
@@ -134,11 +132,9 @@ export class ApiClient {
       | "ast"
       | "human-style"
       | "advanced"
-      | "gemini" = "combined",
+      | "ai" = "combined",
     language: string = "c",
-  ): Promise<
-    AnalysisResponse | IndividualAnalysisResponse | GeminiCombinedResponse
-  > {
+  ): Promise<AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse> {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("analysis_type", analysisType);
@@ -156,15 +152,8 @@ export class ApiClient {
   // Generic analysis method
   async analyze(
     request: CodeAnalysisRequest,
-    method:
-      | "combined"
-      | "ast"
-      | "human-style"
-      | "advanced"
-      | "gemini" = "combined",
-  ): Promise<
-    AnalysisResponse | IndividualAnalysisResponse | GeminiCombinedResponse
-  > {
+    method: "combined" | "ast" | "human-style" | "advanced" | "ai" = "combined",
+  ): Promise<AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse> {
     switch (method) {
       case "combined":
         return this.analyzeCombined(request);
@@ -174,8 +163,8 @@ export class ApiClient {
         return this.analyzeHumanStyle(request);
       case "advanced":
         return this.analyzeAdvanced(request);
-      case "gemini":
-        return this.analyzeGemini(request);
+      case "ai":
+        return this.analyzeAI(request);
       default:
         throw new Error(`Unknown analysis method: ${method}`);
     }
@@ -187,37 +176,28 @@ export const apiClient = new ApiClient();
 
 // Utility functions
 export const isAnalysisResponse = (
-  response:
-    | AnalysisResponse
-    | IndividualAnalysisResponse
-    | GeminiCombinedResponse,
+  response: AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse,
 ): response is AnalysisResponse => {
   return "feature_groups" in response && "assessment" in response;
 };
 
 export const isIndividualAnalysisResponse = (
-  response:
-    | AnalysisResponse
-    | IndividualAnalysisResponse
-    | GeminiCombinedResponse,
+  response: AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse,
 ): response is IndividualAnalysisResponse => {
   return (
     "analysis_type" in response &&
     "features" in response &&
-    !("gemini_analysis" in response)
+    !("mdx_content" in response)
   );
 };
 
-export const isGeminiCombinedResponse = (
-  response:
-    | AnalysisResponse
-    | IndividualAnalysisResponse
-    | GeminiCombinedResponse,
-): response is GeminiCombinedResponse => {
+export const isAIMDXResponse = (
+  response: AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse,
+): response is AIMDXResponse => {
   return (
-    "gemini_analysis" in response &&
+    "mdx_content" in response &&
     "analysis_type" in response &&
-    (response as GeminiCombinedResponse).analysis_type === "gemini_combined"
+    (response as AIMDXResponse).analysis_type === "ai_mdx"
   );
 };
 
@@ -242,10 +222,7 @@ export const isApiError = (error: unknown): error is Error => {
 // Local storage utilities for caching
 export const cacheAnalysisResult = (
   key: string,
-  result:
-    | AnalysisResponse
-    | IndividualAnalysisResponse
-    | GeminiCombinedResponse,
+  result: AnalysisResponse | IndividualAnalysisResponse,
 ): void => {
   try {
     const cached = {
@@ -261,11 +238,7 @@ export const cacheAnalysisResult = (
 
 export const getCachedAnalysisResult = (
   key: string,
-):
-  | AnalysisResponse
-  | IndividualAnalysisResponse
-  | GeminiCombinedResponse
-  | null => {
+): AnalysisResponse | IndividualAnalysisResponse | null => {
   try {
     const cached = localStorage.getItem(`analysis_${key}`);
     if (!cached) return null;

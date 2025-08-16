@@ -24,7 +24,7 @@ export type AnalysisMode =
   // | "ast"
   // | "human-style"
   // | "advanced"
-  | "gemini";
+  | "ai";
 
 interface AnalysisSelectorProps {
   value: AnalysisMode;
@@ -92,11 +92,11 @@ const ANALYSIS_MODES: Record<
   //   ],
   //   timeEstimate: "2-3 giây",
   // },
-  gemini: {
+  ai: {
     icon: Sparkles,
-    title: "Gemini AI Analysis",
+    title: "AI Analysis",
     description:
-      "Phân tích bằng Google Gemini AI với khả năng phát hiện patterns",
+      "Phân tích thông minh với khả năng phát hiện patterns và reasoning chi tiết",
     features: [
       "AI Code Detection",
       "Probability Analysis",

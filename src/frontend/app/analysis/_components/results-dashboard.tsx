@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import {
   AlertCircle,
@@ -30,23 +30,18 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { isAnalysisResponse, isGeminiCombinedResponse } from "@/lib/api-client";
+import { isAIMDXResponse, isAnalysisResponse } from "@/lib/api-client";
 import {
+  AIMDXResponse,
   AnalysisResponse,
-  GeminiCombinedResponse,
   IndividualAnalysisResponse,
 } from "@/lib/api-types";
 
 import BaselineComparisonView from "./baseline-comparison";
 import FeatureCharts from "./feature-charts";
-import GeminiAnalysis from "./gemini-analysis";
-
+import { MDXRenderer } from "@/lib/mdx-utils";
 interface ResultsDashboardProps {
-  result:
-    | AnalysisResponse
-    | IndividualAnalysisResponse
-    | GeminiCombinedResponse
-    | null;
+  result: AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse | null;
   loading?: boolean;
   error?: string | null;
   onRetry?: () => void;
@@ -65,7 +60,7 @@ const getScoreLabel = (score: number): string => {
   return "Giống AI";
 };
 
-export function ResultsDashboard({
+export default function ResultsDashboard({
   result,
   loading = false,
   error = null,
@@ -73,6 +68,9 @@ export function ResultsDashboard({
   onExportReport,
 }: ResultsDashboardProps) {
   const [activeTab, setActiveTab] = useState("overview");
+
+  // Handle MDX content for AI analysis
+  const aiMdxContent = result && isAIMDXResponse(result) ? result.mdx_content : "";
 
   if (loading) {
     return (
@@ -147,7 +145,7 @@ export function ResultsDashboard({
   }
 
   const isComprehensive = isAnalysisResponse(result);
-  const isGeminiAnalysis = isGeminiCombinedResponse(result);
+  const isAIAnalysis = isAIMDXResponse(result);
 
   return (
     <div className='space-y-6'>
@@ -277,12 +275,12 @@ export function ResultsDashboard({
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList
-          className={`grid w-full ${isGeminiAnalysis ? "grid-cols-4" : "grid-cols-6"}`}
+          className={`grid w-full ${isAIAnalysis ? "grid-cols-4" : "grid-cols-6"}`}
         >
           <TabsTrigger value='overview'>Tổng quan</TabsTrigger>
-          {isGeminiAnalysis ? (
+          {isAIAnalysis ? (
             <>
-              <TabsTrigger value='gemini'>Gemini AI</TabsTrigger>
+              <TabsTrigger value='ai'>AI Analysis</TabsTrigger>
               <TabsTrigger value='details'>Chi tiết</TabsTrigger>
               <TabsTrigger value='raw'>Dữ liệu thô</TabsTrigger>
             </>
@@ -366,18 +364,14 @@ export function ResultsDashboard({
                 <div className='grid gap-4 md:grid-cols-3'>
                   <div className='text-center p-4 bg-muted/50 rounded-lg'>
                     <div className='text-2xl font-bold text-primary'>
-                      {isGeminiAnalysis
-                        ? result.gemini_analysis.ai_analysis
-                          ? "Gemini"
-                          : "N/A"
+                      {isAIAnalysis
+                        ? "AI"
                         : Object.keys(
                             (result as IndividualAnalysisResponse).features,
                           ).length}
                     </div>
                     <div className='text-sm text-muted-foreground'>
-                      {isGeminiAnalysis
-                        ? "AI Analysis"
-                        : "Đặc trưng đã trích xuất"}
+                      {isAIAnalysis ? "AI Analysis" : "Đặc trưng đã trích xuất"}
                     </div>
                   </div>
 
@@ -431,7 +425,7 @@ export function ResultsDashboard({
         </TabsContent>
 
         <TabsContent value='features' className='space-y-6'>
-          {isComprehensive ? (
+          {isComprehensive && (
             <div className='space-y-6'>
               {Object.entries(result.feature_groups).map(
                 ([groupName, group]) => (
@@ -517,55 +511,37 @@ export function ResultsDashboard({
                 ),
               )}
             </div>
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>Extracted Đặc trưng</CardTitle>
-                <CardDescription>
-                  {isGeminiAnalysis
-                    ? "Gemini AI Analysis Results"
-                    : `Tất cả ${Object.keys((result as IndividualAnalysisResponse).features).length} đặc trưng từ ${(result as IndividualAnalysisResponse).analysis_type} phân tích`}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className='grid gap-3 md:grid-cols-2'>
-                  {isGeminiAnalysis ? (
-                    <div className='col-span-2 text-center text-muted-foreground'>
-                      Gemini analysis không có raw features. Xem tab Gemini AI
-                      để biết chi tiết.
-                    </div>
-                  ) : (
-                    Object.entries(
-                      (result as IndividualAnalysisResponse).features,
-                    ).map(([name, value]) => (
-                      <div
-                        key={name}
-                        className='flex items-center justify-between p-3 bg-muted/50 rounded-lg'
-                      >
-                        <span className='font-medium text-sm'>{name}</span>
-                        <span className='font-mono text-sm'>
-                          {typeof value === "number"
-                            ? value.toFixed(3)
-                            : String(value)}
-                        </span>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </CardContent>
-            </Card>
           )}
         </TabsContent>
 
-        <TabsContent value='gemini' className='space-y-6'>
-          {isGeminiAnalysis ? (
-            <GeminiAnalysis result={result} />
+        <TabsContent value='ai' className='space-y-6'>
+          {isAIAnalysis ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center gap-2'>
+                  <Sparkles className='h-5 w-5' />
+                  AI Analysis
+                </CardTitle>
+                <CardDescription>
+                  Kết quả phân tích từ AI với đánh giá chi tiết về patterns và
+                  reasoning
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <MDXRenderer 
+                  content={aiMdxContent}
+                  loadingText="Đang xử lý nội dung phân tích AI..."
+                  errorTitle="Lỗi xử lý nội dung phân tích"
+                  errorDescription="Không thể hiển thị kết quả phân tích AI. Vui lòng thử lại."
+                />
+              </CardContent>
+            </Card>
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle>Gemini AI Analysis</CardTitle>
+                <CardTitle>AI Analysis</CardTitle>
                 <CardDescription>
-                  Phân tích Gemini AI chỉ có sẵn cho loại phân tích Gemini
+                  Phân tích AI chỉ có sẵn cho loại phân tích AI
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -711,5 +687,3 @@ export function ResultsDashboard({
     </div>
   );
 }
-
-export default ResultsDashboard;

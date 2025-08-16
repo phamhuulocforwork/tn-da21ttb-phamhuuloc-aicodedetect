@@ -85,7 +85,6 @@ export interface IndividualAnalysisResponse {
   summary: string;
 }
 
-// Gemini AI Analysis Types
 export interface GeminiProbabilityAnalysis {
   ai_likelihood: number;
   human_likelihood: number;
@@ -121,19 +120,14 @@ export interface GeminiResponse {
   fallback_analysis?: GeminiAnalysisResult;
 }
 
-export interface GeminiCombinedResponse {
+export interface AIMDXResponse {
   success: boolean;
   analysis_id: string;
   timestamp: string;
-  analysis_type: "gemini_combined";
+  analysis_type: "ai_mdx";
   code_info: CodeInfo;
-  feature_analysis?: {
-    feature_groups: Record<string, FeatureGroup>;
-    assessment: AssessmentResult;
-    raw_features: Record<string, number>;
-  };
-  gemini_analysis: GeminiResponse;
-  combined_assessment?: AssessmentResult;
+  mdx_content: string;
+  model: string;
   summary: string;
 }
 
@@ -163,7 +157,7 @@ export enum ApiEndpoints {
   AST_ANALYSIS = "/api/analysis/ast-analysis",
   HUMAN_STYLE = "/api/analysis/human-style",
   ADVANCED_FEATURES = "/api/analysis/advanced-features",
-  GEMINI_ANALYSIS = "/api/analysis/gemini-analysis",
+  AI_ANALYSIS = "/api/analysis/ai-analysis",
   UPLOAD_FILE = "/api/analysis/upload-file",
   METHODS = "/api/analysis/methods",
 }

@@ -500,7 +500,7 @@ export function FeatureCharts({
       </div>
 
       <Tabs defaultValue={groupEntries[0]?.[0]} className='w-full'>
-        <TabsList className='grid grid-cols-5 w-full'>
+        <TabsList>
           {groupEntries.map(([groupName, group]) => (
             <TabsTrigger key={groupName} value={groupName} className='text-xs'>
               {group.group_name}

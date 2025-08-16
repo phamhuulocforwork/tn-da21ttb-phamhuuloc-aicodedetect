@@ -17,8 +17,8 @@ import {
 } from "@/components/ui/select";
 
 import {
+  AIMDXResponse,
   AnalysisResponse,
-  GeminiCombinedResponse,
   IndividualAnalysisResponse,
 } from "@/lib/api-types";
 
@@ -47,9 +47,7 @@ export interface CodeEditorProps {
   onSubmit?: (
     code: string,
     language: string,
-  ) => Promise<
-    AnalysisResponse | IndividualAnalysisResponse | GeminiCombinedResponse
-  >;
+  ) => Promise<AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse>;
   placeholder?: string;
   isSubmitting?: boolean;
 }

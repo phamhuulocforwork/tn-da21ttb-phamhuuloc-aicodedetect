@@ -12,12 +12,12 @@ import { Separator } from "@/components/ui/separator";
 import {
   apiClient,
   handleApiError,
+  isAIMDXResponse,
   isAnalysisResponse,
-  isGeminiCombinedResponse,
 } from "@/lib/api-client";
 import {
+  AIMDXResponse,
   AnalysisResponse,
-  GeminiCombinedResponse,
   IndividualAnalysisResponse,
 } from "@/lib/api-types";
 
@@ -51,10 +51,7 @@ int main() {
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>("combined");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<
-    | AnalysisResponse
-    | IndividualAnalysisResponse
-    | GeminiCombinedResponse
-    | null
+    AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse | null
   >(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -85,7 +82,7 @@ int main() {
       code: string,
       language: string,
     ): Promise<
-      AnalysisResponse | IndividualAnalysisResponse | GeminiCombinedResponse
+      AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse
     > => {
       setIsAnalyzing(true);
       setError(null);
@@ -100,23 +97,23 @@ int main() {
         let response:
           | AnalysisResponse
           | IndividualAnalysisResponse
-          | GeminiCombinedResponse;
+          | AIMDXResponse;
 
         switch (analysisMode) {
           case "combined":
             response = await apiClient.analyzeCombined(request);
             break;
-          case "ast":
-            response = await apiClient.analyzeAst(request);
-            break;
-          case "human-style":
-            response = await apiClient.analyzeHumanStyle(request);
-            break;
-          case "advanced":
-            response = await apiClient.analyzeAdvanced(request);
-            break;
-          case "gemini":
-            response = await apiClient.analyzeGemini(request);
+          // case "ast":
+          //   response = await apiClient.analyzeAst(request);
+          //   break;
+          // case "human-style":
+          //   response = await apiClient.analyzeHumanStyle(request);
+          //   break;
+          // case "advanced":
+          //   response = await apiClient.analyzeAdvanced(request);
+          //   break;
+          case "ai":
+            response = await apiClient.analyzeAI(request);
             break;
           default:
             throw new Error(`Unsupported analysis mode: ${analysisMode}`);
@@ -125,17 +122,14 @@ int main() {
         setResult(response);
 
         const isComprehensive = isAnalysisResponse(response);
-        const isGemini = isGeminiCombinedResponse(response);
+        const isAI = isAIMDXResponse(response);
 
-        if (isGemini) {
-          const geminiResponse = response as GeminiCombinedResponse;
-          const prediction =
-            geminiResponse.gemini_analysis.ai_analysis?.prediction || "Unknown";
-          const confidence =
-            geminiResponse.gemini_analysis.ai_analysis?.confidence || 0;
+        if (isAI) {
+          const aiResponse = response as AIMDXResponse;
 
-          toast.success("Gemini AI Analysis hoàn tất", {
-            description: `Prediction: ${prediction} (${Math.round(confidence * 100)}% confidence)`,
+          toast.success("AI Analysis hoàn tất", {
+            description:
+              "Phân tích AI đã hoàn thành, xem kết quả ở tab AI Analysis",
           });
         } else if (isComprehensive) {
           toast.success("Phân tích hoàn tất, có", {
@@ -143,14 +137,15 @@ int main() {
               (response as AnalysisResponse).assessment.overall_score * 100,
             )}% giống AI`,
           });
-        } else {
-          toast.success("Phân tích hoàn tất, có", {
-            description: `${
-              Object.keys((response as IndividualAnalysisResponse).features)
-                .length
-            } đặc trưng đã được trích xuất`,
-          });
         }
+        // else {
+        //   toast.success("Phân tích hoàn tất, có", {
+        //     description: `${
+        //       Object.keys((response as IndividualAnalysisResponse).features)
+        //         .length
+        //     } đặc trưng đã được trích xuất`,
+        //   });
+        // }
 
         return response;
       } catch (err) {
