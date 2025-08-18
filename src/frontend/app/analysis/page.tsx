@@ -125,8 +125,6 @@ int main() {
         const isAI = isAIMDXResponse(response);
 
         if (isAI) {
-          const aiResponse = response as AIMDXResponse;
-
           toast.success("AI Analysis hoàn tất", {
             description:
               "Phân tích AI đã hoàn thành, xem kết quả ở tab AI Analysis",

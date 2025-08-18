@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import {
   AlertCircle,
@@ -36,10 +36,11 @@ import {
   AnalysisResponse,
   IndividualAnalysisResponse,
 } from "@/lib/api-types";
+import { MDXRenderer } from "@/lib/mdx-utils";
 
 import BaselineComparisonView from "./baseline-comparison";
 import FeatureCharts from "./feature-charts";
-import { MDXRenderer } from "@/lib/mdx-utils";
+
 interface ResultsDashboardProps {
   result: AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse | null;
   loading?: boolean;
@@ -70,7 +71,8 @@ export default function ResultsDashboard({
   const [activeTab, setActiveTab] = useState("overview");
 
   // Handle MDX content for AI analysis
-  const aiMdxContent = result && isAIMDXResponse(result) ? result.mdx_content : "";
+  const aiMdxContent =
+    result && isAIMDXResponse(result) ? result.mdx_content : "";
 
   if (loading) {
     return (
@@ -528,11 +530,11 @@ export default function ResultsDashboard({
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <MDXRenderer 
+                <MDXRenderer
                   content={aiMdxContent}
-                  loadingText="Đang xử lý nội dung phân tích AI..."
-                  errorTitle="Lỗi xử lý nội dung phân tích"
-                  errorDescription="Không thể hiển thị kết quả phân tích AI. Vui lòng thử lại."
+                  loadingText='Đang xử lý nội dung phân tích AI...'
+                  errorTitle='Lỗi xử lý nội dung phân tích'
+                  errorDescription='Không thể hiển thị kết quả phân tích AI. Vui lòng thử lại.'
                 />
               </CardContent>
             </Card>
