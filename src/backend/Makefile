@@ -1,4 +1,4 @@
-PYTHON = python3.12
+PYTHON = python3.13
 VENV = venv
 VENV_BIN = $(VENV)/bin
 PIP = $(VENV_BIN)/pip
@@ -23,14 +23,14 @@ setup:
 	@echo "$(YELLOW)📦 Creating virtual environment...$(NC)"
 	$(PYTHON) -m venv $(VENV)
 	@echo "$(YELLOW)📚 Installing dependencies...$(NC)"
-	$(PIP) install --upgrade pip
-	$(PIP) install -r requirements.txt
+	$(PIP) install --upgrade pip setuptools wheel
+	$(PIP) install -r requirements.txt --only-binary=:all:
 	@echo "$(GREEN)✅ Setup completed!$(NC)"
 
 install:
 	@echo "$(YELLOW)📚 Installing/updating dependencies...$(NC)"
-	$(PIP) install --upgrade pip
-	$(PIP) install -r requirements.txt
+	$(PIP) install --upgrade pip setuptools wheel
+	$(PIP) install -r requirements.txt --only-binary=:all:
 	@echo "$(GREEN)✅ Dependencies installed!$(NC)"
 
 dev:
