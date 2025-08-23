@@ -5,6 +5,8 @@ import { useCallback, useState } from "react";
 import { Repeat } from "lucide-react";
 import { toast } from "sonner";
 
+import { CodeEditor } from "@/components/blocks/code-editor/code-editor";
+import oneDarkPro from "@/components/blocks/code-editor/onedarkpro.json";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -24,9 +26,7 @@ import {
 import AnalysisSelector, {
   AnalysisMode,
 } from "./_components/analysis-selector";
-import { CodeEditor } from "./_components/code-editor";
 import Header from "./_components/header";
-import oneDarkPro from "./_components/onedarkpro.json";
 import ResultsDashboard from "./_components/results-dashboard";
 
 export default function AnalysisPage() {
@@ -103,15 +103,6 @@ int main() {
           case "combined":
             response = await apiClient.analyzeCombined(request);
             break;
-          // case "ast":
-          //   response = await apiClient.analyzeAst(request);
-          //   break;
-          // case "human-style":
-          //   response = await apiClient.analyzeHumanStyle(request);
-          //   break;
-          // case "advanced":
-          //   response = await apiClient.analyzeAdvanced(request);
-          //   break;
           case "ai":
             response = await apiClient.analyzeAI(request);
             break;

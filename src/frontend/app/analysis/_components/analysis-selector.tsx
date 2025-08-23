@@ -19,12 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { apiClient, handleApiError } from "@/lib/api-client";
 import { AnalysisMethodsResponse } from "@/lib/api-types";
 
-export type AnalysisMode =
-  | "combined"
-  // | "ast"
-  // | "human-style"
-  // | "advanced"
-  | "ai";
+export type AnalysisMode = "combined" | "ai";
 
 interface AnalysisSelectorProps {
   value: AnalysisMode;
@@ -55,43 +50,6 @@ const ANALYSIS_MODES: Record<
     ],
     timeEstimate: "2-5 giây",
   },
-  // FIXME: Tạm thời cho viết báo cáo
-  // ast: {
-  //   icon: BarChart3,
-  //   title: "Phân tích cấu trúc",
-  //   description: "Cấu trúc mã, luồng điều khiển và mẫu đặt tên",
-  //   features: [
-  //     "Structure metrics",
-  //     "Control flow",
-  //     "Function analysis",
-  //     "Variable naming",
-  //   ],
-  //   timeEstimate: "1-2 giây",
-  // },
-  // "human-style": {
-  //   icon: Brain,
-  //   title: "Phân tích phong cách",
-  //   description: "Phong cách mã và các điểm không nhất quán kiểu human",
-  //   features: [
-  //     "Spacing issues",
-  //     "Indentation consistency",
-  //     "Naming patterns",
-  //     "Formatting",
-  //   ],
-  //   timeEstimate: "1-2 giây",
-  // },
-  // advanced: {
-  //   icon: Zap,
-  //   title: "Phân tích độ phức tạp",
-  //   description: "Độ phức tạp mã, dư thừa, và phát hiện mẫu AI",
-  //   features: [
-  //     "Complexity metrics",
-  //     "Code redundancy",
-  //     "AI patterns",
-  //     "Maintainability",
-  //   ],
-  //   timeEstimate: "2-3 giây",
-  // },
   ai: {
     icon: Sparkles,
     title: "AI Analysis",
