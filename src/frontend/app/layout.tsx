@@ -1,6 +1,6 @@
-import "@/styles/globals.css";
+import { Providers } from "@/components/shared/providers";
 
-import { ThemeProvider } from "./analysis/_components/providers";
+import "@/styles/globals.css";
 
 export default function RootLayout({
   children,
@@ -10,14 +10,7 @@ export default function RootLayout({
   return (
     <html lang='vi' suppressHydrationWarning>
       <body className='antialiased font-sans'>
-        <ThemeProvider
-          attribute='class'
-          defaultTheme='system'
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

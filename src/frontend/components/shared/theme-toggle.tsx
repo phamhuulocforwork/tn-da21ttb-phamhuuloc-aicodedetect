@@ -8,9 +8,15 @@ import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
 
+export interface ThemeToggleProps
+  extends ButtonHTMLAttributes<HTMLButtonElement> {
+  showLabel?: boolean;
+}
+
 export function ThemeToggle({
+  showLabel = false,
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement>): React.ReactElement {
+}: ThemeToggleProps): React.ReactElement {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -38,6 +44,11 @@ export function ThemeToggle({
         <MoonStar className='size-5' />
       )}
       <span className='sr-only'>Đổi giao diện</span>
+      {showLabel && (
+        <span className='ml-2 hidden sm:inline'>
+          {theme === "dark" ? "Sáng" : "Tối"}
+        </span>
+      )}
     </Button>
   );
 }
