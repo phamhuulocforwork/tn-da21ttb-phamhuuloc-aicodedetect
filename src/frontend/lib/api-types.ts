@@ -65,12 +65,7 @@ export interface AnalysisResponse {
   analysis_id: string;
   timestamp: string;
   code_info: CodeInfo;
-  feature_groups: {
-    structure_metrics: FeatureGroup;
-    style_metrics: FeatureGroup;
-    complexity_metrics: FeatureGroup;
-    ai_detection_metrics: FeatureGroup;
-  };
+  feature_groups: Record<string, FeatureGroup>;
   assessment: AssessmentResult;
   raw_features?: Record<string, number>;
 }

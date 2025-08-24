@@ -407,6 +407,7 @@ export default function ResultsDashboard({
               featuresWithComparison={Object.values(result.feature_groups)
                 .flatMap((group) => group.features)
                 .filter((feature) => feature.baseline_comparison)}
+              featureGroups={result.feature_groups}
             />
           ) : (
             <Card>

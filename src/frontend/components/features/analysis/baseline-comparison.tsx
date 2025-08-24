@@ -1,7 +1,20 @@
 "use client";
 
-import { Minus, TrendingDown, TrendingUp } from "lucide-react";
+import * as React from "react";
 
+import * as echarts from "echarts/core";
+import { ParallelChart } from "echarts/charts";
+import {
+  LegendComponent,
+  ParallelComponent,
+  TooltipComponent,
+  VisualMapComponent,
+} from "echarts/components";
+import type { EChartsCoreOption } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+import { ChartLine, Minus, TrendingDown, TrendingUp } from "lucide-react";
+
+import { CollapsibleFilter } from "@/components/customized/collapsible/collapsible";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -13,11 +26,166 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 
-import { BaselineSummary, FeatureInfo } from "@/lib/api-types";
+import { BaselineSummary, FeatureGroup, FeatureInfo } from "@/lib/api-types";
 
 interface BaselineComparisonProps {
   baselineSummary?: BaselineSummary;
   featuresWithComparison: FeatureInfo[];
+  featureGroups?: Record<string, FeatureGroup>;
+}
+
+echarts.use([
+  TooltipComponent,
+  ParallelComponent,
+  VisualMapComponent,
+  LegendComponent,
+  ParallelChart,
+  CanvasRenderer,
+]);
+
+function useParallelChart(
+  containerId: string,
+  features: FeatureInfo[],
+  title: string,
+) {
+  const ref = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    if (!ref.current) return;
+    const chart = echarts.init(ref.current as HTMLDivElement, "dark");
+
+    const CHART_COLORS = {
+      red: "#ef4444",
+      green: "#22c55e",
+      blue: "#3b82f6",
+    } as const;
+
+    const filtered = features.filter((f) => {
+      const current = f.baseline_comparison?.current_value ?? f.value;
+      if (!Number.isFinite(current)) return false;
+      if (current === 999 || current === 0) return false;
+      return true;
+    });
+
+    const formatTick = (v: number) => {
+      if (!Number.isFinite(v)) return "";
+      const abs = Math.abs(v);
+      if (abs >= 1000) return `${Math.round(v)}`;
+      if (abs >= 100) return v.toFixed(0);
+      if (abs >= 1) return v.toFixed(2);
+      return v.toFixed(3);
+    };
+
+    const dims = filtered.map((f, i) => {
+      const label = f.name.replace(/_/g, " ");
+      const valsRaw = [
+        f.baseline_comparison?.ai_baseline,
+        f.baseline_comparison?.human_baseline,
+        f.baseline_comparison?.current_value ?? f.value,
+      ].filter((v) => typeof v === "number" && !Number.isNaN(v)) as number[];
+
+      let min = valsRaw.length ? Math.min(...valsRaw) : 0;
+      let max = valsRaw.length ? Math.max(...valsRaw) : 1;
+      if (!Number.isFinite(min)) min = 0;
+      if (!Number.isFinite(max)) max = 1;
+
+      if (min === max) {
+        if (max === 0) {
+          max = 1;
+        } else {
+          const delta = Math.abs(max) * 0.1 || 1;
+          min = max - delta;
+          max = max + delta;
+        }
+      } else {
+        const pad = (max - min) * 0.1;
+        min = min - pad;
+        max = max + pad;
+      }
+
+      const useLog = max > 100 && min > 0.0001;
+      const axis: Record<string, unknown> = {
+        dim: i,
+        name: label,
+        min: useLog ? Math.max(0.0001, min) : min,
+        max,
+        axisLabel: {
+          color: "#bbb",
+          fontSize: 10,
+          formatter: (val: number) => formatTick(Number(val)),
+        },
+      };
+      if (useLog) {
+        axis.type = "log";
+        (axis as any).logBase = 10;
+      }
+      return axis;
+    });
+
+    const aiRow = filtered.map(
+      (f) => f.baseline_comparison?.ai_baseline ?? NaN,
+    );
+    const humanRow = filtered.map(
+      (f) => f.baseline_comparison?.human_baseline ?? NaN,
+    );
+    const currentRow = filtered.map(
+      (f) => f.baseline_comparison?.current_value ?? f.value,
+    );
+
+    const option: EChartsCoreOption = {
+      backgroundColor: "transparent",
+      tooltip: { trigger: "item" },
+      legend: {
+        bottom: 0,
+        data: ["AI baseline", "Human baseline", "Current code"],
+        textStyle: { color: "#bbb" },
+      },
+      color: [CHART_COLORS.red, CHART_COLORS.green, CHART_COLORS.blue],
+      parallelAxis: dims,
+      parallel: {
+        left: "3%",
+        right: "6%",
+        height: 220,
+        parallelAxisDefault: {
+          nameLocation: "end",
+          nameTextStyle: { color: "#bbb", fontSize: 10 },
+          axisLine: { lineStyle: { color: "#666" } },
+          axisLabel: { color: "#bbb", fontSize: 10 },
+        },
+      },
+      series: [
+        {
+          name: "AI baseline",
+          type: "parallel",
+          lineStyle: { width: 1.5, opacity: 0.8, color: CHART_COLORS.red },
+          data: [aiRow],
+        },
+        {
+          name: "Human baseline",
+          type: "parallel",
+          lineStyle: { width: 1.5, opacity: 0.8, color: CHART_COLORS.green },
+          data: [humanRow],
+        },
+        {
+          name: "Current code",
+          type: "parallel",
+          lineStyle: { width: 2, opacity: 0.9, color: CHART_COLORS.blue },
+          data: [currentRow],
+        },
+      ],
+    };
+
+    chart.setOption(option);
+
+    const handler = () => chart.resize();
+    window.addEventListener("resize", handler);
+    return () => {
+      window.removeEventListener("resize", handler);
+      chart.dispose();
+    };
+  }, [containerId, features]);
+
+  return ref;
 }
 
 const getVerdictColor = (verdict: string): string => {
@@ -263,6 +431,7 @@ function BaselineSummaryCard({ summary }: { summary: BaselineSummary }) {
 export function BaselineComparisonView({
   baselineSummary,
   featuresWithComparison,
+  featureGroups,
 }: BaselineComparisonProps) {
   if (!baselineSummary && featuresWithComparison.length === 0) {
     return (
@@ -282,25 +451,146 @@ export function BaselineComparisonView({
   }
 
   return (
-    <div className='space-y-6'>
+    <div className='divide-y-2 space-y-4'>
       {baselineSummary && <BaselineSummaryCard summary={baselineSummary} />}
 
-      {featuresWithComparison.length > 0 && (
-        <div className='space-y-4'>
-          <div className='flex items-center justify-between'>
-            <h3 className='text-lg font-semibold'>So sánh đặc trưng</h3>
-            <Badge variant='outline'>
-              {featuresWithComparison.length} đặc trưng đã phân tích
-            </Badge>
-          </div>
+      {featureGroups &&
+        Object.keys(featureGroups).length > 0 &&
+        (() => {
+          const allWithBaseline: FeatureInfo[] = Object.values(featureGroups)
+            .flatMap((g) => g.features)
+            .filter((f) => !!f.baseline_comparison);
+          if (allWithBaseline.length === 0) return null;
 
-          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-            {featuresWithComparison.map((feature, index) => (
-              <FeatureComparisonCard key={index} feature={feature} />
-            ))}
+          const sorted = [...allWithBaseline].sort((a, b) => {
+            const aDiff = a.baseline_comparison
+              ? Math.abs(
+                  a.baseline_comparison.ai_baseline -
+                    a.baseline_comparison.human_baseline,
+                ) * (a.baseline_comparison.confidence || 1)
+              : 0;
+            const bDiff = b.baseline_comparison
+              ? Math.abs(
+                  b.baseline_comparison.ai_baseline -
+                    b.baseline_comparison.human_baseline,
+                ) * (b.baseline_comparison.confidence || 1)
+              : 0;
+            return bDiff - aDiff;
+          });
+
+          const topK = 14;
+          const topFeatures = sorted.slice(0, topK);
+          const ref = useParallelChart(
+            `top-parallel`,
+            topFeatures,
+            `Top features`,
+          );
+
+          return (
+            <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center justify-between'>
+                  Top Features (Overall)
+                  <Badge variant='secondary'>{topFeatures.length}</Badge>
+                </CardTitle>
+                <CardDescription>
+                  Các đặc trưng phân biệt AI vs Human mạnh nhất theo baseline
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div ref={ref} className='w-full h-[380px] rounded-md border' />
+              </CardContent>
+            </Card>
+          );
+        })()}
+
+      {featureGroups && Object.keys(featureGroups).length > 0 && (
+        <div className='space-y-4'>
+          <div className='space-y-6'>
+            {Object.entries(featureGroups).map(([key, group]) => {
+              const withBaseline = group.features.filter(
+                (f) => !!f.baseline_comparison,
+              );
+              if (withBaseline.length === 0) return null;
+
+              const sorted = [...withBaseline].sort((a, b) => {
+                const aDiff = a.baseline_comparison
+                  ? Math.abs(
+                      a.baseline_comparison.ai_baseline -
+                        a.baseline_comparison.human_baseline,
+                    )
+                  : 0;
+                const bDiff = b.baseline_comparison
+                  ? Math.abs(
+                      b.baseline_comparison.ai_baseline -
+                        b.baseline_comparison.human_baseline,
+                    )
+                  : 0;
+                return bDiff - aDiff;
+              });
+
+              const chunkSize = 14;
+              const chunks: FeatureInfo[][] = [];
+              for (let i = 0; i < sorted.length; i += chunkSize) {
+                chunks.push(sorted.slice(i, i + chunkSize));
+              }
+
+              return (
+                <Card key={key}>
+                  <CardHeader>
+                    <CardTitle className='flex items-center justify-between'>
+                      {group.group_name}
+                      <Badge variant='secondary'>
+                        {withBaseline.length} features
+                      </Badge>
+                    </CardTitle>
+                    <CardDescription>
+                      So sánh đa chiều giữa AI baseline, Human baseline và code
+                      hiện tại
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className='space-y-4'>
+                    {chunks.map((features, idx) => {
+                      const ref = useParallelChart(
+                        `${key}-parallel-${idx}`,
+                        features,
+                        `${group.group_name} #${idx + 1}`,
+                      );
+                      return (
+                        <div key={idx} className='w-full'>
+                          <div className='text-xs text-muted-foreground mb-2'>
+                            Nhóm {idx + 1}/{chunks.length}
+                          </div>
+                          <div
+                            ref={ref}
+                            className='w-full h-[350px] rounded-md border'
+                          />
+                        </div>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       )}
+
+      <CollapsibleFilter
+        title='So sánh đặc trưng'
+        icon={ChartLine}
+        defaultOpen={false}
+      >
+        {featuresWithComparison.length > 0 && (
+          <div className='space-y-4'>
+            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+              {featuresWithComparison.map((feature, index) => (
+                <FeatureComparisonCard key={index} feature={feature} />
+              ))}
+            </div>
+          </div>
+        )}
+      </CollapsibleFilter>
     </div>
   );
 }
