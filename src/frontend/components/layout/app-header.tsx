@@ -1,7 +1,5 @@
 import React from "react";
 
-import { ThemeToggle } from "@/components/shared/theme-toggle";
-
 interface AppHeaderProps {
   title: string;
   subtitle?: string;
@@ -19,7 +17,6 @@ export function AppHeader({ title, subtitle, className = "" }: AppHeaderProps) {
           <p className='text-sm text-muted-foreground mt-1'>{subtitle}</p>
         )}
       </div>
-      <ThemeToggle />
     </header>
   );
 }

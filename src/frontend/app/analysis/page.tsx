@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 
 import { AnalysisSelector } from "@/components/features/analysis/analysis-selector";
 import { CodeInputSection } from "@/components/features/analysis/code-input-section";
+import { FloatingMenu } from "@/components/features/analysis/floating-menu";
 import { ResultsSection } from "@/components/features/analysis/results-section";
 import { AnalysisMode } from "@/components/features/analysis/types";
 import { AnalysisLayout } from "@/components/layout/analysis-layout";
@@ -121,6 +122,8 @@ export default function AnalysisPage() {
           onExportReport={exportReport}
           canRetry={code.trim().length > 0}
         />
+
+        <FloatingMenu />
       </div>
     </AnalysisLayout>
   );
