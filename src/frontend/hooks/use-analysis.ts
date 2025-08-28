@@ -12,16 +12,9 @@ import {
   isAIMDXResponse,
   isAnalysisResponse,
 } from "@/lib/api-client";
-import {
-  AIMDXResponse,
-  AnalysisResponse,
-  IndividualAnalysisResponse,
-} from "@/lib/api-types";
+import { AIMDXResponse, AnalysisResponse } from "@/lib/api-types";
 
-export type AnalysisResult =
-  | AnalysisResponse
-  | IndividualAnalysisResponse
-  | AIMDXResponse;
+export type AnalysisResult = AnalysisResponse | AIMDXResponse;
 
 export interface UseAnalysisReturn {
   isAnalyzing: boolean;
@@ -32,6 +25,7 @@ export interface UseAnalysisReturn {
     language: string,
     mode: AnalysisMode,
   ) => Promise<AnalysisResult>;
+
   retry: (code: string, language: string, mode: AnalysisMode) => Promise<void>;
   exportReport: () => void;
   clearResult: () => void;

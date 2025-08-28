@@ -5,7 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// API Types and utilities for code analysis
 export interface CodeAnalysisRequest {
   code: string;
   language: string;
@@ -35,14 +34,10 @@ export interface AnalysisResponse {
   timestamp?: string;
 }
 
-// API endpoints
 export const API_ENDPOINTS = {
-  ANALYZE_CODE: "/api/analyze",
-  GET_HISTORY: "/api/history",
-  GET_STATS: "/api/stats",
+  ANALYZE_CODE: "/api/analysis/combined-analysis",
 } as const;
 
-// Utility function to call analysis API
 export async function analyzeCode(
   request: CodeAnalysisRequest,
 ): Promise<AnalysisResponse> {
@@ -51,7 +46,10 @@ export async function analyzeCode(
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(request),
+    body: JSON.stringify({
+      code: request.code,
+      language: request.language,
+    }),
   });
 
   if (!response.ok) {
@@ -61,7 +59,6 @@ export async function analyzeCode(
   return response.json();
 }
 
-// Language detection utilities
 export const LANGUAGE_PATTERNS = {
   c: {
     patterns: [

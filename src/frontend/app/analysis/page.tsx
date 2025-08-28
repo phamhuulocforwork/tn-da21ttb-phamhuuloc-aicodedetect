@@ -76,6 +76,19 @@ export default function AnalysisPage() {
     retry(code, "c", analysisMode);
   }, [code, analysisMode, retry]);
 
+  const handleFileContentLoaded = useCallback(
+    (content: string, filename: string) => {
+      setCode(content);
+      if (
+        filename.endsWith(".cpp") ||
+        filename.endsWith(".c") ||
+        filename.endsWith(".cxx")
+      ) {
+      }
+    },
+    [],
+  );
+
   return (
     <AnalysisLayout>
       <div id='analysis' className='container mx-auto p-4 space-y-6'>
@@ -94,6 +107,7 @@ export default function AnalysisPage() {
             onSubmit={handleSubmitCode}
             isSubmitting={isAnalyzing}
             analysisMode={analysisMode}
+            onFileContentLoaded={handleFileContentLoaded}
           />
         </div>
 

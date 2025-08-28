@@ -1,4 +1,3 @@
-// API Client for AI Code Detection Backend
 import {
   AIMDXResponse,
   AnalysisMethodsResponse,
@@ -6,7 +5,6 @@ import {
   ApiEndpoints,
   ApiError,
   CodeAnalysisRequest,
-  IndividualAnalysisResponse,
 } from "./api-types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -43,7 +41,7 @@ export class ApiClient {
           const errorData: ApiError = await response.json();
           errorMessage = errorData.detail || errorMessage;
         } catch {
-          // If JSON parsing fails, use the default error message
+          //TODO:
         }
 
         throw new Error(errorMessage);
@@ -55,14 +53,12 @@ export class ApiClient {
         throw error;
       }
 
-      // Network or other errors
       throw new Error(
         `Request failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
 
-  // Health check
   async healthCheck(): Promise<{
     status: string;
     timestamp: string;
@@ -71,12 +67,10 @@ export class ApiClient {
     return this.request(ApiEndpoints.HEALTH);
   }
 
-  // Get available analysis methods
   async getAnalysisMethods(): Promise<AnalysisMethodsResponse> {
     return this.request(ApiEndpoints.METHODS);
   }
 
-  // Combined analysis (all features)
   async analyzeCombined(
     request: CodeAnalysisRequest,
   ): Promise<AnalysisResponse> {
@@ -86,37 +80,6 @@ export class ApiClient {
     });
   }
 
-  // AST analysis only
-  async analyzeAst(
-    request: CodeAnalysisRequest,
-  ): Promise<IndividualAnalysisResponse> {
-    return this.request(ApiEndpoints.AST_ANALYSIS, {
-      method: "POST",
-      body: JSON.stringify(request),
-    });
-  }
-
-  // Human style analysis only
-  async analyzeHumanStyle(
-    request: CodeAnalysisRequest,
-  ): Promise<IndividualAnalysisResponse> {
-    return this.request(ApiEndpoints.HUMAN_STYLE, {
-      method: "POST",
-      body: JSON.stringify(request),
-    });
-  }
-
-  // Advanced features analysis only
-  async analyzeAdvanced(
-    request: CodeAnalysisRequest,
-  ): Promise<IndividualAnalysisResponse> {
-    return this.request(ApiEndpoints.ADVANCED_FEATURES, {
-      method: "POST",
-      body: JSON.stringify(request),
-    });
-  }
-
-  // AI analysis with MDX output
   async analyzeAI(request: CodeAnalysisRequest): Promise<AIMDXResponse> {
     return this.request(ApiEndpoints.AI_ANALYSIS, {
       method: "POST",
@@ -124,17 +87,11 @@ export class ApiClient {
     });
   }
 
-  // File upload analysis
   async analyzeFile(
     file: File,
-    analysisType:
-      | "combined"
-      | "ast"
-      | "human-style"
-      | "advanced"
-      | "ai" = "combined",
+    analysisType: "combined" | "ai" = "combined",
     language: string = "c",
-  ): Promise<AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse> {
+  ): Promise<AnalysisResponse | AIMDXResponse> {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("analysis_type", analysisType);
@@ -143,56 +100,21 @@ export class ApiClient {
     return this.request(ApiEndpoints.UPLOAD_FILE, {
       method: "POST",
       body: formData,
-      headers: {
-        // Don't set Content-Type for FormData, let the browser set it with boundary
-      },
+      headers: {},
     });
-  }
-
-  // Generic analysis method
-  async analyze(
-    request: CodeAnalysisRequest,
-    method: "combined" | "ast" | "human-style" | "advanced" | "ai" = "combined",
-  ): Promise<AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse> {
-    switch (method) {
-      case "combined":
-        return this.analyzeCombined(request);
-      case "ast":
-        return this.analyzeAst(request);
-      case "human-style":
-        return this.analyzeHumanStyle(request);
-      case "advanced":
-        return this.analyzeAdvanced(request);
-      case "ai":
-        return this.analyzeAI(request);
-      default:
-        throw new Error(`Unknown analysis method: ${method}`);
-    }
   }
 }
 
-// Default API client instance
 export const apiClient = new ApiClient();
 
-// Utility functions
 export const isAnalysisResponse = (
-  response: AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse,
+  response: AnalysisResponse | AIMDXResponse,
 ): response is AnalysisResponse => {
   return "feature_groups" in response && "assessment" in response;
 };
 
-export const isIndividualAnalysisResponse = (
-  response: AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse,
-): response is IndividualAnalysisResponse => {
-  return (
-    "analysis_type" in response &&
-    "features" in response &&
-    !("mdx_content" in response)
-  );
-};
-
 export const isAIMDXResponse = (
-  response: AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse,
+  response: AnalysisResponse | AIMDXResponse,
 ): response is AIMDXResponse => {
   return (
     "mdx_content" in response &&
@@ -201,7 +123,6 @@ export const isAIMDXResponse = (
   );
 };
 
-// Error handling utilities
 export const handleApiError = (error: unknown): string => {
   if (error instanceof Error) {
     return error.message;
@@ -214,21 +135,19 @@ export const handleApiError = (error: unknown): string => {
   return "An unexpected error occurred";
 };
 
-// Type guards
 export const isApiError = (error: unknown): error is Error => {
   return error instanceof Error;
 };
 
-// Local storage utilities for caching
 export const cacheAnalysisResult = (
   key: string,
-  result: AnalysisResponse | IndividualAnalysisResponse,
+  result: AnalysisResponse | AIMDXResponse,
 ): void => {
   try {
     const cached = {
       result,
       timestamp: Date.now(),
-      expires: Date.now() + 60 * 60 * 1000, // 1 hour
+      expires: Date.now() + 60 * 60 * 1000,
     };
     localStorage.setItem(`analysis_${key}`, JSON.stringify(cached));
   } catch (error) {
@@ -238,7 +157,7 @@ export const cacheAnalysisResult = (
 
 export const getCachedAnalysisResult = (
   key: string,
-): AnalysisResponse | IndividualAnalysisResponse | null => {
+): AnalysisResponse | AIMDXResponse | null => {
   try {
     const cached = localStorage.getItem(`analysis_${key}`);
     if (!cached) return null;

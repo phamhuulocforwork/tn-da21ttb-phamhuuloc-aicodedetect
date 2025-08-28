@@ -149,9 +149,6 @@ export interface ApiError {
 export enum ApiEndpoints {
   HEALTH = "/health",
   COMBINED_ANALYSIS = "/api/analysis/combined-analysis",
-  AST_ANALYSIS = "/api/analysis/ast-analysis",
-  HUMAN_STYLE = "/api/analysis/human-style",
-  ADVANCED_FEATURES = "/api/analysis/advanced-features",
   AI_ANALYSIS = "/api/analysis/ai-analysis",
   UPLOAD_FILE = "/api/analysis/upload-file",
   METHODS = "/api/analysis/methods",

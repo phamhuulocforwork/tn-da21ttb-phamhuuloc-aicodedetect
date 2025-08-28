@@ -837,132 +837,6 @@ async def analyze_code_combined(request: CodeAnalysisRequest):
             detail=f"Phân tích thất bại: {str(e)}"
         )
 
-@app.post("/api/analysis/ast-analysis")
-async def analyze_ast_only(request: CodeAnalysisRequest):
-    try:
-        if not ANALYSIS_MODULES_AVAILABLE:
-            raise HTTPException(
-                status_code=503,
-                detail="Module phân tích không khả dụng"
-            )
-        
-        analysis_id = generate_analysis_id()
-        timestamp = datetime.now().isoformat()
-        ast_features = ast_analyzer.analyze_code(request.code, request.filename)
-        if hasattr(ast_features, '__dict__'):
-            features_dict = ast_features.__dict__
-        else:
-            features_dict = ast_features
-        response = {
-            "success": True,
-            "analysis_id": analysis_id,
-            "timestamp": timestamp,
-            "analysis_type": "ast_only",
-            "code_info": {
-                "filename": request.filename,
-                "language": request.language,
-                "loc": features_dict.get('total_nodes', len(request.code.splitlines())),
-                "file_size": calculate_file_size(request.code)
-            },
-            "features": features_dict,
-            "summary": f"Phân tích AST hoàn tất với {len(features_dict)} đặc trưng được trích xuất"
-        }
-        
-        return response
-        
-    except Exception as e:
-        print(f"Lỗi phân tích AST: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Phân tích AST thất bại: {str(e)}")
-
-@app.post("/api/analysis/human-style")  
-async def analyze_human_style_only(request: CodeAnalysisRequest):
-    try:
-        if not ANALYSIS_MODULES_AVAILABLE:
-            raise HTTPException(
-                status_code=503,
-                detail="Module phân tích không khả dụng"
-            )
-        
-        analysis_id = generate_analysis_id()
-        timestamp = datetime.now().isoformat()
-        style_features = human_style_analyzer.analyze_code(request.code, request.filename)
-        if hasattr(style_features, 'to_dict'):
-            features_dict = style_features.to_dict()
-        elif hasattr(style_features, '__dict__'):
-            features_dict = style_features.__dict__
-        else:
-            features_dict = style_features
-        
-        response = {
-            "success": True,
-            "analysis_id": analysis_id,
-            "timestamp": timestamp,
-            "analysis_type": "human_style_only",
-            "code_info": {
-                "filename": request.filename,
-                "language": request.language,
-                "loc": len(request.code.splitlines()),
-                "file_size": calculate_file_size(request.code)
-            },
-            "features": features_dict,
-            "summary": f"Phân tích phong cách Human hoàn tất với {len(features_dict)} đặc trưng được trích xuất"
-        }
-        
-        return response
-        
-    except Exception as e:
-        print(f"Lỗi phân tích phong cách Human: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Phân tích phong cách Human thất bại: {str(e)}")
-
-@app.post("/api/analysis/advanced-features")
-async def analyze_advanced_features_only(request: CodeAnalysisRequest):
-    try:
-        if not ANALYSIS_MODULES_AVAILABLE:
-            raise HTTPException(
-                status_code=503,
-                detail="Module phân tích không khả dụng"
-            )
-        
-        analysis_id = generate_analysis_id()
-        timestamp = datetime.now().isoformat()
-        all_features = advanced_extractor.extract_all_features(request.code, request.filename)
-        
-        if hasattr(all_features, 'to_dict'):
-            all_features_dict = all_features.to_dict()
-        else:
-            all_features_dict = all_features
-        advanced_feature_prefixes = [
-            'redundancy_', 'complexity_', 'ai_pattern_', 'naming_', 
-            'halstead', 'cognitive', 'maintainability', 'copy_paste'
-        ]
-        
-        advanced_features = {}
-        for key, value in all_features_dict.items():
-            if any(key.startswith(prefix) for prefix in advanced_feature_prefixes):
-                advanced_features[key] = value
-            elif key in ['loc', 'token_count', 'cyclomatic_complexity', 'functions', 'comment_ratio', 'blank_ratio']:
-                advanced_features[key] = value
-        
-        response = {
-            "success": True,
-            "analysis_id": analysis_id,
-            "timestamp": timestamp,
-            "analysis_type": "advanced_features_only",
-            "code_info": {
-                "filename": request.filename,
-                "language": request.language,
-                "loc": advanced_features.get('loc', len(request.code.splitlines())),
-                "file_size": calculate_file_size(request.code)
-            },
-            "features": advanced_features,
-            "summary": f"Phân tích đặc trưng nâng cao hoàn tất với {len(advanced_features)} đặc trưng được trích xuất"
-        }
-        
-        return response
-        
-    except Exception as e:
-        print(f"Lỗi phân tích đặc trưng nâng cao: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Phân tích tính năng nâng cao thất bại: {str(e)}")
 
 @app.post("/api/analysis/upload-file")
 async def analyze_uploaded_file(
@@ -971,24 +845,23 @@ async def analyze_uploaded_file(
     language: str = Form("c")
 ):
     try:
-        MAX_FILE_SIZE = 1024 * 1024
+        MAX_FILE_SIZE = 1024 * 1024  # 1MB
         content = await file.read()
-        
+
         if len(content) > MAX_FILE_SIZE:
             raise HTTPException(
                 status_code=413,
                 detail=f"File quá lớn. Kích thước tối đa là {MAX_FILE_SIZE/1024/1024}MB"
             )
-        
+
         allowed_extensions = ['.c', '.cpp', '.cc', '.cxx', '.txt']
         file_extension = Path(file.filename).suffix.lower()
-        
+
         if file_extension not in allowed_extensions:
             raise HTTPException(
                 status_code=400,
                 detail=f"Định dạng file không được hỗ trợ. Cho phép: {', '.join(allowed_extensions)}"
             )
-        
 
         try:
             code_content = content.decode('utf-8')
@@ -997,36 +870,29 @@ async def analyze_uploaded_file(
                 status_code=400,
                 detail="File phải được mã hóa UTF-8 hợp lệ"
             )
-        
 
         if not code_content.strip():
             raise HTTPException(
                 status_code=400,
                 detail="File không thể để trống"
             )
-        
 
         analysis_request = CodeAnalysisRequest(
             code=code_content,
             filename=file.filename,
             language=language
         )
-        
 
         if analysis_type == "combined":
             return await analyze_code_combined(analysis_request)
-        elif analysis_type == "ast":
-            return await analyze_ast_only(analysis_request)
-        elif analysis_type == "human-style":
-            return await analyze_human_style_only(analysis_request)
-        elif analysis_type == "advanced":
-            return await analyze_advanced_features_only(analysis_request)
+        elif analysis_type == "ai":
+            return await analyze_code_with_ai(analysis_request)
         else:
             raise HTTPException(
                 status_code=400,
-                detail="Loại phân tích không hợp lệ. Phải là: combined, ast, human-style, hoặc advanced"
+                detail="Loại phân tích không hợp lệ. Phải là: combined hoặc ai"
             )
-            
+
     except HTTPException:
         raise
     except Exception as e:
@@ -1035,6 +901,7 @@ async def analyze_uploaded_file(
             status_code=500,
             detail=f"Phân tích file thất bại: {str(e)}"
         )
+
 
 @app.get("/api/analysis/methods")
 async def get_analysis_methods():
@@ -1054,125 +921,13 @@ async def get_analysis_methods():
                 "features": ["AST Analysis", "Human Style", "Advanced Features", "AI Detection"],
                 "estimated_time": "2-5 seconds"
             },
-            # {
-            #     "id": "ast",
-            #     "name": "AST Analysis",
-            #     "description": "Code structure, control flow, and naming pattern analysis",
-            #     "features": ["Structure metrics", "Control flow", "Function analysis", "Variable naming"],
-            #     "estimated_time": "1-2 seconds"
-            # },
-            # {
-            #     "id": "human-style", 
-            #     "name": "Human Style Analysis",
-            #     "description": "Coding style and human-like inconsistency detection",
-            #     "features": ["Spacing issues", "Indentation consistency", "Naming patterns", "Formatting"],
-            #     "estimated_time": "1-2 seconds"
-            # },
-            # {
-            #     "id": "advanced",
-            #     "name": "Advanced Features",
-            #     "description": "Code complexity, redundancy, and AI pattern detection",
-            #     "features": ["Complexity metrics", "Code redundancy", "AI patterns", "Maintainability"],
-            #     "estimated_time": "2-3 seconds"
-            # }
+
         ],
         "supported_languages": ["c", "cpp", "c++"],
         "supported_extensions": [".c", ".cpp", ".cc", ".cxx", ".txt"],
         "max_file_size": "1MB",
         "max_code_length": 50000
     }
-
-@app.get("/api/baseline/stats")
-async def get_baseline_stats():
-    try:
-        from baseline_loader import get_baseline_loader
-        baseline_loader = get_baseline_loader()
-        stats_summary = baseline_loader.get_feature_stats_summary()
-        
-        return {
-            "success": True,
-            "baseline_stats": stats_summary,
-            "timestamp": datetime.now().isoformat()
-        }
-        
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Không thể lấy thống kê baseline: {str(e)}"
-        )
-
-@app.post("/api/baseline/reload")
-async def reload_baseline():
-    try:
-        from baseline_loader import reload_baseline_stats
-        reload_baseline_stats()
-        
-
-        global detection_model
-        if ANALYSIS_MODULES_AVAILABLE:
-            detection_model = create_detector("enhanced")
-        
-        return {
-            "success": True,
-            "message": "Thống kê baseline đã được tải lại thành công",
-            "timestamp": datetime.now().isoformat()
-        }
-        
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Không thể tải lại thống kê baseline: {str(e)}"
-        )
-
-@app.get("/api/baseline/critical-features")
-async def get_critical_features():
-    try:
-        from baseline_loader import get_baseline_loader
-        baseline_loader = get_baseline_loader()
-        critical_features = baseline_loader.get_critical_features()
-        
-
-        formatted_features = []
-        for feature_name, config in critical_features.items():
-            formatted_features.append({
-                "name": feature_name,
-                "weight": config["weight"],
-                "ai_favored": config["ai_better"],
-                "effect_size": config.get("effect_size", 0),
-                "description": _get_feature_description(feature_name)
-            })
-        
-
-        formatted_features.sort(key=lambda x: x["weight"], reverse=True)
-        
-        return {
-            "success": True,
-            "critical_features": formatted_features,
-            "total_features": len(formatted_features),
-            "timestamp": datetime.now().isoformat()
-        }
-        
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Không thể lấy danh sách tính năng quan trọng: {str(e)}"
-        )
-
-def _get_feature_description(feature_name: str) -> str:
-    descriptions = {
-        'comment_ratio': 'Ratio of comment lines to total lines',
-        'ast_indentation_consistency': 'Consistency of code indentation',
-        'naming_generic_var_ratio': 'Ratio of generic variable names (i, j, temp, etc.)',
-        'ast_if_statements_per_loc': 'Number of if statements per line of code',
-        'ast_for_loops_per_loc': 'Number of for loops per line of code',
-        'cyclomatic_complexity': 'Cyclomatic complexity of the code',
-        'human_style_overall_score': 'Overall human-like style score',
-        'naming_descriptive_var_ratio': 'Ratio of descriptive variable names',
-        'ast_avg_variable_name_length': 'Average length of variable names',
-        'blank_ratio': 'Ratio of blank lines to total lines',
-        'spacing_spacing_issues_ratio': 'Ratio of spacing inconsistencies'
-    }
-    return descriptions.get(feature_name, f"Đặc trưng: {feature_name}")
 
 @app.post("/api/analysis/ai-analysis")
 async def analyze_code_with_ai(request: CodeAnalysisRequest):

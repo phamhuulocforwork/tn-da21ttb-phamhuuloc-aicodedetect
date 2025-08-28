@@ -7,6 +7,8 @@ import { FileCode, Loader2, Send } from "lucide-react";
 import { editor } from "monaco-editor";
 import { useTheme } from "next-themes";
 
+import { FileUploadDialog } from "@/components/features/analysis/file-upload-dialog";
+import { AnalysisMode } from "@/components/features/analysis/types";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -16,11 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import {
-  AIMDXResponse,
-  AnalysisResponse,
-  IndividualAnalysisResponse,
-} from "@/lib/api-types";
+import { AIMDXResponse, AnalysisResponse } from "@/lib/api-types";
 
 export interface CodeEditorTheme {
   base: string;
@@ -47,9 +45,11 @@ export interface CodeEditorProps {
   onSubmit?: (
     code: string,
     language: string,
-  ) => Promise<AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse>;
+  ) => Promise<AnalysisResponse | AIMDXResponse>;
   placeholder?: string;
   isSubmitting?: boolean;
+  analysisMode?: AnalysisMode;
+  onFileContentLoaded?: (content: string, filename: string) => void;
 }
 
 const SUPPORTED_LANGUAGES = [
@@ -70,6 +70,8 @@ export function CodeEditor({
   onSubmit,
   placeholder = "Nhập code của bạn vào đây...",
   isSubmitting = false,
+  analysisMode = "combined",
+  onFileContentLoaded,
   ...props
 }: CodeEditorProps) {
   const { theme: systemTheme } = useTheme();
@@ -208,6 +210,12 @@ export function CodeEditor({
         </div>
 
         <div className='flex items-center gap-2'>
+          {onFileContentLoaded && (
+            <FileUploadDialog
+              onFileContentLoaded={onFileContentLoaded}
+              disabled={isSubmitting}
+            />
+          )}
           {onSubmit && (
             <Button
               onClick={handleSubmit}

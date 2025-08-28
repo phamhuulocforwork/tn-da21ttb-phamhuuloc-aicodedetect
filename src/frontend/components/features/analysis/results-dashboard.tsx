@@ -31,18 +31,14 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { isAIMDXResponse, isAnalysisResponse } from "@/lib/api-client";
-import {
-  AIMDXResponse,
-  AnalysisResponse,
-  IndividualAnalysisResponse,
-} from "@/lib/api-types";
+import { AIMDXResponse, AnalysisResponse } from "@/lib/api-types";
 import { MDXRenderer } from "@/lib/mdx-utils";
 
 import BaselineComparisonView from "./baseline-comparison";
 import FeatureCharts from "./feature-charts";
 
 interface ResultsDashboardProps {
-  result: AnalysisResponse | IndividualAnalysisResponse | AIMDXResponse | null;
+  result: AnalysisResponse | AIMDXResponse | null;
   loading?: boolean;
   error?: string | null;
   onRetry?: () => void;
@@ -174,104 +170,130 @@ export default function ResultsDashboard({
             )}
           </div>
 
-          {isComprehensive && (
-            <div className='mt-4 p-4 bg-muted/50 rounded-lg'>
-              <div className='flex items-center justify-between mb-3'>
-                <div>
-                  <h4 className='font-semibold'>Đánh giá Feature Analysis</h4>
-                  <p className='text-xs text-muted-foreground'>
-                    Kết quả từ phân tích đặc trưng và so sánh baseline dataset
-                  </p>
-                </div>
-                <Badge variant='outline'>
-                  Độ tin cậy: {Math.round(result.assessment.confidence * 100)}%
-                </Badge>
-              </div>
-
-              <div className='space-y-3'>
-                <div>
-                  <div className='flex items-center justify-between mb-2'>
-                    <span className='text-sm font-medium'>
-                      Điểm khả năng giống AI
-                    </span>
-                    <span
-                      className={`text-lg font-bold ${getScoreColor(result.assessment.overall_score)}`}
-                    >
-                      {getScoreLabel(result.assessment.overall_score)} (
-                      {Math.round(result.assessment.overall_score * 100)}%)
-                    </span>
-                  </div>
-                  <Progress
-                    value={result.assessment.overall_score * 100}
-                    className='h-2'
-                  />
-                </div>
-
-                {result.assessment.baseline_summary && (
-                  <div className='p-3 bg-background/50 rounded-lg border'>
-                    <div className='flex items-center justify-between mb-2'>
-                      <h5 className='text-xs font-medium text-muted-foreground'>
-                        So sánh với Dataset Baseline:
-                      </h5>
-                      <Badge variant='secondary' className='text-xs'>
+          {isAnalysisResponse(result) && result.assessment.baseline_summary && (
+            <div className='mt-6'>
+              <Card className='border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10'>
+                <CardHeader className='pb-4'>
+                  <div className='flex items-center justify-between'>
+                    <div>
+                      <CardTitle className='flex items-center gap-2 text-primary'>
+                        <BarChart3 className='h-5 w-5' />
+                        Phân tích Dataset Baseline
+                      </CardTitle>
+                      <CardDescription className='text-primary/70'>
+                        So sánh với dataset chuẩn gồm{" "}
                         {
                           result.assessment.baseline_summary
                             .total_features_compared
                         }{" "}
-                        features
-                      </Badge>
-                    </div>
-                    <div className='grid gap-3 md:grid-cols-2'>
-                      <div className='text-center'>
-                        <div className='text-sm font-medium text-red-600 dark:text-red-400'>
-                          {Math.round(
-                            result.assessment.baseline_summary
-                              .overall_ai_similarity * 100,
-                          )}
-                          %
-                        </div>
-                        <div className='text-xs text-muted-foreground'>
-                          Tương đồng với AI samples
-                        </div>
-                      </div>
-                      <div className='text-center'>
-                        <div className='text-sm font-medium text-green-600 dark:text-green-400'>
-                          {Math.round(
-                            result.assessment.baseline_summary
-                              .overall_human_similarity * 100,
-                          )}
-                          %
-                        </div>
-                        <div className='text-xs text-muted-foreground'>
-                          Tương đồng với Human samples
-                        </div>
-                      </div>
+                        đặc trưng
+                      </CardDescription>
                     </div>
                   </div>
-                )}
+                </CardHeader>
+                <CardContent className='space-y-6'>
+                  <div className='grid gap-6 md:grid-cols-2'>
+                    <div className='space-y-4'>
+                      <div className='flex items-center gap-3'>
+                        <div className='p-2 rounded-full bg-red-100 dark:bg-red-900/20'>
+                          <Brain className='h-4 w-4 text-red-600 dark:text-red-400' />
+                        </div>
+                        <div>
+                          <div className='text-2xl font-bold text-red-600 dark:text-red-400'>
+                            {Math.round(
+                              result.assessment.baseline_summary
+                                .overall_ai_similarity * 100,
+                            )}
+                            %
+                          </div>
+                          <div className='text-xs text-muted-foreground'>
+                            Tương đồng với AI samples
+                          </div>
+                        </div>
+                      </div>
+                      <Progress
+                        value={
+                          result.assessment.baseline_summary
+                            .overall_ai_similarity * 100
+                        }
+                        className='h-3 bg-red-100 dark:bg-red-900/20'
+                      />
+                    </div>
 
-                <p className='text-sm text-muted-foreground'>
-                  {result.assessment.summary}
-                </p>
+                    <div className='space-y-4'>
+                      <div className='flex items-center gap-3'>
+                        <div className='p-2 rounded-full bg-green-100 dark:bg-green-900/20'>
+                          <FileText className='h-4 w-4 text-green-600 dark:text-green-400' />
+                        </div>
+                        <div>
+                          <div className='text-2xl font-bold text-green-600 dark:text-green-400'>
+                            {Math.round(
+                              result.assessment.baseline_summary
+                                .overall_human_similarity * 100,
+                            )}
+                            %
+                          </div>
+                          <div className='text-xs text-muted-foreground'>
+                            Tương đồng với Human samples
+                          </div>
+                        </div>
+                      </div>
+                      <Progress
+                        value={
+                          result.assessment.baseline_summary
+                            .overall_human_similarity * 100
+                        }
+                        className='h-3 bg-green-100 dark:bg-green-900/20'
+                      />
+                    </div>
+                  </div>
 
-                {result.assessment.key_indicators.length > 0 && (
-                  <div className='flex flex-wrap gap-2'>
-                    {result.assessment.key_indicators.map(
-                      (indicator, index) => (
+                  <div className='pt-4 border-t border-primary/10'>
+                    <div className='flex items-center justify-between mb-3'>
+                      <h4 className='font-semibold text-primary'>
+                        Kết luận phân tích:
+                      </h4>
+                      <div className='flex gap-2'>
                         <Badge
-                          key={index}
-                          variant='secondary'
-                          className='text-xs'
+                          variant='outline'
+                          className='border-red-200 text-red-700 dark:border-red-800 dark:text-red-300'
                         >
-                          {indicator}
+                          {result.assessment.baseline_summary.ai_like_features}{" "}
+                          AI-like
                         </Badge>
-                      ),
-                    )}
+                        <Badge
+                          variant='outline'
+                          className='border-green-200 text-green-700 dark:border-green-800 dark:text-green-300'
+                        >
+                          {
+                            result.assessment.baseline_summary
+                              .human_like_features
+                          }{" "}
+                          Human-like
+                        </Badge>
+                      </div>
+                    </div>
                   </div>
-                )}
-              </div>
+                </CardContent>
+              </Card>
             </div>
           )}
+
+          {isAnalysisResponse(result) &&
+            !result.assessment.baseline_summary && (
+              <div className='mt-4 p-4 bg-muted/50 rounded-lg'>
+                <div className='text-center py-8'>
+                  <BarChart3 className='h-12 w-12 text-muted-foreground mx-auto mb-4' />
+                  <h4 className='font-semibold text-muted-foreground mb-2'>
+                    Dataset Baseline không khả dụng
+                  </h4>
+                  <p className='text-sm text-muted-foreground'>
+                    Không thể so sánh với dataset chuẩn. Kết quả phân tích có
+                    thể kém chính xác hơn.
+                  </p>
+                </div>
+              </div>
+            )}
         </CardHeader>
       </Card>
 
@@ -369,7 +391,7 @@ export default function ResultsDashboard({
                       {isAIAnalysis
                         ? "AI"
                         : Object.keys(
-                            (result as IndividualAnalysisResponse).features,
+                            (result as AnalysisResponse).feature_groups,
                           ).length}
                     </div>
                     <div className='text-sm text-muted-foreground'>

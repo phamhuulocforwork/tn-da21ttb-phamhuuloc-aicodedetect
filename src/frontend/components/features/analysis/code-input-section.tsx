@@ -13,6 +13,7 @@ interface CodeInputSectionProps {
   onSubmit: (code: string, language: string) => Promise<unknown>;
   isSubmitting: boolean;
   analysisMode: AnalysisMode;
+  onFileContentLoaded?: (content: string, filename: string) => void;
 }
 
 export function CodeInputSection({
@@ -20,6 +21,8 @@ export function CodeInputSection({
   onCodeChange,
   onSubmit,
   isSubmitting,
+  analysisMode,
+  onFileContentLoaded,
 }: CodeInputSectionProps) {
   return (
     <div className='space-y-4'>
@@ -33,6 +36,8 @@ export function CodeInputSection({
         onChange={onCodeChange}
         onSubmit={onSubmit}
         isSubmitting={isSubmitting}
+        analysisMode={analysisMode}
+        onFileContentLoaded={onFileContentLoaded}
         placeholder='Dán mã C/C++ vào đây để phân tích...'
         customDarkTheme={{
           base: "vs-dark",
