@@ -1,6 +1,8 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
+
+import { useSearchParams } from "next/navigation";
 
 import { AnalysisSelector } from "@/components/features/analysis/analysis-selector";
 import { CodeInputSection } from "@/components/features/analysis/code-input-section";
@@ -30,7 +32,8 @@ int main() {
     return 0;
 }`;
 
-export default function AnalysisPage() {
+function AnalysisPageContent() {
+  const searchParams = useSearchParams();
   const [code, setCode] = useState(DEFAULT_CODE);
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>("combined");
 
@@ -43,6 +46,43 @@ export default function AnalysisPage() {
     exportReport,
     clearResult,
   } = useAnalysis();
+
+  const decodeBase64 = useCallback((encoded: string) => {
+    try {
+      return decodeURIComponent(atob(encoded));
+    } catch (error) {
+      console.error("Failed to decode base64:", error);
+      return null;
+    }
+  }, []);
+
+  const decodeUrl = useCallback((encoded: string) => {
+    try {
+      return decodeURIComponent(encoded);
+    } catch (error) {
+      console.error("Failed to decode URL:", error);
+      return null;
+    }
+  }, []);
+
+  useEffect(() => {
+    const codeParam = searchParams.get("code");
+    if (codeParam) {
+      let decodedCode = null;
+
+      if (codeParam.match(/^[A-Za-z0-9+/]*={0,2}$/)) {
+        decodedCode = decodeBase64(codeParam);
+      }
+
+      if (!decodedCode) {
+        decodedCode = decodeUrl(codeParam);
+      }
+
+      if (decodedCode) {
+        setCode(decodedCode);
+      }
+    }
+  }, [searchParams, decodeBase64, decodeUrl]);
 
   const handleCodeChange = useCallback(
     (value: string | undefined) => {
@@ -126,5 +166,15 @@ export default function AnalysisPage() {
         <FloatingMenu />
       </div>
     </AnalysisLayout>
+  );
+}
+
+export default function AnalysisPage() {
+  return (
+    <Suspense
+      fallback={<div className='container mx-auto p-4'>Đang tải...</div>}
+    >
+      <AnalysisPageContent />
+    </Suspense>
   );
 }
