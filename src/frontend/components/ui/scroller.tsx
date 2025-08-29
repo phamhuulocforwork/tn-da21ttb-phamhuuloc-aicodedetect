@@ -1,14 +1,16 @@
 "use client";
 
+import * as React from "react";
+
 import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
+import { type VariantProps, cva } from "class-variance-authority";
 import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronUp,
 } from "lucide-react";
-import * as React from "react";
+
 import { useComposedRefs } from "@/lib/compose-refs";
 import { cn } from "@/lib/utils";
 
@@ -230,7 +232,7 @@ const Scroller = React.forwardRef<HTMLDivElement, ScrollerProps>(
 
     const ScrollerImpl = (
       <ScrollerPrimitive
-        data-slot="scroller"
+        data-slot='scroller'
         {...scrollerProps}
         ref={composedRef}
         style={composedStyle}
@@ -248,7 +250,7 @@ const Scroller = React.forwardRef<HTMLDivElement, ScrollerProps>(
         .map((direction) => (
           <ScrollButton
             key={direction}
-            data-slot="scroll-button"
+            data-slot='scroll-button'
             direction={direction}
             onClick={scrollHandlers[direction]}
             triggerMode={scrollTriggerMode}
@@ -264,7 +266,7 @@ const Scroller = React.forwardRef<HTMLDivElement, ScrollerProps>(
 
     if (withNavigation) {
       return (
-        <div className="relative w-full">
+        <div className='relative w-full'>
           {navigationButtons}
           {ScrollerImpl}
         </div>
@@ -375,7 +377,7 @@ const ScrollButton = React.forwardRef<HTMLButtonElement, ScrollButtonProps>(
 
     return (
       <button
-        type="button"
+        type='button'
         {...buttonProps}
         {...eventHandlers}
         ref={forwardedRef}

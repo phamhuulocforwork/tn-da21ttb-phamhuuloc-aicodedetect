@@ -146,10 +146,53 @@ export interface ApiError {
   detail: string;
 }
 
+// Batch Analysis Types
+export interface FileAnalysisResult {
+  filename: string;
+  filepath: string;
+  language: string;
+  loc: number;
+  file_size: number;
+  ai_similarity: number;
+  human_similarity: number;
+  confidence: number;
+  analysis_id: string;
+  status: "success" | "error" | "processing";
+  code_content?: string; // Add code content for navigation
+  error_message?: string;
+}
+
+export interface BatchAnalysisRequest {
+  source_type: "zip" | "google_drive";
+  google_drive_url?: string;
+  batch_name?: string;
+}
+
+export interface BatchAnalysisResponse {
+  batch_id: string;
+  batch_name: string;
+  total_files: number;
+  processed_files: number;
+  success_count: number;
+  error_count: number;
+  results: FileAnalysisResult[];
+  status: "processing" | "completed" | "error";
+  created_at: string;
+  completed_at?: string;
+  error_message?: string;
+}
+
 export enum ApiEndpoints {
   HEALTH = "/health",
   COMBINED_ANALYSIS = "/api/analysis/combined-analysis",
   AI_ANALYSIS = "/api/analysis/ai-analysis",
   UPLOAD_FILE = "/api/analysis/upload-file",
   METHODS = "/api/analysis/methods",
+
+  // Batch Analysis Endpoints
+  BATCH_UPLOAD_ZIP = "/api/analysis/batch/upload-zip",
+  BATCH_GOOGLE_DRIVE = "/api/analysis/batch/google-drive",
+  BATCH_STATUS = "/api/analysis/batch/{batch_id}/status",
+  BATCH_RESULTS = "/api/analysis/batch/{batch_id}/results",
+  BATCH_METHODS = "/api/analysis/batch/methods",
 }

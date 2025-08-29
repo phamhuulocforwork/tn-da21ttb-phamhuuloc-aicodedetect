@@ -1,8 +1,10 @@
 "use client";
 
+import * as React from "react";
+
 import type { Table } from "@tanstack/react-table";
 import { Check, ChevronsUpDown, Settings2 } from "lucide-react";
-import * as React from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -17,6 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+
 import { cn } from "@/lib/utils";
 
 interface DataTableViewOptionsProps<TData> {
@@ -41,20 +44,20 @@ export function DataTableViewOptions<TData>({
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          aria-label="Toggle columns"
-          role="combobox"
-          variant="outline"
-          size="sm"
-          className="ml-auto hidden h-8 lg:flex"
+          aria-label='Toggle columns'
+          role='combobox'
+          variant='outline'
+          size='sm'
+          className='ml-auto hidden h-8 lg:flex'
         >
           <Settings2 />
           View
-          <ChevronsUpDown className="ml-auto opacity-50" />
+          <ChevronsUpDown className='ml-auto opacity-50' />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-44 p-0">
+      <PopoverContent align='end' className='w-44 p-0'>
         <Command>
-          <CommandInput placeholder="Search columns..." />
+          <CommandInput placeholder='Search columns...' />
           <CommandList>
             <CommandEmpty>No columns found.</CommandEmpty>
             <CommandGroup>
@@ -65,7 +68,7 @@ export function DataTableViewOptions<TData>({
                     column.toggleVisibility(!column.getIsVisible())
                   }
                 >
-                  <span className="truncate">
+                  <span className='truncate'>
                     {column.columnDef.meta?.label ?? column.id}
                   </span>
                   <Check

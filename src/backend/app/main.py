@@ -8,6 +8,28 @@ from typing import Dict, List, Optional, Any
 import tempfile
 import json
 import asyncio
+import zipfile
+try:
+    import rarfile
+    RARFILE_AVAILABLE = True
+except ImportError:
+    RARFILE_AVAILABLE = False
+    class rarfile:
+        @staticmethod
+        def RarFile(*args, **kwargs):
+            raise ImportError("rarfile module not available")
+
+try:
+    import googleapiclient.discovery
+    from googleapiclient.http import MediaIoBaseDownload
+    GOOGLE_DRIVE_AVAILABLE = True
+except ImportError:
+    GOOGLE_DRIVE_AVAILABLE = False
+import shutil
+import re
+from urllib.parse import urlparse
+import aiofiles
+import aiohttp
 
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -318,9 +340,368 @@ class AnalysisResponse(BaseModel):
     assessment: AssessmentResult
     raw_features: Optional[Dict[str, float]] = None
 
+class FileAnalysisResult(BaseModel):
+    filename: str
+    filepath: str
+    language: str
+    loc: int
+    file_size: int
+    ai_similarity: float
+    human_similarity: float
+    confidence: float
+    analysis_id: str
+    status: str  # "success", "error", "processing"
+    code_content: Optional[str] = None # NOTE: Trả code đọc được từ Google Drive -> FE
+    error_message: Optional[str] = None
+
+class BatchAnalysisRequest(BaseModel):
+    source_type: str = Field(..., description="Type of source: 'zip' or 'google_drive'")
+    google_drive_url: Optional[str] = Field(None, description="Google Drive share URL")
+    batch_name: Optional[str] = Field("Batch Analysis", description="Name for this batch")
+
+    @validator('source_type')
+    def validate_source_type(cls, v):
+        if v not in ['zip', 'google_drive']:
+            raise ValueError("source_type phải là 'zip' hoặc 'google_drive'")
+        return v
+
+    @validator('google_drive_url')
+    def validate_google_drive_url(cls, v, values):
+        if values.get('source_type') == 'google_drive' and not v:
+            raise ValueError("google_drive_url là bắt buộc khi source_type là 'google_drive'")
+        if v and not re.match(r'https://drive\.google\.com/.*', v):
+            raise ValueError("URL không hợp lệ cho Google Drive")
+        return v
+
+class BatchAnalysisResponse(BaseModel):
+    batch_id: str
+    batch_name: str
+    total_files: int
+    processed_files: int
+    success_count: int
+    error_count: int
+    results: List[FileAnalysisResult]
+    status: str  # "processing", "completed", "error"
+    created_at: str
+    completed_at: Optional[str] = None
+    error_message: Optional[str] = None
+
 
 def generate_analysis_id() -> str:
     return f"analysis_{uuid.uuid4().hex[:12]}"
+
+def generate_batch_id() -> str:
+    return f"batch_{uuid.uuid4().hex[:12]}"
+
+def extract_google_drive_id(url: str) -> Optional[str]:
+    patterns = [
+        r'/file/d/([a-zA-Z0-9_-]+)',  # File URL
+        r'/folders/([a-zA-Z0-9_-]+)', # Folder URL
+        r'id=([a-zA-Z0-9_-]+)',       # Query parameter
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            return match.group(1)
+    return None
+
+def create_google_drive_service():
+    if not GOOGLE_DRIVE_AVAILABLE:
+        raise HTTPException(
+            status_code=500,
+            detail="Google API client not available. Install with: pip install google-api-python-client"
+        )
+
+    api_key = os.getenv("GOOGLE_DRIVE_API_KEY")
+    if not api_key:
+        raise HTTPException(
+            status_code=500,
+            detail="GOOGLE_DRIVE_API_KEY environment variable not set"
+        )
+
+    try:
+        # Create Drive API service with API key
+        service = googleapiclient.discovery.build(
+            'drive',
+            'v3',
+            developerKey=api_key
+        )
+        return service
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to create Google Drive service: {str(e)}"
+        )
+
+def get_google_drive_files_info(service, folder_id: str, base_path: str = "") -> List[Dict[str, str]]:
+    files_info = []
+
+    try:
+        query = f"'{folder_id}' in parents and trashed = false"
+        results = service.files().list(
+            q=query,
+            fields="files(id, name, mimeType, size)",
+            pageSize=1000
+        ).execute()
+
+        items = results.get('files', [])
+
+        for item in items:
+            file_name = item['name']
+            file_id = item['id']
+            mime_type = item['mimeType']
+            file_size = int(item.get('size', 0))
+
+            if mime_type == 'application/vnd.google-apps.folder':
+                subfolder_files = get_google_drive_files_info(
+                    service,
+                    file_id,
+                    f"{base_path}{file_name}/"
+                )
+                files_info.extend(subfolder_files)
+            else:
+                if any(file_name.endswith(ext) for ext in ['.c', '.cpp', '.cc', '.cxx', '.h', '.hpp', '.txt']):
+                    files_info.append({
+                        'filename': file_name,
+                        'file_id': file_id,
+                        'filepath': f"{base_path}{file_name}",
+                        'language': get_file_language(file_name),
+                        'size': file_size
+                    })
+
+    except Exception as e:
+        print(f"Error getting files from folder {folder_id}: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to access Google Drive folder: {str(e)}"
+        )
+
+    return files_info
+
+async def download_google_drive_files(files_info: List[Dict[str, str]], extract_to: str) -> List[Dict[str, str]]:
+    if not GOOGLE_DRIVE_AVAILABLE:
+        raise HTTPException(
+            status_code=500,
+            detail="Google API client not available"
+        )
+
+    service = create_google_drive_service()
+    downloaded_files = []
+
+    async def download_single_file(file_info: Dict[str, str]):
+        try:
+            local_path = os.path.join(extract_to, file_info['filename'])
+
+            request = service.files().get_media(fileId=file_info['file_id'])
+            with open(local_path, 'wb') as fh:
+                downloader = MediaIoBaseDownload(fh, request)
+                done = False
+                while done is False:
+                    status, done = downloader.next_chunk()
+                    print(f"Download {file_info['filename']}: {int(status.progress() * 100)}%.")
+
+            return {
+                'filename': file_info['filename'],
+                'filepath': file_info['filepath'],
+                'extracted_path': local_path,
+                'language': file_info['language']
+            }
+
+        except Exception as e:
+            print(f"Failed to download {file_info['filename']}: {e}")
+            if os.path.exists(local_path):
+                os.remove(local_path)
+            return None
+
+    semaphore = asyncio.Semaphore(3)
+
+    async def limited_download(file_info):
+        async with semaphore:
+            return await download_single_file(file_info)
+
+    tasks = [limited_download(file_info) for file_info in files_info]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    for result in results:
+        if isinstance(result, dict) and result is not None:
+            downloaded_files.append(result)
+
+    return downloaded_files
+
+def get_file_language(filename: str) -> str:
+    ext = Path(filename).suffix.lower()
+    language_map = {
+        '.c': 'c',
+        '.cpp': 'cpp',
+        '.cc': 'cpp',
+        '.cxx': 'cpp',
+        '.h': 'c',
+        '.hpp': 'cpp',
+        '.txt': 'c'
+    }
+    return language_map.get(ext, 'c')
+
+def extract_files_from_archive(archive_path: str, extract_to: str) -> List[Dict[str, str]]:
+    extracted_files = []
+
+    try:
+        if archive_path.endswith('.zip'):
+            with zipfile.ZipFile(archive_path, 'r') as zip_ref:
+                for file_info in zip_ref.filelist:
+                    if not file_info.is_dir():
+                        filename = file_info.filename
+                        if any(filename.endswith(ext) for ext in ['.c', '.cpp', '.cc', '.cxx', '.h', '.hpp', '.txt']):
+                            extracted_path = zip_ref.extract(file_info, extract_to)
+                            extracted_files.append({
+                                'filename': Path(filename).name,
+                                'filepath': filename,
+                                'extracted_path': extracted_path,
+                                'language': get_file_language(filename)
+                            })
+
+        elif archive_path.endswith('.rar'):
+            if not RARFILE_AVAILABLE:
+                raise HTTPException(
+                    status_code=400,
+                    detail="RAR file support not available. Please install rarfile module."
+                )
+            with rarfile.RarFile(archive_path, 'r') as rar_ref:
+                for file_info in rar_ref.infolist():
+                    if not file_info.isdir():
+                        filename = file_info.filename
+                        if any(filename.endswith(ext) for ext in ['.c', '.cpp', '.cc', '.cxx', '.h', '.hpp', '.txt']):
+                            extracted_path = rar_ref.extract(file_info, extract_to)
+                            extracted_files.append({
+                                'filename': Path(filename).name,
+                                'filepath': filename,
+                                'extracted_path': str(extracted_path) if isinstance(extracted_path, Path) else extracted_path,
+                                'language': get_file_language(filename)
+                            })
+
+    except Exception as e:
+        print(f"Lỗi extract archive: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Không thể extract file: {str(e)}"
+        )
+
+    return extracted_files
+
+async def analyze_file_batch(files_info: List[Dict[str, str]]) -> List[FileAnalysisResult]:
+    results = []
+
+    async def analyze_single_file(file_info: Dict[str, str]) -> FileAnalysisResult:
+        try:
+            async with aiofiles.open(file_info['extracted_path'], 'r', encoding='utf-8') as f:
+                content = await f.read()
+
+            if not content.strip():
+                return FileAnalysisResult(
+                    filename=file_info['filename'],
+                    filepath=file_info['filepath'],
+                    language=file_info['language'],
+                    loc=0,
+                    file_size=0,
+                    ai_similarity=0.0,
+                    human_similarity=0.0,
+                    confidence=0.0,
+                    analysis_id="",
+                    status="error",
+                    code_content=None,
+                    error_message="File trống"
+                )
+
+            # Create analysis request
+            analysis_request = CodeAnalysisRequest(
+                code=content,
+                filename=file_info['filename'],
+                language=file_info['language']
+            )
+
+            # Perform analysis
+            analysis_response = await analyze_code_combined(analysis_request)
+
+            if analysis_response.success:
+                assessment = analysis_response.assessment
+                ai_similarity = assessment.overall_score * 100
+                human_similarity = (1 - assessment.overall_score) * 100
+
+                return FileAnalysisResult(
+                    filename=file_info['filename'],
+                    filepath=file_info['filepath'],
+                    language=file_info['language'],
+                    loc=analysis_response.code_info.loc,
+                    file_size=analysis_response.code_info.file_size,
+                    ai_similarity=round(ai_similarity, 1),
+                    human_similarity=round(human_similarity, 1),
+                    confidence=round(assessment.confidence, 3),
+                    analysis_id=analysis_response.analysis_id,
+                    status="success",
+                    code_content=content
+                )
+            else:
+                return FileAnalysisResult(
+                    filename=file_info['filename'],
+                    filepath=file_info['filepath'],
+                    language=file_info['language'],
+                    loc=len(content.splitlines()),
+                    file_size=len(content.encode('utf-8')),
+                    ai_similarity=0.0,
+                    human_similarity=0.0,
+                    confidence=0.0,
+                    analysis_id="",
+                    status="error",
+                    code_content=content if len(content) < 10000 else None,
+                    error_message="Phân tích thất bại"
+                )
+
+        except Exception as e:
+            return FileAnalysisResult(
+                filename=file_info['filename'],
+                filepath=file_info['filepath'],
+                language=file_info['language'],
+                loc=0,
+                file_size=0,
+                ai_similarity=0.0,
+                human_similarity=0.0,
+                confidence=0.0,
+                analysis_id="",
+                status="error",
+                code_content=None,
+                error_message=str(e)
+            )
+    semaphore = asyncio.Semaphore(5)
+
+    async def limited_analyze(file_info):
+        async with semaphore:
+            return await analyze_single_file(file_info)
+
+    tasks = [limited_analyze(file_info) for file_info in files_info]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    final_results = []
+    for result in results:
+        if isinstance(result, Exception):
+            final_results.append(FileAnalysisResult(
+                filename="unknown",
+                filepath="unknown",
+                language="c",
+                loc=0,
+                file_size=0,
+                ai_similarity=0.0,
+                human_similarity=0.0,
+                confidence=0.0,
+                analysis_id="",
+                status="error",
+                code_content=None,
+                error_message=str(result)
+            ))
+        else:
+            final_results.append(result)
+
+    return final_results
 
 def calculate_file_size(code: str) -> int:
     return len(code.encode('utf-8'))
@@ -968,6 +1349,224 @@ async def analyze_code_with_ai(request: CodeAnalysisRequest):
             status_code=500,
             detail=f"Phân tích AI thất bại: {str(e)}"
         )
+
+# FIXME: Sử dụng db cho batch analysis results
+batch_results = {}
+
+@app.post("/api/analysis/batch/upload-zip", response_model=BatchAnalysisResponse)
+async def analyze_batch_upload(
+    file: UploadFile = File(...),
+    batch_name: str = Form("Batch Analysis")
+):
+    try:
+        if not file.filename.endswith(('.zip', '.rar')):
+            raise HTTPException(
+                status_code=400,
+                detail="Chỉ hỗ trợ file ZIP hoặc RAR"
+            )
+
+        MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
+        content = await file.read()
+        if len(content) > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=413,
+                detail=f"File quá lớn. Kích thước tối đa là {MAX_FILE_SIZE/1024/1024}MB"
+            )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            archive_path = Path(temp_dir) / file.filename
+            with open(archive_path, 'wb') as f:
+                f.write(content)
+
+            extracted_files = extract_files_from_archive(str(archive_path), temp_dir)
+
+            if not extracted_files:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Không tìm thấy file code hợp lệ trong archive"
+                )
+
+            batch_id = generate_batch_id()
+            created_at = datetime.now().isoformat()
+
+            batch_results[batch_id] = BatchAnalysisResponse(
+                batch_id=batch_id,
+                batch_name=batch_name,
+                total_files=len(extracted_files),
+                processed_files=0,
+                success_count=0,
+                error_count=0,
+                results=[],
+                status="processing",
+                created_at=created_at
+            )
+
+            asyncio.create_task(process_batch_analysis(batch_id, extracted_files))
+
+            return batch_results[batch_id]
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Lỗi upload batch: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Upload thất bại: {str(e)}"
+        )
+
+@app.post("/api/analysis/batch/google-drive", response_model=BatchAnalysisResponse)
+async def analyze_google_drive(request: BatchAnalysisRequest):
+    try:
+        if request.source_type != 'google_drive':
+            raise HTTPException(
+                status_code=400,
+                detail="Endpoint này chỉ dành cho Google Drive"
+            )
+
+        drive_id = extract_google_drive_id(request.google_drive_url)
+        if not drive_id:
+            raise HTTPException(
+                status_code=400,
+                detail="URL Google Drive không hợp lệ"
+            )
+
+        service = create_google_drive_service()
+
+        files_info = get_google_drive_files_info(service, drive_id)
+
+        if not files_info:
+            raise HTTPException(
+                status_code=400,
+                detail="Không tìm thấy file code hợp lệ trong Google Drive folder"
+            )
+
+        batch_id = generate_batch_id()
+        created_at = datetime.now().isoformat()
+
+        batch_results[batch_id] = BatchAnalysisResponse(
+            batch_id=batch_id,
+            batch_name=request.batch_name,
+            total_files=len(files_info),
+            processed_files=0,
+            success_count=0,
+            error_count=0,
+            results=[],
+            status="processing",
+            created_at=created_at
+        )
+
+
+        asyncio.create_task(process_google_drive_analysis(batch_id, files_info))
+
+        return batch_results[batch_id]
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Lỗi Google Drive analysis: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Google Drive analysis thất bại: {str(e)}"
+        )
+
+async def process_google_drive_analysis(batch_id: str, files_info: List[Dict[str, str]]):
+    """Background task to process Google Drive analysis"""
+    try:
+        print(f"Starting Google Drive analysis {batch_id} with {len(files_info)} files")
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            downloaded_files = await download_google_drive_files(files_info, temp_dir)
+
+            if not downloaded_files:
+                batch_results[batch_id].status = "error"
+                batch_results[batch_id].error_message = "Không thể download files từ Google Drive"
+                batch_results[batch_id].completed_at = datetime.now().isoformat()
+                return
+
+            results = await analyze_file_batch(downloaded_files)
+
+            success_count = len([r for r in results if r.status == "success"])
+            error_count = len([r for r in results if r.status == "error"])
+
+            batch_results[batch_id].results = results
+            batch_results[batch_id].processed_files = len(results)
+            batch_results[batch_id].success_count = success_count
+            batch_results[batch_id].error_count = error_count
+            batch_results[batch_id].status = "completed"
+            batch_results[batch_id].completed_at = datetime.now().isoformat()
+
+            print(f"Completed Google Drive analysis {batch_id}: {success_count} success, {error_count} errors")
+
+    except Exception as e:
+        print(f"Error in Google Drive analysis {batch_id}: {str(e)}")
+        batch_results[batch_id].status = "error"
+        batch_results[batch_id].error_message = str(e)
+        batch_results[batch_id].completed_at = datetime.now().isoformat()
+
+@app.get("/api/analysis/batch/{batch_id}/status", response_model=BatchAnalysisResponse)
+async def get_batch_status(batch_id: str):
+    if batch_id not in batch_results:
+        raise HTTPException(
+            status_code=404,
+            detail="Batch ID không tồn tại"
+        )
+
+    return batch_results[batch_id]
+
+@app.get("/api/analysis/batch/{batch_id}/results", response_model=BatchAnalysisResponse)
+async def get_batch_results(batch_id: str):
+    return await get_batch_status(batch_id)
+
+async def process_batch_analysis(batch_id: str, files_info: List[Dict[str, str]]):
+    try:
+        print(f"Starting batch analysis {batch_id} with {len(files_info)} files")
+
+        results = await analyze_file_batch(files_info)
+
+        success_count = len([r for r in results if r.status == "success"])
+        error_count = len([r for r in results if r.status == "error"])
+
+        batch_results[batch_id].results = results
+        batch_results[batch_id].processed_files = len(results)
+        batch_results[batch_id].success_count = success_count
+        batch_results[batch_id].error_count = error_count
+        batch_results[batch_id].status = "completed"
+        batch_results[batch_id].completed_at = datetime.now().isoformat()
+
+        print(f"Completed batch analysis {batch_id}: {success_count} success, {error_count} errors")
+
+    except Exception as e:
+        print(f"Error in batch analysis {batch_id}: {str(e)}")
+        batch_results[batch_id].status = "error"
+        batch_results[batch_id].error_message = str(e)
+        batch_results[batch_id].completed_at = datetime.now().isoformat()
+
+@app.get("/api/analysis/batch/methods")
+async def get_batch_methods():
+    return {
+        "methods": [
+            {
+                "id": "zip_upload",
+                "name": "Upload ZIP/RAR",
+                "description": "Upload file nén chứa nhiều file code để phân tích batch",
+                "supported_formats": [".zip", ".rar"],
+                "supported_languages": ["c", "cpp"],
+                "supported_extensions": [".c", ".cpp", ".cc", ".cxx", ".h", ".hpp", ".txt"],
+                "max_file_size": "50MB",
+                "max_files": 100
+            },
+            {
+                "id": "google_drive",
+                "name": "Google Drive Link",
+                "description": "Phân tích files từ Google Drive share link (folders và files)",
+                "supported_formats": ["Google Drive share links"],
+                "supported_languages": ["c", "cpp"],
+                "supported_extensions": [".c", ".cpp", ".cc", ".cxx", ".h", ".hpp", ".txt"],
+                "features": ["Recursive folder scanning", "Concurrent downloads", "Real-time progress"],
+                "note": "Hoàn chỉnh và sẵn sàng sử dụng"
+            }
+        ]
+    }
 
 if __name__ == "__main__":
     uvicorn.run(

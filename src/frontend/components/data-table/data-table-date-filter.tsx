@@ -1,8 +1,9 @@
 "use client";
 
+import * as React from "react";
+
 import type { Column } from "@tanstack/react-table";
 import { CalendarIcon, XCircle } from "lucide-react";
-import * as React from "react";
 import type { DateRange } from "react-day-picker";
 
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+
 import { formatDate } from "@/lib/format";
 
 type DateSelection = Date[] | DateRange;
@@ -134,13 +136,13 @@ export function DataTableDateFilter<TData>({
         : "Select date range";
 
       return (
-        <span className="flex items-center gap-2">
+        <span className='flex items-center gap-2'>
           <span>{title}</span>
           {hasSelectedDates && (
             <>
               <Separator
-                orientation="vertical"
-                className="mx-0.5 data-[orientation=vertical]:h-4"
+                orientation='vertical'
+                className='mx-0.5 data-[orientation=vertical]:h-4'
               />
               <span>{dateText}</span>
             </>
@@ -157,13 +159,13 @@ export function DataTableDateFilter<TData>({
       : "Select date";
 
     return (
-      <span className="flex items-center gap-2">
+      <span className='flex items-center gap-2'>
         <span>{title}</span>
         {hasSelectedDate && (
           <>
             <Separator
-              orientation="vertical"
-              className="mx-0.5 data-[orientation=vertical]:h-4"
+              orientation='vertical'
+              className='mx-0.5 data-[orientation=vertical]:h-4'
             />
             <span>{dateText}</span>
           </>
@@ -175,14 +177,14 @@ export function DataTableDateFilter<TData>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="border-dashed">
+        <Button variant='outline' size='sm' className='border-dashed'>
           {hasValue ? (
             <div
-              role="button"
+              role='button'
               aria-label={`Clear ${title} filter`}
               tabIndex={0}
               onClick={onReset}
-              className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className='rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
             >
               <XCircle />
             </div>
@@ -192,11 +194,11 @@ export function DataTableDateFilter<TData>({
           {label}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className='w-auto p-0' align='start'>
         {multiple ? (
           <Calendar
             initialFocus
-            mode="range"
+            mode='range'
             selected={
               getIsDateRange(selectedDates)
                 ? selectedDates
@@ -207,7 +209,7 @@ export function DataTableDateFilter<TData>({
         ) : (
           <Calendar
             initialFocus
-            mode="single"
+            mode='single'
             selected={
               !getIsDateRange(selectedDates) ? selectedDates[0] : undefined
             }

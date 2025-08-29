@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import { cn } from "@/lib/utils";
 
 interface DataTableSkeletonProps extends React.ComponentProps<"div"> {
@@ -40,23 +41,23 @@ export function DataTableSkeleton({
       className={cn("flex w-full flex-col gap-2.5 overflow-auto", className)}
       {...props}
     >
-      <div className="flex w-full items-center justify-between gap-2 overflow-auto p-1">
-        <div className="flex flex-1 items-center gap-2">
+      <div className='flex w-full items-center justify-between gap-2 overflow-auto p-1'>
+        <div className='flex flex-1 items-center gap-2'>
           {filterCount > 0
             ? Array.from({ length: filterCount }).map((_, i) => (
-                <Skeleton key={i} className="h-7 w-[4.5rem] border-dashed" />
+                <Skeleton key={i} className='h-7 w-[4.5rem] border-dashed' />
               ))
             : null}
         </div>
         {withViewOptions ? (
-          <Skeleton className="ml-auto hidden h-7 w-[4.5rem] lg:flex" />
+          <Skeleton className='ml-auto hidden h-7 w-[4.5rem] lg:flex' />
         ) : null}
       </div>
-      <div className="rounded-md border">
+      <div className='rounded-md border'>
         <Table>
           <TableHeader>
             {Array.from({ length: 1 }).map((_, i) => (
-              <TableRow key={i} className="hover:bg-transparent">
+              <TableRow key={i} className='hover:bg-transparent'>
                 {Array.from({ length: columnCount }).map((_, j) => (
                   <TableHead
                     key={j}
@@ -65,7 +66,7 @@ export function DataTableSkeleton({
                       minWidth: shrinkZero ? cozyCellWidths[j] : "auto",
                     }}
                   >
-                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className='h-6 w-full' />
                   </TableHead>
                 ))}
               </TableRow>
@@ -73,7 +74,7 @@ export function DataTableSkeleton({
           </TableHeader>
           <TableBody>
             {Array.from({ length: rowCount }).map((_, i) => (
-              <TableRow key={i} className="hover:bg-transparent">
+              <TableRow key={i} className='hover:bg-transparent'>
                 {Array.from({ length: columnCount }).map((_, j) => (
                   <TableCell
                     key={j}
@@ -82,7 +83,7 @@ export function DataTableSkeleton({
                       minWidth: shrinkZero ? cozyCellWidths[j] : "auto",
                     }}
                   >
-                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className='h-6 w-full' />
                   </TableCell>
                 ))}
               </TableRow>
@@ -91,21 +92,21 @@ export function DataTableSkeleton({
         </Table>
       </div>
       {withPagination ? (
-        <div className="flex w-full items-center justify-between gap-4 overflow-auto p-1 sm:gap-8">
-          <Skeleton className="h-7 w-40 shrink-0" />
-          <div className="flex items-center gap-4 sm:gap-6 lg:gap-8">
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-7 w-24" />
-              <Skeleton className="h-7 w-[4.5rem]" />
+        <div className='flex w-full items-center justify-between gap-4 overflow-auto p-1 sm:gap-8'>
+          <Skeleton className='h-7 w-40 shrink-0' />
+          <div className='flex items-center gap-4 sm:gap-6 lg:gap-8'>
+            <div className='flex items-center gap-2'>
+              <Skeleton className='h-7 w-24' />
+              <Skeleton className='h-7 w-[4.5rem]' />
             </div>
-            <div className="flex items-center justify-center font-medium text-sm">
-              <Skeleton className="h-7 w-20" />
+            <div className='flex items-center justify-center font-medium text-sm'>
+              <Skeleton className='h-7 w-20' />
             </div>
-            <div className="flex items-center gap-2">
-              <Skeleton className="hidden size-7 lg:block" />
-              <Skeleton className="size-7" />
-              <Skeleton className="size-7" />
-              <Skeleton className="hidden size-7 lg:block" />
+            <div className='flex items-center gap-2'>
+              <Skeleton className='hidden size-7 lg:block' />
+              <Skeleton className='size-7' />
+              <Skeleton className='size-7' />
+              <Skeleton className='hidden size-7 lg:block' />
             </div>
           </div>
         </div>

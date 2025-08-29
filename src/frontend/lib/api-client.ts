@@ -4,6 +4,8 @@ import {
   AnalysisResponse,
   ApiEndpoints,
   ApiError,
+  BatchAnalysisRequest,
+  BatchAnalysisResponse,
   CodeAnalysisRequest,
 } from "./api-types";
 
@@ -102,6 +104,55 @@ export class ApiClient {
       body: formData,
       headers: {},
     });
+  }
+
+  // Batch Analysis Methods
+  async uploadBatchZip(
+    file: File,
+    batchName: string = "Batch Analysis",
+  ): Promise<BatchAnalysisResponse> {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("batch_name", batchName);
+
+    return this.request(ApiEndpoints.BATCH_UPLOAD_ZIP, {
+      method: "POST",
+      body: formData,
+      headers: {},
+    });
+  }
+
+  async analyzeBatchGoogleDrive(
+    request: BatchAnalysisRequest,
+  ): Promise<BatchAnalysisResponse> {
+    return this.request(ApiEndpoints.BATCH_GOOGLE_DRIVE, {
+      method: "POST",
+      body: JSON.stringify(request),
+    });
+  }
+
+  async getBatchStatus(batchId: string): Promise<BatchAnalysisResponse> {
+    const endpoint = ApiEndpoints.BATCH_STATUS.replace("{batch_id}", batchId);
+    return this.request(endpoint);
+  }
+
+  async getBatchResults(batchId: string): Promise<BatchAnalysisResponse> {
+    const endpoint = ApiEndpoints.BATCH_RESULTS.replace("{batch_id}", batchId);
+    return this.request(endpoint);
+  }
+
+  async getBatchMethods(): Promise<{
+    methods: Array<{
+      id: string;
+      name: string;
+      description: string;
+      supported_formats?: string[];
+      supported_languages?: string[];
+      max_file_size?: string;
+      features?: string[];
+    }>;
+  }> {
+    return this.request(ApiEndpoints.BATCH_METHODS);
   }
 }
 
