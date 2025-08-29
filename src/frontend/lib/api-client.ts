@@ -107,13 +107,9 @@ export class ApiClient {
   }
 
   // Batch Analysis Methods
-  async uploadBatchZip(
-    file: File,
-    batchName: string = "Batch Analysis",
-  ): Promise<BatchAnalysisResponse> {
+  async uploadBatchZip(file: File): Promise<BatchAnalysisResponse> {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("batch_name", batchName);
 
     return this.request(ApiEndpoints.BATCH_UPLOAD_ZIP, {
       method: "POST",

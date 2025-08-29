@@ -159,18 +159,16 @@ export interface FileAnalysisResult {
   analysis_id: string;
   status: "success" | "error" | "processing";
   code_content?: string; // Add code content for navigation
-  error_message?: string;
+  error_message?: string | null;
 }
 
 export interface BatchAnalysisRequest {
   source_type: "zip" | "google_drive";
   google_drive_url?: string;
-  batch_name?: string;
 }
 
 export interface BatchAnalysisResponse {
   batch_id: string;
-  batch_name: string;
   total_files: number;
   processed_files: number;
   success_count: number;
@@ -179,7 +177,7 @@ export interface BatchAnalysisResponse {
   status: "processing" | "completed" | "error";
   created_at: string;
   completed_at?: string;
-  error_message?: string;
+  error_message?: string | null;
 }
 
 export enum ApiEndpoints {
@@ -189,7 +187,6 @@ export enum ApiEndpoints {
   UPLOAD_FILE = "/api/analysis/upload-file",
   METHODS = "/api/analysis/methods",
 
-  // Batch Analysis Endpoints
   BATCH_UPLOAD_ZIP = "/api/analysis/batch/upload-zip",
   BATCH_GOOGLE_DRIVE = "/api/analysis/batch/google-drive",
   BATCH_STATUS = "/api/analysis/batch/{batch_id}/status",

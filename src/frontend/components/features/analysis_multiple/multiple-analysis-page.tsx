@@ -45,7 +45,6 @@ export function MultipleAnalysisPage() {
   );
   const [file, setFile] = React.useState<File | null>(null);
   const [googleDriveUrl, setGoogleDriveUrl] = React.useState("");
-  const [batchName, setBatchName] = React.useState("Phân Tích Lô");
 
   const [batchData, setBatchData] =
     React.useState<BatchAnalysisResponse | null>(null);
@@ -83,7 +82,6 @@ export function MultipleAnalysisPage() {
 
       setFile(selectedFile);
       setError(null);
-      setBatchName(selectedFile.name.replace(/\.(zip|rar)$/i, ""));
     }
   };
 
@@ -124,12 +122,11 @@ export function MultipleAnalysisPage() {
       let data: BatchAnalysisResponse;
 
       if (sourceType === "zip" && file) {
-        data = await apiClient.uploadBatchZip(file, batchName);
+        data = await apiClient.uploadBatchZip(file);
       } else if (sourceType === "google_drive" && googleDriveUrl) {
         data = await apiClient.analyzeBatchGoogleDrive({
           source_type: "google_drive",
           google_drive_url: googleDriveUrl,
-          batch_name: batchName,
         });
       } else {
         throw new Error("Tùy chọn tải lên không hợp lệ");
@@ -214,7 +211,7 @@ export function MultipleAnalysisPage() {
           <CardHeader>
             <CardTitle>Tải Lên Tệp</CardTitle>
             <CardDescription>
-              Chọn nguồn của bạn và bắt đầu phân tích lô
+              Chọn nguồn của bạn và bắt đầu phân tích Lỗi
             </CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
@@ -234,16 +231,6 @@ export function MultipleAnalysisPage() {
                   Liên Kết Google Drive
                 </TabsTrigger>
               </TabsList>
-
-              <div className='mt-4'>
-                <Label htmlFor='batch-name'>Tên Lô</Label>
-                <Input
-                  id='batch-name'
-                  value={batchName}
-                  onChange={(e) => setBatchName(e.target.value)}
-                  placeholder='Nhập tên cho phân tích lô này'
-                />
-              </div>
 
               <TabsContent value='zip' className='space-y-4'>
                 <div>
@@ -299,7 +286,7 @@ export function MultipleAnalysisPage() {
                 </>
               ) : (
                 <>
-                  Bắt Đầu Phân Tích Lô
+                  Phân Tích
                   <Upload className='h-4 w-4 ml-2' />
                 </>
               )}
@@ -330,9 +317,6 @@ export function MultipleAnalysisPage() {
                     {batchData.status.charAt(0).toUpperCase() +
                       batchData.status.slice(1)}
                   </Badge>
-                  <span className='text-sm font-medium'>
-                    {batchData.batch_name}
-                  </span>
                   <span className='text-sm text-muted-foreground'>
                     {batchData.processed_files}/{batchData.total_files} tệp
                   </span>

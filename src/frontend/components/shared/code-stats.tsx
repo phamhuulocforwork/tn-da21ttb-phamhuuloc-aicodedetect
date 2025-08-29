@@ -6,7 +6,7 @@ interface CodeStatsProps {
 }
 
 export function CodeStats({ code, className = "" }: CodeStatsProps) {
-  if (!code.trim()) return null;
+  if (!code?.trim()) return null;
 
   const lineCount = code.split("\n").length;
   const sizeInKB = Math.round((code.length / 1024) * 10) / 10;

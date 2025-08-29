@@ -357,7 +357,6 @@ class FileAnalysisResult(BaseModel):
 class BatchAnalysisRequest(BaseModel):
     source_type: str = Field(..., description="Type of source: 'zip' or 'google_drive'")
     google_drive_url: Optional[str] = Field(None, description="Google Drive share URL")
-    batch_name: Optional[str] = Field("Batch Analysis", description="Name for this batch")
 
     @validator('source_type')
     def validate_source_type(cls, v):
@@ -375,7 +374,6 @@ class BatchAnalysisRequest(BaseModel):
 
 class BatchAnalysisResponse(BaseModel):
     batch_id: str
-    batch_name: str
     total_files: int
     processed_files: int
     success_count: int
@@ -1355,8 +1353,7 @@ batch_results = {}
 
 @app.post("/api/analysis/batch/upload-zip", response_model=BatchAnalysisResponse)
 async def analyze_batch_upload(
-    file: UploadFile = File(...),
-    batch_name: str = Form("Batch Analysis")
+    file: UploadFile = File(...)
 ):
     try:
         if not file.filename.endswith(('.zip', '.rar')):
@@ -1391,7 +1388,6 @@ async def analyze_batch_upload(
 
             batch_results[batch_id] = BatchAnalysisResponse(
                 batch_id=batch_id,
-                batch_name=batch_name,
                 total_files=len(extracted_files),
                 processed_files=0,
                 success_count=0,
@@ -1445,7 +1441,6 @@ async def analyze_google_drive(request: BatchAnalysisRequest):
 
         batch_results[batch_id] = BatchAnalysisResponse(
             batch_id=batch_id,
-            batch_name=request.batch_name,
             total_files=len(files_info),
             processed_files=0,
             success_count=0,

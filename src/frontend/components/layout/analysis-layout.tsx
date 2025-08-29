@@ -8,6 +8,7 @@ interface AnalysisLayoutProps {
   showBackground?: boolean;
   title?: string;
   subtitle?: string;
+  className?: string;
 }
 
 export function AnalysisLayout({
@@ -15,13 +16,14 @@ export function AnalysisLayout({
   showBackground = false,
   title = "HỆ THỐNG PHÂN TÍCH MÃ NGUỒN",
   subtitle = "Phát hiện AI-generated code trong bài tập lập trình của sinh viên",
+  className = "",
 }: AnalysisLayoutProps) {
   if (showBackground) {
     return <GradientBackground>{children}</GradientBackground>;
   }
 
   return (
-    <AppLayout title={title} subtitle={subtitle}>
+    <AppLayout title={title} subtitle={subtitle} className={className}>
       {children}
     </AppLayout>
   );
