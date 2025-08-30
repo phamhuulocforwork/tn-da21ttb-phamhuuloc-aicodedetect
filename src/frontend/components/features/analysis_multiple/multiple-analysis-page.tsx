@@ -16,6 +16,9 @@ import {
   X,
 } from "lucide-react";
 
+import { CodeStats } from "@/components/shared";
+import { DynamicLink } from "@/components/shared/dynamic-link";
+import LanguageIcon from "@/components/shared/language-icons";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,6 +33,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Scroller } from "@/components/ui/scroller";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import { apiClient } from "@/lib/api-client";
 import type {
@@ -191,14 +199,7 @@ export function MultipleAnalysisPage() {
     batchData?.results.filter((r) => r.status === "success") || [];
 
   return (
-    <div className='container mx-auto p-6 space-y-6'>
-      <div className='text-center'>
-        <h1 className='text-3xl font-bold mb-2'>Phân Tích Nhiều Tệp</h1>
-        <p className='text-muted-foreground'>
-          Phân tích nhiều tệp mã cùng lúc để phát hiện AI
-        </p>
-      </div>
-
+    <div className='container mx-auto py-6 h-[calc(100vh-var(--header-height))] flex flex-col'>
       {error && (
         <Alert variant='destructive'>
           <AlertCircle className='h-4 w-4' />
@@ -296,8 +297,8 @@ export function MultipleAnalysisPage() {
       )}
 
       {batchData && (
-        <div className='space-y-6'>
-          <Card>
+        <>
+          <Card className='p-0'>
             <CardContent className='p-4'>
               <div className='flex justify-between items-center'>
                 <div className='flex items-center gap-3'>
@@ -345,98 +346,45 @@ export function MultipleAnalysisPage() {
           </Card>
 
           {successfulResults.length > 0 && (
-            <Card>
-              <CardHeader>
+            <Card className='flex-1 flex flex-col min-h-0 mt-6'>
+              <CardHeader className='flex-shrink-0'>
                 <CardTitle className='flex items-center gap-2'>
                   <FileText className='h-5 w-5' />
-                  Kết Quả Phân Tích ({successfulResults.length} tệp)
+                  Kết Quả Phân Tích ({successfulResults.length} files)
                 </CardTitle>
-                <CardDescription>
-                  Nhấp vào &quot;Xem Chi Tiết&quot; để phân tích từng tệp riêng
-                  lẻ
+                <CardDescription className='flex items-center gap-2'>
+                  Nhấp vào nút <ExternalLink className='h-3.5 w-3.5' /> xem phân
+                  tích chi tiết
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <Scroller orientation='horizontal' className='w-full'>
-                  <div className='flex gap-4 pb-4'>
+              <CardContent className='flex-1 min-h-0 p-6'>
+                <Scroller className='w-full'>
+                  <div className='space-y-2'>
                     {successfulResults.map((result) => (
                       <Card
                         key={result.analysis_id || result.filename}
-                        className='flex-shrink-0 w-80 hover:shadow-md transition-shadow'
+                        className='hover:shadow-2xl shadow transition-shadow p-0'
                       >
-                        <CardContent className='p-4'>
-                          <div className='space-y-3'>
-                            <div className='flex items-start gap-2'>
-                              <FileText className='h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5' />
-                              <div className='flex-1 min-w-0'>
-                                <div
-                                  className='font-medium text-sm truncate'
-                                  title={result.filename}
-                                >
-                                  {result.filename}
-                                </div>
-                                <div className='text-xs text-muted-foreground truncate'>
-                                  {result.filepath}
-                                </div>
+                        <CardContent className='p-4 flex w-full justify-between'>
+                          <div className='flex items-start gap-2'>
+                            <LanguageIcon language='c' className='h-8 w-8' />
+                            <div className='flex-1 min-w-0'>
+                              <div className='font-medium text-sm truncate'>
+                                {result.filename}
                               </div>
-                              <CheckCircle className='h-4 w-4 text-green-500 flex-shrink-0' />
+                              <CodeStats
+                                code={result?.code_content || ""}
+                                className='text-xs'
+                              />
                             </div>
-
-                            <div className='space-y-2'>
-                              <div className='flex justify-between text-xs'>
-                                <span className='text-red-500'>
-                                  Tương Đồng AI
-                                </span>
-                                <span className='font-medium'>
-                                  {result.ai_similarity.toFixed(1)}%
-                                </span>
-                              </div>
-                              <div className='w-full bg-muted rounded-full h-2'>
-                                <div
-                                  className='bg-red-500 h-2 rounded-full transition-all duration-300'
-                                  style={{ width: `${result.ai_similarity}%` }}
-                                />
-                              </div>
-
-                              <div className='flex justify-between text-xs'>
-                                <span className='text-green-500'>
-                                  Tương Đồng Con Người
-                                </span>
-                                <span className='font-medium'>
-                                  {result.human_similarity.toFixed(1)}%
-                                </span>
-                              </div>
-                              <div className='w-full bg-muted rounded-full h-2'>
-                                <div
-                                  className='bg-green-500 h-2 rounded-full transition-all duration-300'
-                                  style={{
-                                    width: `${result.human_similarity}%`,
-                                  }}
-                                />
-                              </div>
-                            </div>
-
-                            <div className='flex justify-between items-center'>
-                              {getSimilarityBadge(
-                                result.ai_similarity,
-                                result.human_similarity,
-                              )}
-                              <div className='text-xs text-muted-foreground text-right'>
-                                <div>{result.loc} dòng</div>
-                                <div>{formatFileSize(result.file_size)}</div>
-                              </div>
-                            </div>
-
-                            <Button
-                              size='sm'
-                              variant='outline'
-                              className='w-full'
-                              onClick={() => handleViewDetails(result)}
-                            >
-                              <ExternalLink className='h-3 w-3 mr-1' />
-                              Xem Chi Tiết
-                            </Button>
                           </div>
+
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <DynamicLink href='/analysis' />
+                            </TooltipTrigger>
+                            <TooltipContent>Xem chi tiết</TooltipContent>
+                          </Tooltip>
                         </CardContent>
                       </Card>
                     ))}
@@ -458,7 +406,7 @@ export function MultipleAnalysisPage() {
                 </CardContent>
               </Card>
             )}
-        </div>
+        </>
       )}
     </div>
   );

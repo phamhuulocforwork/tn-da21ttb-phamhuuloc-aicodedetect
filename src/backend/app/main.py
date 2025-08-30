@@ -902,10 +902,6 @@ def create_feature_groups(features_dict: Dict[str, float]) -> Dict[str, FeatureG
                 value = features_dict[fname]
                 
                 baseline_comparison = calculate_baseline_comparison(fname, value)
-                if baseline_comparison:
-                    print(f"✓ So sánh baseline cho {fname}: {baseline_comparison.verdict}")
-                else:
-                    print(f"❌ Không có so sánh baseline cho {fname}")
                 
                 features.append(FeatureInfo(
                     name=fname,

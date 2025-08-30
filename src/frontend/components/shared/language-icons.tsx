@@ -1,7 +1,7 @@
 import React from "react";
 
-import C from "../icons/c";
-import CPlusPlusIcon from "../icons/c-plusplus";
+import C from "../icons/c-icon";
+import CPlusPlusIcon from "../icons/c-plusplus-icon";
 
 interface LanguageIconProps {
   language: string;

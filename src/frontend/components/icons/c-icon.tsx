@@ -1,6 +1,6 @@
 import { SVGProps } from "react";
 
-export default function c(props: SVGProps<SVGSVGElement>) {
+export default function CIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       viewBox='0 0 306 345'

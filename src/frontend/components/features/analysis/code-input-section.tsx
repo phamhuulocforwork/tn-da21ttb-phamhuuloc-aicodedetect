@@ -19,7 +19,6 @@ interface CodeInputSectionProps {
 export function CodeInputSection({
   code,
   onCodeChange,
-  onSubmit,
   isSubmitting,
   analysisMode,
   onFileContentLoaded,
@@ -34,7 +33,6 @@ export function CodeInputSection({
         value={code}
         height='400px'
         onChange={onCodeChange}
-        onSubmit={onSubmit}
         isSubmitting={isSubmitting}
         analysisMode={analysisMode}
         onFileContentLoaded={onFileContentLoaded}
