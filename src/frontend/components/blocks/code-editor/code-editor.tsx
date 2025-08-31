@@ -8,7 +8,6 @@ import { editor } from "monaco-editor";
 import { useTheme } from "next-themes";
 
 import { FileUploadDialog } from "@/components/features/analysis/file-upload-dialog";
-import { AnalysisMode } from "@/components/features/analysis/types";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -48,7 +47,6 @@ export interface CodeEditorProps {
   ) => Promise<AnalysisResponse | AIMDXResponse>;
   placeholder?: string;
   isSubmitting?: boolean;
-  analysisMode?: AnalysisMode;
   onFileContentLoaded?: (content: string, filename: string) => void;
 }
 
@@ -70,7 +68,6 @@ export function CodeEditor({
   onSubmit,
   placeholder = "Nhập code của bạn vào đây...",
   isSubmitting = false,
-  analysisMode = "combined",
   onFileContentLoaded,
   ...props
 }: CodeEditorProps) {
