@@ -2,11 +2,7 @@
 
 import * as React from "react";
 
-import { useRouter } from "next/navigation";
-
 import {
-  Activity,
-  AlertCircle,
   CheckCircle,
   ExternalLink,
   FileText,
@@ -16,10 +12,6 @@ import {
   X,
 } from "lucide-react";
 
-import { CodeStats } from "@/components/shared/code-stats";
-import { DynamicLink } from "@/components/shared/dynamic-link";
-import { LanguageIcon } from "@/components/shared/language-icons";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,28 +25,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Scroller } from "@/components/ui/scroller";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 import { apiClient } from "@/lib/api-client";
 import type { BatchAnalysisResponse } from "@/lib/api-types";
+import type { ProcessedFile } from "@/lib/google-drive-service";
 
 import {
   AnalysisResultCard,
   AnalysisResultCardSkeleton,
 } from "./analysis-result-card";
+import GoogleDriveAuth from "./google-drive-auth";
+import GoogleDrivePicker from "./google-drive-picker";
 
 export function MultipleAnalysisPage() {
-  const router = useRouter();
-
-  const [sourceType, setSourceType] = React.useState<"zip" | "google_drive">(
-    "zip",
-  );
+  const [sourceType, setSourceType] = React.useState<
+    "zip" | "google_drive_url" | "google_drive_oauth"
+  >("zip");
   const [file, setFile] = React.useState<File | null>(null);
   const [googleDriveUrl, setGoogleDriveUrl] = React.useState("");
+  const [oauthFiles, setOauthFiles] = React.useState<ProcessedFile[]>([]);
+  const [isOauthAuthorized, setIsOauthAuthorized] = React.useState(false);
 
   const [batchData, setBatchData] =
     React.useState<BatchAnalysisResponse | null>(null);
@@ -104,6 +94,21 @@ export function MultipleAnalysisPage() {
     }
   };
 
+  const handleOauthAuthSuccess = () => {
+    setIsOauthAuthorized(true);
+    setError(null);
+  };
+
+  const handleOauthAuthError = (error: string) => {
+    setError(error);
+    setIsOauthAuthorized(false);
+  };
+
+  const handleOauthFilesSelected = (files: ProcessedFile[]) => {
+    setOauthFiles(files);
+    setError(null);
+  };
+
   const startPolling = (batchId: string) => {
     const interval = setInterval(async () => {
       try {
@@ -133,11 +138,14 @@ export function MultipleAnalysisPage() {
 
       if (sourceType === "zip" && file) {
         data = await apiClient.uploadBatchZip(file);
-      } else if (sourceType === "google_drive" && googleDriveUrl) {
+      } else if (sourceType === "google_drive_url" && googleDriveUrl) {
         data = await apiClient.analyzeBatchGoogleDrive({
           source_type: "google_drive",
           google_drive_url: googleDriveUrl,
         });
+      } else if (sourceType === "google_drive_oauth" && oauthFiles.length > 0) {
+        // Đọc file bằng OAuth - gửi BE phân tích
+        data = await apiClient.analyzeBatchFromFiles(oauthFiles);
       } else {
         throw new Error("Tùy chọn tải lên không hợp lệ");
       }
@@ -172,6 +180,7 @@ export function MultipleAnalysisPage() {
 
   return (
     <div className='container mx-auto py-6 max-h-[calc(100vh-var(--header-height))] flex flex-col'>
+      {/* TODO: Thông báo lỗi */}
       {/* {error && (
         <Alert variant='destructive'>
           <AlertCircle className='h-4 w-4' />
@@ -191,17 +200,23 @@ export function MultipleAnalysisPage() {
             <Tabs
               value={sourceType}
               onValueChange={(value) =>
-                setSourceType(value as "zip" | "google_drive")
+                setSourceType(
+                  value as "zip" | "google_drive_url" | "google_drive_oauth",
+                )
               }
             >
-              <TabsList className='grid w-full grid-cols-2'>
+              <TabsList className='grid w-full grid-cols-3'>
                 <TabsTrigger value='zip'>
                   <Upload className='h-4 w-4 mr-2' />
                   Tải Lên ZIP/RAR
                 </TabsTrigger>
-                <TabsTrigger value='google_drive'>
+                <TabsTrigger value='google_drive_url'>
                   <Link className='h-4 w-4 mr-2' />
-                  Liên Kết Google Drive
+                  Google Drive URL
+                </TabsTrigger>
+                <TabsTrigger value='google_drive_oauth'>
+                  <ExternalLink className='h-4 w-4 mr-2' />
+                  Google Drive OAuth
                 </TabsTrigger>
               </TabsList>
 
@@ -226,7 +241,7 @@ export function MultipleAnalysisPage() {
                 </div>
               </TabsContent>
 
-              <TabsContent value='google_drive' className='space-y-4'>
+              <TabsContent value='google_drive_url' className='space-y-4'>
                 <div>
                   <Label htmlFor='drive-url'>URL Google Drive</Label>
                   <Input
@@ -241,6 +256,20 @@ export function MultipleAnalysisPage() {
                   </p>
                 </div>
               </TabsContent>
+
+              <TabsContent value='google_drive_oauth' className='space-y-4'>
+                {!isOauthAuthorized ? (
+                  <GoogleDriveAuth
+                    onAuthSuccess={handleOauthAuthSuccess}
+                    onAuthError={handleOauthAuthError}
+                  />
+                ) : (
+                  <GoogleDrivePicker
+                    onFilesSelected={handleOauthFilesSelected}
+                    onError={handleOauthAuthError}
+                  />
+                )}
+              </TabsContent>
             </Tabs>
 
             <Button
@@ -248,7 +277,8 @@ export function MultipleAnalysisPage() {
               disabled={
                 isUploading ||
                 (sourceType === "zip" && !file) ||
-                (sourceType === "google_drive" && !googleDriveUrl)
+                (sourceType === "google_drive_url" && !googleDriveUrl) ||
+                (sourceType === "google_drive_oauth" && oauthFiles.length === 0)
               }
               className='w-full'
             >

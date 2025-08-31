@@ -192,4 +192,5 @@ export enum ApiEndpoints {
   BATCH_STATUS = "/api/analysis/batch/{batch_id}/status",
   BATCH_RESULTS = "/api/analysis/batch/{batch_id}/results",
   BATCH_METHODS = "/api/analysis/batch/methods",
+  BATCH_OAUTH_FILES = "/api/analysis/batch/oauth-files",
 }

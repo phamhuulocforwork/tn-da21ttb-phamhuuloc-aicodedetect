@@ -8,6 +8,7 @@ import {
   BatchAnalysisResponse,
   CodeAnalysisRequest,
 } from "./api-types";
+import type { ProcessedFile } from "./google-drive-service";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -125,6 +126,30 @@ export class ApiClient {
       method: "POST",
       body: JSON.stringify(request),
     });
+  }
+
+  async analyzeBatchFromFiles(
+    files: ProcessedFile[],
+  ): Promise<BatchAnalysisResponse> {
+    // Convert ProcessedFile[] to format expected by backend
+    const fileData = files.map((file) => ({
+      filename: file.filename,
+      filepath: file.filepath,
+      language: file.language,
+      content: file.content,
+      size: file.size,
+    }));
+
+    return this.request(
+      ApiEndpoints.BATCH_OAUTH_FILES || "/api/analysis/batch/oauth-files",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          source_type: "oauth_files",
+          files: fileData,
+        }),
+      },
+    );
   }
 
   async getBatchStatus(batchId: string): Promise<BatchAnalysisResponse> {

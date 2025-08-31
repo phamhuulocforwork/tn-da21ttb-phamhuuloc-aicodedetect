@@ -354,14 +354,22 @@ class FileAnalysisResult(BaseModel):
     code_content: Optional[str] = None # NOTE: Trả code đọc được từ Google Drive -> FE
     error_message: Optional[str] = None
 
+class OAuthFileData(BaseModel):
+    filename: str
+    filepath: str
+    language: str
+    content: str
+    size: int
+
 class BatchAnalysisRequest(BaseModel):
-    source_type: str = Field(..., description="Type of source: 'zip' or 'google_drive'")
+    source_type: str = Field(..., description="Type of source: 'zip', 'google_drive', or 'oauth_files'")
     google_drive_url: Optional[str] = Field(None, description="Google Drive share URL")
+    files: Optional[List[OAuthFileData]] = Field(None, description="OAuth files data")
 
     @validator('source_type')
     def validate_source_type(cls, v):
-        if v not in ['zip', 'google_drive']:
-            raise ValueError("source_type phải là 'zip' hoặc 'google_drive'")
+        if v not in ['zip', 'google_drive', 'oauth_files']:
+            raise ValueError("source_type phải là 'zip', 'google_drive', hoặc 'oauth_files'")
         return v
 
     @validator('google_drive_url')
@@ -370,6 +378,12 @@ class BatchAnalysisRequest(BaseModel):
             raise ValueError("google_drive_url là bắt buộc khi source_type là 'google_drive'")
         if v and not re.match(r'https://drive\.google\.com/.*', v):
             raise ValueError("URL không hợp lệ cho Google Drive")
+        return v
+    
+    @validator('files')
+    def validate_files(cls, v, values):
+        if values.get('source_type') == 'oauth_files' and not v:
+            raise ValueError("files là bắt buộc khi source_type là 'oauth_files'")
         return v
 
 class BatchAnalysisResponse(BaseModel):
@@ -1461,7 +1475,6 @@ async def analyze_google_drive(request: BatchAnalysisRequest):
         )
 
 async def process_google_drive_analysis(batch_id: str, files_info: List[Dict[str, str]]):
-    """Background task to process Google Drive analysis"""
     try:
         print(f"Starting Google Drive analysis {batch_id} with {len(files_info)} files")
 
@@ -1490,6 +1503,107 @@ async def process_google_drive_analysis(batch_id: str, files_info: List[Dict[str
 
     except Exception as e:
         print(f"Error in Google Drive analysis {batch_id}: {str(e)}")
+        batch_results[batch_id].status = "error"
+        batch_results[batch_id].error_message = str(e)
+        batch_results[batch_id].completed_at = datetime.now().isoformat()
+
+@app.post("/api/analysis/batch/oauth-files", response_model=BatchAnalysisResponse)
+async def analyze_batch_oauth_files(request: BatchAnalysisRequest):
+    """Analyze files received from frontend OAuth2 flow"""
+    try:
+        if request.source_type != 'oauth_files':
+            raise HTTPException(
+                status_code=400,
+                detail="Endpoint này chỉ dành cho OAuth files"
+            )
+
+        if not request.files or len(request.files) == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="Không có files để phân tích"
+            )
+
+        batch_id = generate_batch_id()
+        created_at = datetime.now().isoformat()
+
+        files_info = []
+        for oauth_file in request.files:
+            files_info.append({
+                'filename': oauth_file.filename,
+                'filepath': oauth_file.filepath,
+                'language': oauth_file.language,
+                'content': oauth_file.content,
+                'size': oauth_file.size,
+                'extracted_path': None
+            })
+
+        batch_results[batch_id] = BatchAnalysisResponse(
+            batch_id=batch_id,
+            total_files=len(files_info),
+            processed_files=0,
+            success_count=0,
+            error_count=0,
+            results=[],
+            status="processing",
+            created_at=created_at
+        )
+
+        asyncio.create_task(process_oauth_files_analysis(batch_id, files_info))
+
+        return batch_results[batch_id]
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Lỗi OAuth files analysis: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"OAuth files analysis thất bại: {str(e)}"
+        )
+
+async def process_oauth_files_analysis(batch_id: str, files_info: List[Dict[str, Any]]):
+    try:
+        print(f"Starting OAuth files analysis {batch_id} with {len(files_info)} files")
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            processed_files_info = []
+            
+            for file_info in files_info:
+                try:
+                    temp_file_path = os.path.join(temp_dir, file_info['filename'])
+                    
+                    with open(temp_file_path, 'w', encoding='utf-8') as f:
+                        f.write(file_info['content'])
+                    
+                    file_info['extracted_path'] = temp_file_path
+                    processed_files_info.append(file_info)
+                    
+                except Exception as e:
+                    print(f"Error creating temp file for {file_info['filename']}: {e}")
+                    continue
+
+            if not processed_files_info:
+                batch_results[batch_id].status = "error"
+                batch_results[batch_id].error_message = "Không thể xử lý files từ OAuth"
+                batch_results[batch_id].completed_at = datetime.now().isoformat()
+                return
+
+            results = await analyze_file_batch(processed_files_info)
+
+            success_count = len([r for r in results if r.status == "success"])
+            error_count = len([r for r in results if r.status == "error"])
+
+            batch_results[batch_id].results = results
+            batch_results[batch_id].processed_files = len(results)
+            batch_results[batch_id].success_count = success_count
+            batch_results[batch_id].error_count = error_count
+            batch_results[batch_id].status = "completed"
+            batch_results[batch_id].completed_at = datetime.now().isoformat()
+
+            print(f"Completed OAuth files analysis {batch_id}: {success_count} success, {error_count} errors")
+
+    except Exception as e:
+        print(f"Error in OAuth files analysis {batch_id}: {str(e)}")
         batch_results[batch_id].status = "error"
         batch_results[batch_id].error_message = str(e)
         batch_results[batch_id].completed_at = datetime.now().isoformat()
