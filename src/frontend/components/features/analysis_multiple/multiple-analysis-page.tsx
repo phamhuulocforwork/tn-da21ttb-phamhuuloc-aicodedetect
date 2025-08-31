@@ -16,9 +16,9 @@ import {
   X,
 } from "lucide-react";
 
-import { CodeStats } from "@/components/shared";
+import { CodeStats } from "@/components/shared/code-stats";
 import { DynamicLink } from "@/components/shared/dynamic-link";
-import LanguageIcon from "@/components/shared/language-icons";
+import { LanguageIcon } from "@/components/shared/language-icons";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,10 +40,12 @@ import {
 } from "@/components/ui/tooltip";
 
 import { apiClient } from "@/lib/api-client";
-import type {
-  BatchAnalysisResponse,
-  FileAnalysisResult,
-} from "@/lib/api-types";
+import type { BatchAnalysisResponse } from "@/lib/api-types";
+
+import {
+  AnalysisResultCard,
+  AnalysisResultCardSkeleton,
+} from "./analysis-result-card";
 
 export function MultipleAnalysisPage() {
   const router = useRouter();
@@ -165,47 +167,17 @@ export function MultipleAnalysisPage() {
     }
   };
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 B";
-    const k = 1024;
-    const sizes = ["B", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
-  const getSimilarityBadge = (
-    aiSimilarity: number,
-    humanSimilarity: number,
-  ) => {
-    if (aiSimilarity > humanSimilarity + 10)
-      return <Badge variant='destructive'>Giống AI</Badge>;
-    if (humanSimilarity > aiSimilarity + 10)
-      return <Badge className='bg-green-500'>Giống Con Người</Badge>;
-    return <Badge variant='secondary'>Hỗn Hợp</Badge>;
-  };
-
-  const handleViewDetails = (result: FileAnalysisResult) => {
-    if (result.code_content) {
-      const encodedCode = encodeURIComponent(result.code_content);
-      router.push(`http://localhost:3000/analysis?code=${encodedCode}`);
-    } else if (result.analysis_id) {
-      router.push(
-        `http://localhost:3000/analysis?code=${encodeURIComponent(result.analysis_id)}`,
-      );
-    }
-  };
-
-  const successfulResults =
-    batchData?.results.filter((r) => r.status === "success") || [];
+  const allResults = batchData?.results || [];
+  const successfulResults = allResults.filter((r) => r.status === "success");
 
   return (
-    <div className='container mx-auto py-6 h-[calc(100vh-var(--header-height))] flex flex-col'>
-      {error && (
+    <div className='container mx-auto py-6 max-h-[calc(100vh-var(--header-height))] flex flex-col'>
+      {/* {error && (
         <Alert variant='destructive'>
           <AlertCircle className='h-4 w-4' />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
-      )}
+      )} */}
 
       {!batchData && (
         <Card>
@@ -360,33 +332,11 @@ export function MultipleAnalysisPage() {
               <CardContent className='flex-1 min-h-0 p-6'>
                 <Scroller className='w-full'>
                   <div className='space-y-2'>
-                    {successfulResults.map((result) => (
-                      <Card
+                    {allResults.map((result) => (
+                      <AnalysisResultCard
                         key={result.analysis_id || result.filename}
-                        className='hover:shadow-2xl shadow transition-shadow p-0'
-                      >
-                        <CardContent className='p-4 flex w-full justify-between'>
-                          <div className='flex items-start gap-2'>
-                            <LanguageIcon language='c' className='h-8 w-8' />
-                            <div className='flex-1 min-w-0'>
-                              <div className='font-medium text-sm truncate'>
-                                {result.filename}
-                              </div>
-                              <CodeStats
-                                code={result?.code_content || ""}
-                                className='text-xs'
-                              />
-                            </div>
-                          </div>
-
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <DynamicLink href='/analysis' />
-                            </TooltipTrigger>
-                            <TooltipContent>Xem chi tiết</TooltipContent>
-                          </Tooltip>
-                        </CardContent>
-                      </Card>
+                        result={result}
+                      />
                     ))}
                   </div>
                 </Scroller>
@@ -394,18 +344,24 @@ export function MultipleAnalysisPage() {
             </Card>
           )}
 
-          {batchData.status === "processing" &&
-            successfulResults.length === 0 && (
-              <Card>
-                <CardContent className='p-8 text-center'>
-                  <Activity className='h-12 w-12 mx-auto text-muted-foreground/50 animate-pulse mb-4' />
-                  <p className='text-muted-foreground'>Đang xử lý tệp...</p>
-                  <p className='text-sm text-muted-foreground mt-1'>
-                    Kết quả sẽ xuất hiện ở đây khi phân tích hoàn tất
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+          {batchData.status === "processing" && allResults.length === 0 && (
+            <Card className='mt-6'>
+              <CardHeader className='flex-shrink-0'>
+                <CardTitle className='flex items-center gap-2'>
+                  <FileText className='h-5 w-5' />
+                  Kết Quả Phân Tích
+                </CardTitle>
+                <CardDescription className='flex items-center gap-2'>
+                  Đang phân tích {batchData.total_files} tệp...
+                </CardDescription>
+              </CardHeader>
+              <CardContent className='p-8 text-center space-y-4'>
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <AnalysisResultCardSkeleton key={i} />
+                ))}
+              </CardContent>
+            </Card>
+          )}
         </>
       )}
     </div>

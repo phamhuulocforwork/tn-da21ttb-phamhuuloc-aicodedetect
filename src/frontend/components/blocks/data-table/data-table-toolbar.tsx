@@ -5,10 +5,10 @@ import * as React from "react";
 import type { Column, Table } from "@tanstack/react-table";
 import { X } from "lucide-react";
 
-import { DataTableDateFilter } from "@/components/data-table/data-table-date-filter";
-import { DataTableFacetedFilter } from "@/components/data-table/data-table-faceted-filter";
-import { DataTableSliderFilter } from "@/components/data-table/data-table-slider-filter";
-import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
+import { DataTableDateFilter } from "@/components/blocks/data-table/data-table-date-filter";
+import { DataTableFacetedFilter } from "@/components/blocks/data-table/data-table-faceted-filter";
+import { DataTableSliderFilter } from "@/components/blocks/data-table/data-table-slider-filter";
+import { DataTableViewOptions } from "@/components/blocks/data-table/data-table-view-options";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 

@@ -14,7 +14,7 @@ import type { EChartsCoreOption } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { ChartLine, Minus, TrendingDown, TrendingUp } from "lucide-react";
 
-import { CollapsibleFilter } from "@/components/customized/collapsible/collapsible";
+import { CollapsibleFilter } from "@/components/blocks/collapsible/collapsible";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
