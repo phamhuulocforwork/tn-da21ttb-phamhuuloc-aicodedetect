@@ -2,8 +2,15 @@
 
 import * as React from "react";
 
-import { CheckCircle, ExternalLink, Shield, User, X } from "lucide-react";
+import {
+  CheckCircle,
+  Loader2,
+  Shield,
+  User,
+  X,
+} from "lucide-react";
 
+import GoogleIcon from "@/components/icons/google-icons";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +20,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
 import { getGoogleDriveService } from "@/lib/google-drive-service";
 
@@ -42,6 +48,12 @@ export function GoogleDriveAuth({
       initializeService();
     }
   }, [isConfigured]);
+
+  React.useEffect(() => {
+    if (isAuthorized) {
+      onAuthSuccess();
+    }
+  }, [isAuthorized, onAuthSuccess]);
 
   const initializeService = async () => {
     setIsInitializing(true);
@@ -88,8 +100,10 @@ export function GoogleDriveAuth({
     try {
       await driveService.revokeAuthorization();
       setIsAuthorized(false);
+      onAuthError("Đã ngắt kết nối khỏi Google Drive");
     } catch (error) {
       console.error("Failed to revoke authorization:", error);
+      onAuthError("Không thể ngắt kết nối khỏi Google Drive");
     }
   };
 
@@ -155,18 +169,44 @@ export function GoogleDriveAuth({
   }
 
   return (
-    <Card className='border-blue-200'>
-      <CardHeader className='pb-4'>
-        <div className='flex items-center gap-2'>
-          <Shield className='h-5 w-5 text-blue-600' />
-          <CardTitle className='text-blue-900'>
-            Kết nối với Google Drive
-          </CardTitle>
+    <Card className='border-primary-200'>
+      <CardHeader className='pb-4 flex justify-between'>
+        <div className='space-y-2'>
+          <div className='flex items-center gap-2'>
+            <Shield className='h-5 w-5 text-primary-600' />
+            <CardTitle className='text-primary-900'>
+              Kết nối với Google Drive
+            </CardTitle>
+          </div>
+          <CardDescription>
+            Đăng nhập để truy cập trực tiếp files từ Google Drive của bạn mà
+            không cần paste URL.
+          </CardDescription>
         </div>
-        <CardDescription>
-          Đăng nhập để truy cập trực tiếp files từ Google Drive của bạn mà không
-          cần paste URL.
-        </CardDescription>
+        <Button
+          onClick={handleAuthorize}
+          disabled={isInitializing || isAuthorizing}
+          variant='outline'
+        >
+          {isInitializing && (
+            <>
+              <Loader2 className='h-4 w-4 mr-1 animate-spin' />
+              Đang khởi tạo...
+            </>
+          )}
+          {isAuthorizing && (
+            <>
+              <Loader2 className='h-4 w-4 mr-1 animate-spin' />
+              Đang đăng nhập...
+            </>
+          )}
+          {!isInitializing && !isAuthorizing && (
+            <>
+              <GoogleIcon className='h-4 w-4 mr-1' />
+              Đăng nhập với Google
+            </>
+          )}
+        </Button>
       </CardHeader>
 
       <CardContent className='space-y-4'>
@@ -183,30 +223,6 @@ export function GoogleDriveAuth({
             <CheckCircle className='h-4 w-4 text-purple-600' />
             <span>Tự động phát hiện và download files code</span>
           </div>
-        </div>
-
-        <Separator />
-
-        <div className='space-y-3'>
-          <Button
-            onClick={handleAuthorize}
-            disabled={isInitializing || isAuthorizing}
-            className='w-full bg-blue-600 hover:bg-blue-700'
-          >
-            {isInitializing && "Đang khởi tạo..."}
-            {isAuthorizing && "Đang đăng nhập..."}
-            {!isInitializing && !isAuthorizing && (
-              <>
-                <ExternalLink className='h-4 w-4 mr-2' />
-                Đăng nhập với Google
-              </>
-            )}
-          </Button>
-
-          <p className='text-xs text-muted-foreground text-center'>
-            Việc đăng nhập sẽ mở popup mới. Đảm bảo trình duyệt không chặn
-            popup.
-          </p>
         </div>
       </CardContent>
     </Card>

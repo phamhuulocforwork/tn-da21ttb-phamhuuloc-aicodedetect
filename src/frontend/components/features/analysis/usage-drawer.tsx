@@ -122,7 +122,7 @@ export default function UsageDrawer() {
               disabled={currentStep === 0}
               className='flex-1'
             >
-              <ChevronLeft className='mr-2 h-4 w-4' />
+              <ChevronLeft className='mr-1 h-4 w-4' />
               Trước
             </Button>
             <Button onClick={handleNext} size='sm' className='flex-1'>

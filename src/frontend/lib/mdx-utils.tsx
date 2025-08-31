@@ -165,7 +165,7 @@ export function MDXRenderer({
   if (loading) {
     return (
       <div className='flex items-center justify-center py-8'>
-        <Loader2 className='h-6 w-6 animate-spin mr-2' />
+        <Loader2 className='h-6 w-6 animate-spin mr-1' />
         <span className='text-muted-foreground'>{loadingText}</span>
       </div>
     );

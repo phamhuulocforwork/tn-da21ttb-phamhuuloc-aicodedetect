@@ -5,12 +5,17 @@ import oneDarkPro from "@/components/blocks/code-editor/onedarkpro.json";
 import { CodeStats } from "@/components/shared/code-stats";
 import { SectionHeader } from "@/components/shared/section-header";
 
+import { AIMDXResponse, AnalysisResponse } from "@/lib/api-types";
+
 import { AnalysisMode } from "./types";
 
 interface CodeInputSectionProps {
   code: string;
   onCodeChange: (value: string | undefined) => void;
-  onSubmit: (code: string, language: string) => Promise<unknown>;
+  onSubmit: (
+    code: string,
+    language: string,
+  ) => Promise<AnalysisResponse | AIMDXResponse>;
   isSubmitting: boolean;
   analysisMode: AnalysisMode;
   onFileContentLoaded?: (content: string, filename: string) => void;
@@ -19,6 +24,7 @@ interface CodeInputSectionProps {
 export function CodeInputSection({
   code,
   onCodeChange,
+  onSubmit,
   isSubmitting,
   analysisMode,
   onFileContentLoaded,
@@ -33,6 +39,7 @@ export function CodeInputSection({
         value={code}
         height='400px'
         onChange={onCodeChange}
+        onSubmit={onSubmit}
         isSubmitting={isSubmitting}
         analysisMode={analysisMode}
         onFileContentLoaded={onFileContentLoaded}

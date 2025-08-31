@@ -245,7 +245,7 @@ export function CodeEditor({
           beforeMount={beforeMount}
           loading={
             <div className='flex h-full items-center justify-center text-sm text-muted-foreground'>
-              <Loader2 className='w-5 h-5 animate-spin mr-2' />
+              <Loader2 className='w-5 h-5 animate-spin mr-1' />
               Đang tải...
             </div>
           }

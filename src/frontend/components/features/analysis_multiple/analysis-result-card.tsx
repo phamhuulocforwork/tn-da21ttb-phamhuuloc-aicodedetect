@@ -11,6 +11,10 @@ import type { FileAnalysisResult } from "@/lib/api-types";
 
 import { FileInfo } from "./file-info";
 
+function encodeFileContent(content: string): string {
+  return encodeURIComponent(content);
+}
+
 interface AnalysisResultCardProps {
   result: FileAnalysisResult;
 }
@@ -33,7 +37,10 @@ export function AnalysisResultCard({ result }: AnalysisResultCardProps) {
 
         <Tooltip>
           <TooltipTrigger>
-            <DynamicLink href='/analysis' />
+            <DynamicLink
+              href={`/analysis?code=${encodeFileContent(result.code_content || "")}`}
+              isExternal
+            />
           </TooltipTrigger>
           <TooltipContent>Xem chi tiết</TooltipContent>
         </Tooltip>

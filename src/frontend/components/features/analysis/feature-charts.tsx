@@ -1,3 +1,5 @@
+// NOTE: Component này k còn được sử dụng
+
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";

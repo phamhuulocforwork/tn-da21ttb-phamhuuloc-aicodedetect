@@ -6,14 +6,12 @@ import {
   AlertCircle,
   BarChart3,
   Brain,
-  Code,
   Download,
   FileText,
   Info,
   Loader2,
   Sparkles,
   TrendingUp,
-  Zap,
 } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -147,159 +145,9 @@ export default function ResultsDashboard({
 
   return (
     <div className='space-y-6'>
-      <Card>
-        <CardHeader>
-          <div className='flex items-start justify-between'>
-            <div>
-              <CardTitle className='flex items-center gap-2'>
-                <FileText className='h-5 w-5' />
-                Kết quả phân tích
-              </CardTitle>
-              <CardDescription>
-                {result.code_info.filename} •{" "}
-                {result.code_info.language.toUpperCase()} •{" "}
-                {result.code_info.loc} dòng
-              </CardDescription>
-            </div>
-
-            {onExportReport && (
-              <Button variant='outline' size='sm' onClick={onExportReport}>
-                <Download className='h-4 w-4 mr-2' />
-                Xuất báo cáo
-              </Button>
-            )}
-          </div>
-
-          {isAnalysisResponse(result) && result.assessment.baseline_summary && (
-            <div className='mt-6'>
-              <Card className='border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10'>
-                <CardHeader className='pb-4'>
-                  <div className='flex items-center justify-between'>
-                    <div>
-                      <CardTitle className='flex items-center gap-2 text-primary'>
-                        <BarChart3 className='h-5 w-5' />
-                        Phân tích Dataset Baseline
-                      </CardTitle>
-                      <CardDescription className='text-primary/70'>
-                        So sánh với dataset chuẩn gồm{" "}
-                        {
-                          result.assessment.baseline_summary
-                            .total_features_compared
-                        }{" "}
-                        đặc trưng
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className='space-y-6'>
-                  <div className='grid gap-6 md:grid-cols-2'>
-                    <div className='space-y-4'>
-                      <div className='flex items-center gap-3'>
-                        <div className='p-2 rounded-full bg-red-100 dark:bg-red-900/20'>
-                          <Brain className='h-4 w-4 text-red-600 dark:text-red-400' />
-                        </div>
-                        <div>
-                          <div className='text-2xl font-bold text-red-600 dark:text-red-400'>
-                            {Math.round(
-                              result.assessment.baseline_summary
-                                .overall_ai_similarity * 100,
-                            )}
-                            %
-                          </div>
-                          <div className='text-xs text-muted-foreground'>
-                            Tương đồng với AI samples
-                          </div>
-                        </div>
-                      </div>
-                      <Progress
-                        value={
-                          result.assessment.baseline_summary
-                            .overall_ai_similarity * 100
-                        }
-                        className='h-3 bg-red-100 dark:bg-red-900/20'
-                      />
-                    </div>
-
-                    <div className='space-y-4'>
-                      <div className='flex items-center gap-3'>
-                        <div className='p-2 rounded-full bg-green-100 dark:bg-green-900/20'>
-                          <FileText className='h-4 w-4 text-green-600 dark:text-green-400' />
-                        </div>
-                        <div>
-                          <div className='text-2xl font-bold text-green-600 dark:text-green-400'>
-                            {Math.round(
-                              result.assessment.baseline_summary
-                                .overall_human_similarity * 100,
-                            )}
-                            %
-                          </div>
-                          <div className='text-xs text-muted-foreground'>
-                            Tương đồng với Human samples
-                          </div>
-                        </div>
-                      </div>
-                      <Progress
-                        value={
-                          result.assessment.baseline_summary
-                            .overall_human_similarity * 100
-                        }
-                        className='h-3 bg-green-100 dark:bg-green-900/20'
-                      />
-                    </div>
-                  </div>
-
-                  <div className='pt-4 border-t border-primary/10'>
-                    <div className='flex items-center justify-between mb-3'>
-                      <h4 className='font-semibold text-primary'>
-                        Kết luận phân tích:
-                      </h4>
-                      <div className='flex gap-2'>
-                        <Badge
-                          variant='outline'
-                          className='border-red-200 text-red-700 dark:border-red-800 dark:text-red-300'
-                        >
-                          {result.assessment.baseline_summary.ai_like_features}{" "}
-                          AI-like
-                        </Badge>
-                        <Badge
-                          variant='outline'
-                          className='border-green-200 text-green-700 dark:border-green-800 dark:text-green-300'
-                        >
-                          {
-                            result.assessment.baseline_summary
-                              .human_like_features
-                          }{" "}
-                          Human-like
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {isAnalysisResponse(result) &&
-            !result.assessment.baseline_summary && (
-              <div className='mt-4 p-4 bg-muted/50 rounded-lg'>
-                <div className='text-center py-8'>
-                  <BarChart3 className='h-12 w-12 text-muted-foreground mx-auto mb-4' />
-                  <h4 className='font-semibold text-muted-foreground mb-2'>
-                    Dataset Baseline không khả dụng
-                  </h4>
-                  <p className='text-sm text-muted-foreground'>
-                    Không thể so sánh với dataset chuẩn. Kết quả phân tích có
-                    thể kém chính xác hơn.
-                  </p>
-                </div>
-              </div>
-            )}
-        </CardHeader>
-      </Card>
-
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList
-          className={`grid w-full ${isAIAnalysis ? "grid-cols-4" : "grid-cols-6"}`}
+          className={`grid w-full ${isAIAnalysis ? "grid-cols-4" : "grid-cols-5"}`}
         >
           <TabsTrigger value='overview'>Tổng quan</TabsTrigger>
           {isAIAnalysis ? (
@@ -312,7 +160,6 @@ export default function ResultsDashboard({
             <>
               <TabsTrigger value='features'>Đặc trưng</TabsTrigger>
               <TabsTrigger value='baseline'>So sánh baseline</TabsTrigger>
-              <TabsTrigger value='charts'>Biểu đồ</TabsTrigger>
               <TabsTrigger value='details'>Chi tiết</TabsTrigger>
               <TabsTrigger value='raw'>Dữ liệu thô</TabsTrigger>
             </>
@@ -321,58 +168,163 @@ export default function ResultsDashboard({
 
         <TabsContent value='overview' className='space-y-6'>
           {isComprehensive ? (
-            <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
-              {Object.entries(result.feature_groups).map(
-                ([groupName, group]) => {
-                  const icons: Record<
-                    string,
-                    React.ComponentType<{ className?: string }>
-                  > = {
-                    structure_metrics: Code,
-                    style_metrics: Brain,
-                    complexity_metrics: TrendingUp,
-                    ai_detection_metrics: Zap,
-                  };
+            <Card>
+              <CardHeader>
+                <div className='flex items-start justify-between'>
+                  <div>
+                    <CardTitle className='flex items-center gap-2'>
+                      <FileText className='h-5 w-5' />
+                      Kết quả phân tích
+                    </CardTitle>
+                    <CardDescription>
+                      {result.code_info.filename} •{" "}
+                      {result.code_info.language.toUpperCase()} •{" "}
+                      {result.code_info.loc} dòng
+                    </CardDescription>
+                  </div>
 
-                  const Icon = icons[groupName] || BarChart3;
+                  {onExportReport && (
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      onClick={onExportReport}
+                    >
+                      <Download className='h-4 w-4 mr-1' />
+                      Xuất báo cáo
+                    </Button>
+                  )}
+                </div>
 
-                  return (
-                    <Card key={groupName}>
-                      <CardContent className='p-6'>
-                        <div className='flex items-center gap-3 mb-3'>
-                          <div className='p-2 bg-primary/10 rounded-md'>
-                            <Icon className='h-4 w-4 text-primary' />
-                          </div>
-                          <h3 className='font-semibold text-sm'>
-                            {group.group_name}
-                          </h3>
-                        </div>
-
-                        <div className='space-y-2'>
+                {isAnalysisResponse(result) &&
+                  result.assessment.baseline_summary && (
+                    <div className='mt-6'>
+                      <Card className='border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10'>
+                        <CardHeader className='pb-4'>
                           <div className='flex items-center justify-between'>
-                            <span className='text-2xl font-bold'>
-                              {Math.round(group.group_score * 100)}%
-                            </span>
-                            <Badge variant='outline' className='text-xs'>
-                              {group.features.length} đặc trưng
-                            </Badge>
+                            <div>
+                              <CardTitle className='flex items-center gap-2 text-primary'>
+                                <BarChart3 className='h-5 w-5' />
+                                Phân tích Dataset Baseline
+                              </CardTitle>
+                              <CardDescription className='text-primary/70'>
+                                So sánh với dataset chuẩn gồm{" "}
+                                {
+                                  result.assessment.baseline_summary
+                                    .total_features_compared
+                                }{" "}
+                                đặc trưng
+                              </CardDescription>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className='space-y-6'>
+                          <div className='grid gap-6 md:grid-cols-2'>
+                            <div className='space-y-4'>
+                              <div className='flex items-center gap-3'>
+                                <div className='p-2 rounded-full bg-red-100 dark:bg-red-900/20'>
+                                  <Brain className='h-4 w-4 text-red-600 dark:text-red-400' />
+                                </div>
+                                <div>
+                                  <div className='text-2xl font-bold text-red-600 dark:text-red-400'>
+                                    {Math.round(
+                                      result.assessment.baseline_summary
+                                        .overall_ai_similarity * 100,
+                                    )}
+                                    %
+                                  </div>
+                                  <div className='text-xs text-muted-foreground'>
+                                    Tương đồng với AI samples
+                                  </div>
+                                </div>
+                              </div>
+                              <Progress
+                                value={
+                                  result.assessment.baseline_summary
+                                    .overall_ai_similarity * 100
+                                }
+                                className='h-3 bg-red-100 dark:bg-red-900/20'
+                              />
+                            </div>
+
+                            <div className='space-y-4'>
+                              <div className='flex items-center gap-3'>
+                                <div className='p-2 rounded-full bg-green-100 dark:bg-green-900/20'>
+                                  <FileText className='h-4 w-4 text-green-600 dark:text-green-400' />
+                                </div>
+                                <div>
+                                  <div className='text-2xl font-bold text-green-600 dark:text-green-400'>
+                                    {Math.round(
+                                      result.assessment.baseline_summary
+                                        .overall_human_similarity * 100,
+                                    )}
+                                    %
+                                  </div>
+                                  <div className='text-xs text-muted-foreground'>
+                                    Tương đồng với Human samples
+                                  </div>
+                                </div>
+                              </div>
+                              <Progress
+                                value={
+                                  result.assessment.baseline_summary
+                                    .overall_human_similarity * 100
+                                }
+                                className='h-3 bg-green-100 dark:bg-green-900/20'
+                              />
+                            </div>
                           </div>
 
-                          <Progress
-                            value={group.group_score * 100}
-                            className='h-1'
-                          />
+                          <div className='pt-4 border-t border-primary/10'>
+                            <div className='flex items-center justify-between mb-3'>
+                              <h4 className='font-semibold text-primary'>
+                                Kết luận phân tích:
+                              </h4>
+                              <div className='flex gap-2'>
+                                <Badge
+                                  variant='outline'
+                                  className='border-red-200 text-red-700 dark:border-red-800 dark:text-red-300'
+                                >
+                                  {
+                                    result.assessment.baseline_summary
+                                      .ai_like_features
+                                  }{" "}
+                                  AI-like
+                                </Badge>
+                                <Badge
+                                  variant='outline'
+                                  className='border-green-200 text-green-700 dark:border-green-800 dark:text-green-300'
+                                >
+                                  {
+                                    result.assessment.baseline_summary
+                                      .human_like_features
+                                  }{" "}
+                                  Human-like
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
 
-                          <p className='text-xs text-muted-foreground'>
-                            {group.description}
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                },
-              )}
-            </div>
+                {isAnalysisResponse(result) &&
+                  !result.assessment.baseline_summary && (
+                    <div className='mt-4 p-4 bg-muted/50 rounded-lg'>
+                      <div className='text-center py-8'>
+                        <BarChart3 className='h-12 w-12 text-muted-foreground mx-auto mb-4' />
+                        <h4 className='font-semibold text-muted-foreground mb-2'>
+                          Dataset Baseline không khả dụng
+                        </h4>
+                        <p className='text-sm text-muted-foreground'>
+                          Không thể so sánh với dataset chuẩn. Kết quả phân tích
+                          có thể kém chính xác hơn.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+              </CardHeader>
+            </Card>
           ) : (
             <Card>
               <CardHeader>
@@ -572,26 +524,6 @@ export default function ResultsDashboard({
               <CardContent>
                 <div className='flex items-center justify-center py-8 text-muted-foreground'>
                   <Sparkles className='h-12 w-12 mb-4' />
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        <TabsContent value='charts' className='space-y-6'>
-          {isComprehensive ? (
-            <FeatureCharts featureGroups={result.feature_groups} />
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>Không có trực quan hóa</CardTitle>
-                <CardDescription>
-                  Biểu đồ chỉ không có sẵn cho phân tích đang được chọn
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className='flex items-center justify-center py-8 text-muted-foreground'>
-                  <BarChart3 className='h-12 w-12 mb-4' />
                 </div>
               </CardContent>
             </Card>

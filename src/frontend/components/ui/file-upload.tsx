@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import WinrarOutlineIcon from "@/components/icons/winrar-icon";
 
 const ROOT_NAME = "FileUpload";
 const DROPZONE_NAME = "FileUploadDropzone";
@@ -1031,6 +1032,10 @@ function getFileIcon(file: File) {
     ["txt", "md", "rtf", "pdf"].includes(extension)
   ) {
     return <FileTextIcon />;
+  }
+
+  if (["rar", "zip"].includes(extension)) {
+    return <WinrarOutlineIcon/>;
   }
 
   if (

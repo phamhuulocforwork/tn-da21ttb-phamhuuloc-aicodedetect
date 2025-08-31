@@ -8,10 +8,12 @@ import {
   FileText,
   Link,
   RefreshCw,
+  Send,
   Upload,
   X,
 } from "lucide-react";
 
+import GoogleDrive from "@/components/icons/google-drive-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,8 +23,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  FileUpload,
+  FileUploadDropzone,
+  FileUploadItem,
+  FileUploadItemDelete,
+  FileUploadItemMetadata,
+  FileUploadItemPreview,
+  FileUploadList,
+  FileUploadTrigger,
+} from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Scroller } from "@/components/ui/scroller";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -39,9 +52,13 @@ import GoogleDrivePicker from "./google-drive-picker";
 
 export function MultipleAnalysisPage() {
   const [sourceType, setSourceType] = React.useState<
-    "zip" | "google_drive_url" | "google_drive_oauth"
+    "file_upload" | "google_drive_oauth"
+  >("file_upload");
+  const [uploadType, setUploadType] = React.useState<
+    "zip" | "google_drive_url"
   >("zip");
   const [file, setFile] = React.useState<File | null>(null);
+  const [files, setFiles] = React.useState<File[]>([]);
   const [googleDriveUrl, setGoogleDriveUrl] = React.useState("");
   const [oauthFiles, setOauthFiles] = React.useState<ProcessedFile[]>([]);
   const [isOauthAuthorized, setIsOauthAuthorized] = React.useState(false);
@@ -61,15 +78,16 @@ export function MultipleAnalysisPage() {
     };
   }, [pollingInterval]);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
+  const handleFilesChange = (newFiles: File[]) => {
+    if (newFiles.length > 0) {
+      const selectedFile = newFiles[0];
       if (
         !selectedFile.name.endsWith(".zip") &&
         !selectedFile.name.endsWith(".rar")
       ) {
         setError("Chỉ hỗ trợ file ZIP hoặc RAR");
         setFile(null);
+        setFiles([]);
         return;
       }
 
@@ -77,12 +95,23 @@ export function MultipleAnalysisPage() {
       if (selectedFile.size > maxSize) {
         setError("File không được vượt quá 50MB");
         setFile(null);
+        setFiles([]);
         return;
       }
 
       setFile(selectedFile);
+      setFiles(newFiles);
       setError(null);
+    } else {
+      setFile(null);
+      setFiles([]);
     }
+  };
+
+  const handleFileReject = (rejectedFile: File, message: string) => {
+    setError(`${rejectedFile.name}: ${message}`);
+    setFile(null);
+    setFiles([]);
   };
 
   const handleGoogleDriveUrlChange = (value: string) => {
@@ -136,13 +165,19 @@ export function MultipleAnalysisPage() {
     try {
       let data: BatchAnalysisResponse;
 
-      if (sourceType === "zip" && file) {
-        data = await apiClient.uploadBatchZip(file);
-      } else if (sourceType === "google_drive_url" && googleDriveUrl) {
-        data = await apiClient.analyzeBatchGoogleDrive({
-          source_type: "google_drive",
-          google_drive_url: googleDriveUrl,
-        });
+      if (sourceType === "file_upload") {
+        if (uploadType === "zip" && file) {
+          data = await apiClient.uploadBatchZip(file);
+        } else if (uploadType === "google_drive_url" && googleDriveUrl) {
+          data = await apiClient.analyzeBatchGoogleDrive({
+            source_type: "google_drive",
+            google_drive_url: googleDriveUrl,
+          });
+        } else {
+          throw new Error(
+            "Vui lòng chọn file hoặc nhập URL Google Drive hợp lệ",
+          );
+        }
       } else if (sourceType === "google_drive_oauth" && oauthFiles.length > 0) {
         // Đọc file bằng OAuth - gửi BE phân tích
         data = await apiClient.analyzeBatchFromFiles(oauthFiles);
@@ -179,7 +214,7 @@ export function MultipleAnalysisPage() {
   const successfulResults = allResults.filter((r) => r.status === "success");
 
   return (
-    <div className='container mx-auto py-6 max-h-[calc(100vh-var(--header-height))] flex flex-col'>
+    <div className='container mx-auto py-6 h-[calc(100vh-var(--header-height))] flex flex-col'>
       {/* TODO: Thông báo lỗi */}
       {/* {error && (
         <Alert variant='destructive'>
@@ -200,61 +235,106 @@ export function MultipleAnalysisPage() {
             <Tabs
               value={sourceType}
               onValueChange={(value) =>
-                setSourceType(
-                  value as "zip" | "google_drive_url" | "google_drive_oauth",
-                )
+                setSourceType(value as "file_upload" | "google_drive_oauth")
               }
             >
-              <TabsList className='grid w-full grid-cols-3'>
-                <TabsTrigger value='zip'>
-                  <Upload className='h-4 w-4 mr-2' />
-                  Tải Lên ZIP/RAR
-                </TabsTrigger>
-                <TabsTrigger value='google_drive_url'>
-                  <Link className='h-4 w-4 mr-2' />
-                  Google Drive URL
+              <TabsList className='grid w-full grid-cols-2'>
+                <TabsTrigger value='file_upload'>
+                  <Upload className='h-4 w-4 mr-1' />
+                  Tải Lên File
                 </TabsTrigger>
                 <TabsTrigger value='google_drive_oauth'>
-                  <ExternalLink className='h-4 w-4 mr-2' />
-                  Google Drive OAuth
+                  <GoogleDrive className='h-4 w-4 mr-1' />
+                  Google Drive
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value='zip' className='space-y-4'>
-                <div>
-                  <Label htmlFor='file-upload'>Chọn Tệp ZIP/RAR</Label>
-                  <Input
-                    id='file-upload'
-                    type='file'
-                    accept='.zip,.rar'
-                    onChange={handleFileChange}
-                    className='cursor-pointer'
-                  />
-                  {file && (
-                    <div className='mt-2 flex items-center gap-2'>
-                      <Badge variant='secondary'>{file.name}</Badge>
-                      <Badge variant='outline'>
-                        {(file.size / 1024 / 1024).toFixed(2)} MB
-                      </Badge>
+              <TabsContent value='file_upload' className='space-y-4'>
+                <RadioGroup
+                  value={uploadType}
+                  onValueChange={(value) =>
+                    setUploadType(value as "zip" | "google_drive_url")
+                  }
+                  className='space-y-4'
+                >
+                  <div className='flex items-center space-x-2'>
+                    <RadioGroupItem value='zip' id='zip-upload' />
+                    <Label htmlFor='zip-upload' className='cursor-pointer'>
+                      Tải lên file ZIP/RAR
+                    </Label>
+                  </div>
+
+                  {uploadType === "zip" && (
+                    <div className='ml-6 space-y-4'>
+                      <Label>Chọn tệp ZIP/RAR</Label>
+                      <FileUpload
+                        maxFiles={1}
+                        maxSize={50 * 1024 * 1024} // 50MB
+                        value={files}
+                        onValueChange={handleFilesChange}
+                        onFileReject={handleFileReject}
+                        accept='.zip,.rar'
+                      >
+                        <FileUploadDropzone>
+                          <div className='flex flex-col items-center gap-2 text-center p-4'>
+                            <div className='flex items-center justify-center rounded-full border p-3'>
+                              <Upload className='h-6 w-6 text-muted-foreground' />
+                            </div>
+                            <p className='font-medium text-sm'>
+                              Kéo thả file ZIP/RAR vào đây hoặc click để chọn
+                            </p>
+                            <p className='text-xs text-muted-foreground'>
+                              Hỗ trợ: .zip, .rar (tối đa 50MB)
+                            </p>
+                          </div>
+                        </FileUploadDropzone>
+
+                        <FileUploadList>
+                          {files.map((file, index) => (
+                            <FileUploadItem key={index} value={file}>
+                              <FileUploadItemPreview />
+                              <FileUploadItemMetadata />
+                              <FileUploadItemDelete asChild>
+                                <Button
+                                  variant='ghost'
+                                  size='icon'
+                                  className='h-7 w-7'
+                                >
+                                  <X className='h-4 w-4' />
+                                </Button>
+                              </FileUploadItemDelete>
+                            </FileUploadItem>
+                          ))}
+                        </FileUploadList>
+                      </FileUpload>
                     </div>
                   )}
-                </div>
-              </TabsContent>
 
-              <TabsContent value='google_drive_url' className='space-y-4'>
-                <div>
-                  <Label htmlFor='drive-url'>URL Google Drive</Label>
-                  <Input
-                    id='drive-url'
-                    value={googleDriveUrl}
-                    onChange={(e) => handleGoogleDriveUrlChange(e.target.value)}
-                    placeholder='https://drive.google.com/drive/folders/... hoặc https://drive.google.com/file/d/...'
-                  />
-                  <p className='text-sm text-muted-foreground mt-1'>
-                    Dán một liên kết thư mục hoặc tệp Google Drive có thể chia
-                    sẻ
-                  </p>
-                </div>
+                  <div className='flex items-center space-x-2'>
+                    <RadioGroupItem value='google_drive_url' id='drive-url' />
+                    <Label htmlFor='drive-url' className='cursor-pointer'>
+                      Nhập URL Google Drive
+                    </Label>
+                  </div>
+
+                  {uploadType === "google_drive_url" && (
+                    <div className='ml-6 space-y-2'>
+                      <Label htmlFor='drive-url-input'>URL Google Drive</Label>
+                      <Input
+                        id='drive-url-input'
+                        value={googleDriveUrl}
+                        onChange={(e) =>
+                          handleGoogleDriveUrlChange(e.target.value)
+                        }
+                        placeholder='https://drive.google.com/drive/folders/... hoặc https://drive.google.com/file/d/...'
+                      />
+                      <p className='text-xs text-muted-foreground'>
+                        Dán một liên kết thư mục hoặc tệp Google Drive mà bạn có
+                        quyền truy cập.
+                      </p>
+                    </div>
+                  )}
+                </RadioGroup>
               </TabsContent>
 
               <TabsContent value='google_drive_oauth' className='space-y-4'>
@@ -276,21 +356,22 @@ export function MultipleAnalysisPage() {
               onClick={handleStartAnalysis}
               disabled={
                 isUploading ||
-                (sourceType === "zip" && !file) ||
-                (sourceType === "google_drive_url" && !googleDriveUrl) ||
+                (sourceType === "file_upload" &&
+                  ((uploadType === "zip" && !file) ||
+                    (uploadType === "google_drive_url" && !googleDriveUrl))) ||
                 (sourceType === "google_drive_oauth" && oauthFiles.length === 0)
               }
               className='w-full'
             >
               {isUploading ? (
                 <>
-                  <RefreshCw className='h-4 w-4 mr-2 animate-spin' />
+                  <RefreshCw className='h-4 w-4 mr-1 animate-spin' />
                   Bắt Đầu Phân Tích...
                 </>
               ) : (
                 <>
+                  <Send className='w-4 h-4 mr-1' />
                   Phân Tích
-                  <Upload className='h-4 w-4 ml-2' />
                 </>
               )}
             </Button>
@@ -360,7 +441,7 @@ export function MultipleAnalysisPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className='flex-1 min-h-0 p-6'>
-                <Scroller className='w-full'>
+                <Scroller className='h-full' hideScrollbar>
                   <div className='space-y-2'>
                     {allResults.map((result) => (
                       <AnalysisResultCard

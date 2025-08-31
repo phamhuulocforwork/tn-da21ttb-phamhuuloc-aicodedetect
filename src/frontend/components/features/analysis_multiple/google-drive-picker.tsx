@@ -9,6 +9,7 @@ import {
   Folder,
   Link,
   Loader2,
+  LogIn,
   RefreshCw,
 } from "lucide-react";
 
@@ -23,6 +24,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Scroller } from "@/components/ui/scroller";
 
 import {
   type ProcessedFile,
@@ -135,39 +137,42 @@ export function GoogleDrivePicker({
 
         <CardContent className='space-y-4'>
           <div>
-            <Label htmlFor='drive-url'>URL Google Drive</Label>
-            <Input
-              id='drive-url'
-              value={url}
-              onChange={(e) => handleUrlChange(e.target.value)}
-              placeholder='https://drive.google.com/drive/folders/... hoặc https://drive.google.com/file/d/...'
-              className={urlError ? "border-red-300" : ""}
-            />
+            <div className='space-y-3'>
+              <Label htmlFor='drive-url'>URL Google Drive</Label>
+              <div className='flex gap-2'>
+                <Input
+                  id='drive-url'
+                  value={url}
+                  onChange={(e) => handleUrlChange(e.target.value)}
+                  placeholder='https://drive.google.com/drive/folders/... hoặc https://drive.google.com/file/d/...'
+                  className={urlError ? "border-red-300" : ""}
+                />
+                <Button
+                  onClick={handleProcessUrl}
+                  disabled={!url || !!urlError || isProcessing}
+                  className='shrink-0'
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className='h-4 w-4 mr-1 animate-spin' />
+                      Đang xử lý...
+                    </>
+                  ) : (
+                    "Tiếp tục"
+                  )}
+                </Button>
+              </div>
+            </div>
             {urlError && (
-              <p className='text-sm text-red-600 mt-1'>{urlError}</p>
+              <p className='text-xs font-semibold text-red-600 mt-1'>
+                {urlError}
+              </p>
             )}
-            <p className='text-sm text-muted-foreground mt-1'>
-              Paste URL của Google Drive folder/file mà bạn có quyền truy cập.
+            <p className='text-xs text-muted-foreground mt-2'>
+              Dán liên kết của Google Drive là thư mục/tệp mà bạn có quyền truy
+              cập.
             </p>
           </div>
-
-          <Button
-            onClick={handleProcessUrl}
-            disabled={!url || !!urlError || isProcessing}
-            className='w-full'
-          >
-            {isProcessing ? (
-              <>
-                <Loader2 className='h-4 w-4 mr-2 animate-spin' />
-                Đang xử lý...
-              </>
-            ) : (
-              <>
-                <Folder className='h-4 w-4 mr-2' />
-                Truy cập và Phân tích Files
-              </>
-            )}
-          </Button>
         </CardContent>
       </Card>
 
@@ -185,63 +190,51 @@ export function GoogleDrivePicker({
                 onClick={handleProcessUrl}
                 disabled={isProcessing}
               >
-                <RefreshCw className='h-4 w-4 mr-2' />
+                <RefreshCw className='h-4 w-4 mr-1' />
                 Làm mới
               </Button>
             </div>
             <CardDescription>
-              Đã tìm thấy {processedFiles.length} files code hợp lệ.
+              Đã tìm thấy{" "}
+              <span className='font-semibold text-primary'>
+                {processedFiles.length}
+              </span>{" "}
+              file{processedFiles.length !== 1 ? "s" : ""} code hợp lệ.
             </CardDescription>
           </CardHeader>
 
           <CardContent>
-            <div className='space-y-2 max-h-60 overflow-y-auto'>
-              {processedFiles.map((file, index) => (
-                <div
-                  key={index}
-                  className='flex items-center justify-between p-2 rounded-lg border bg-gray-50'
-                >
-                  <div className='flex items-center gap-2 flex-1 min-w-0'>
-                    {getFileIcon(file.filename)}
-                    <div className='flex-1 min-w-0'>
-                      <p className='text-sm font-medium truncate'>
-                        {file.filename}
-                      </p>
-                      <p className='text-xs text-muted-foreground truncate'>
-                        {file.filepath}
-                      </p>
+            <Scroller className='h-60' hideScrollbar>
+              <div className='space-y-2'>
+                {processedFiles.map((file, index) => (
+                  <div
+                    key={index}
+                    className='flex items-center justify-between p-2 rounded-lg border '
+                  >
+                    <div className='flex items-center gap-2 flex-1 min-w-0'>
+                      {getFileIcon(file.filename)}
+                      <div className='flex-1 min-w-0'>
+                        <p className='text-sm font-medium truncate'>
+                          {file.filename}
+                        </p>
+                        <p className='text-xs text-muted-foreground truncate'>
+                          {file.filepath}
+                        </p>
+                      </div>
+                    </div>
+                    <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+                      <span className='bg-blue-100 text-blue-800 px-2 py-1 rounded'>
+                        {file.language.toUpperCase()}
+                      </span>
+                      <span>{formatFileSize(file.size)}</span>
                     </div>
                   </div>
-                  <div className='flex items-center gap-2 text-xs text-muted-foreground'>
-                    <span className='bg-blue-100 text-blue-800 px-2 py-1 rounded'>
-                      {file.language.toUpperCase()}
-                    </span>
-                    <span>{formatFileSize(file.size)}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </Scroller>
           </CardContent>
         </Card>
       )}
-
-      <Alert>
-        <ExternalLink className='h-4 w-4' />
-        <AlertDescription>
-          <div className='space-y-1'>
-            <p className='font-medium'>Hướng dẫn sử dụng:</p>
-            <ul className='text-sm space-y-1 ml-4 list-disc'>
-              <li>
-                Chỉ files có extension .c, .cpp, .cc, .cxx, .h, .hpp, .txt sẽ
-                được phân tích
-              </li>
-              <li>Nếu là folder, sẽ tự động duyệt tất cả subfolders</li>
-              <li>Files quá lớn (&gt; 1MB) có thể mất thời gian xử lý</li>
-              <li>Đảm bảo folder/file được share hoặc bạn có quyền truy cập</li>
-            </ul>
-          </div>
-        </AlertDescription>
-      </Alert>
     </div>
   );
 }

@@ -182,10 +182,10 @@ You are an AI Code Detector designed to analyze and detect if a given piece of c
 # Phân tích Code AI Detection
 
 ## Kết quả dự đoán
-**Dự đoán:** [Code do AI viết hoặc Code do người viết]  
-**Độ tin cậy:** [0-100]%  
-**Xác suất là AI viết:** [0-100]%  
-**Xác suất là người viết:** [0-100]%  
+**Dự đoán:** [Code do AI viết hoặc Code do người viết]\n
+**Độ tin cậy:** [0-100]% \n
+**Xác suất là AI viết:** [0-100]% \n
+**Xác suất là người viết:** [0-100]% \n
 
 ## Phân tích chi tiết
 
