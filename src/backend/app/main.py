@@ -47,7 +47,13 @@ except ImportError as e:
     GENAI_AVAILABLE = False
 
 try:
-    from baseline_loader import get_baseline_loader, reload_baseline_stats
+    try:
+        try:
+            from baseline_loader import get_baseline_loader
+        except ImportError:
+            from app.baseline_loader import get_baseline_loader, reload_baseline_stats
+    except ImportError:
+        from app.baseline_loader import get_baseline_loader, reload_baseline_stats
     BASELINE_LOADER_AVAILABLE = True
 except ImportError as e:
     BASELINE_LOADER_AVAILABLE = False
@@ -720,7 +726,10 @@ def calculate_file_size(code: str) -> int:
 
 def calculate_baseline_comparison(feature_name: str, current_value: float) -> Optional[BaselineComparison]:
     try:
-        from baseline_loader import get_baseline_loader
+        try:
+            from baseline_loader import get_baseline_loader
+        except ImportError:
+            from app.baseline_loader import get_baseline_loader
         baseline_loader = get_baseline_loader()
         baseline_stats = baseline_loader.get_baseline_stats()
         baseline = baseline_stats.get_feature_baseline(feature_name)
@@ -799,7 +808,10 @@ def interpret_feature(feature_name: str, value: float, normalized: bool = True) 
 
 def create_feature_groups(features_dict: Dict[str, float]) -> Dict[str, FeatureGroup]:
     try:
-        from baseline_loader import get_baseline_loader
+        try:
+            from baseline_loader import get_baseline_loader
+        except ImportError:
+            from app.baseline_loader import get_baseline_loader
         baseline_loader = get_baseline_loader()
         baseline_stats = baseline_loader.get_baseline_stats()
         
@@ -1672,6 +1684,78 @@ async def get_batch_methods():
             }
         ]
     }
+
+@app.get("/api/debug/baseline-stats")
+async def debug_baseline_stats():
+    """Debug endpoint to inspect baseline stats loading and integrity"""
+    try:
+        try:
+            from baseline_loader import get_baseline_loader
+        except ImportError:
+            from app.baseline_loader import get_baseline_loader
+        loader = get_baseline_loader()
+
+        # Get stats integrity
+        integrity = loader.validate_stats_integrity()
+
+        # Get sample features
+        stats = loader.get_baseline_stats()
+        sample_features = {}
+        for feature_name in list(stats.ai_stats.keys())[:10]:  # Show first 10 features
+            sample_features[feature_name] = {
+                "ai_baseline": stats.ai_stats.get(feature_name),
+                "human_baseline": stats.human_stats.get(feature_name)
+            }
+
+        return {
+            "status": "success",
+            "integrity_check": integrity,
+            "stats_file_path": loader.stats_file_path,
+            "sample_features": sample_features,
+            "total_features": {
+                "ai_features": len(stats.ai_stats),
+                "human_features": len(stats.human_stats),
+                "common_features": len(set(stats.ai_stats.keys()) & set(stats.human_stats.keys()))
+            }
+        }
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
+
+@app.post("/api/debug/reload-baseline")
+async def reload_baseline_stats():
+    """Force reload baseline stats from file"""
+    try:
+        try:
+            from baseline_loader import reload_baseline_stats
+        except ImportError:
+            from app.baseline_loader import reload_baseline_stats
+        reload_baseline_stats()
+
+        # Verify reload worked
+        try:
+            from baseline_loader import get_baseline_loader
+        except ImportError:
+            from app.baseline_loader import get_baseline_loader
+        loader = get_baseline_loader()
+        integrity = loader.validate_stats_integrity()
+
+        return {
+            "status": "success",
+            "message": "Baseline stats reloaded successfully",
+            "integrity_check": integrity
+        }
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
 
 if __name__ == "__main__":
     uvicorn.run(

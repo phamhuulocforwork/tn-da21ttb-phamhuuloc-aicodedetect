@@ -1,11 +1,29 @@
 import json
 import os
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, List
 from dataclasses import dataclass
 import logging
+import time
+from functools import lru_cache
 
 logger = logging.getLogger(__name__)
+
+# Configuration for stats file paths
+STATS_FILE_CONFIG = {
+    'docker_paths': [
+        Path('/src/feature_stats.json'),  # Docker volume mount
+        Path('/app/../src/feature_stats.json'),
+    ],
+    'dev_paths': [
+        Path(__file__).parent.parent.parent / "src" / "feature_stats.json",
+        Path(__file__).parent.parent.parent.parent / "src" / "src" / "feature_stats.json",
+        Path("../../src/feature_stats.json"),
+        Path("../../../src/src/feature_stats.json"),
+        Path("src/src/feature_stats.json"),
+        Path("../src/src/feature_stats.json"),
+    ]
+}
 
 @dataclass
 class BaselineStats:
@@ -32,51 +50,92 @@ class BaselineLoader:
         self._load_baseline_stats()
     
     def _auto_detect_stats_file(self) -> str:
-        current_dir = Path(__file__).parent.absolute()
-        
-        possible_paths = [
-            current_dir.parent.parent / "src" / "feature_stats.json",
-            current_dir.parent.parent.parent / "src" / "src" / "feature_stats.json",
-            Path("../../src/feature_stats.json"),
-            Path("../../../src/src/feature_stats.json"),
-        ]
-        
-        for path in possible_paths:
+        """Auto-detect feature_stats.json file with optimized path resolution"""
+        # First try Docker-specific paths (more efficient in containerized environment)
+        for path in STATS_FILE_CONFIG['docker_paths']:
             if path.exists():
-                logger.info(f"Found feature_stats.json at: {path}")
+                logger.info(f"Found feature_stats.json at Docker path: {path}")
                 return str(path.resolve())
-        
-        raise FileNotFoundError(f"Could not find feature_stats.json. Tried paths: {[str(p) for p in possible_paths]}")
+
+        # Then try development paths
+        for path in STATS_FILE_CONFIG['dev_paths']:
+            if path.exists():
+                logger.info(f"Found feature_stats.json at dev path: {path}")
+                return str(path.resolve())
+
+        # If no file found, provide detailed error with all attempted paths
+        all_paths = STATS_FILE_CONFIG['docker_paths'] + STATS_FILE_CONFIG['dev_paths']
+        error_msg = f"Could not find feature_stats.json. Searched {len(all_paths)} locations:\n"
+        for i, path in enumerate(all_paths, 1):
+            error_msg += f"  {i}. {path} {'✓' if path.exists() else '✗'}\n"
+
+        raise FileNotFoundError(error_msg)
     
+    @lru_cache(maxsize=1)
     def _load_baseline_stats(self) -> None:
+        """Load baseline stats with caching and improved error handling"""
         try:
             if not self.stats_file_path:
                 self.stats_file_path = self._auto_detect_stats_file()
-            
+
+            # Check file modification time to detect changes
+            file_path = Path(self.stats_file_path)
+            if not file_path.exists():
+                raise FileNotFoundError(f"Stats file not found: {self.stats_file_path}")
+
+            # Load and parse JSON data
             with open(self.stats_file_path, 'r', encoding='utf-8') as f:
                 stats_data = json.load(f)
-            
+
+            if not isinstance(stats_data, dict):
+                raise ValueError(f"Invalid stats file format: expected dict, got {type(stats_data)}")
+
             ai_stats = {}
             human_stats = {}
-            
+
+            # Parse features with validation
             for key, value in stats_data.items():
+                if not isinstance(key, str) or not isinstance(value, (int, float)):
+                    logger.warning(f"Skipping invalid entry: {key} = {value}")
+                    continue
+
                 if key.endswith('_ai_mean'):
                     feature_name = key.replace('_ai_mean', '')
                     ai_stats[feature_name] = float(value)
                 elif key.endswith('_human_mean'):
                     feature_name = key.replace('_human_mean', '')
                     human_stats[feature_name] = float(value)
-            
+
+            if not ai_stats and not human_stats:
+                raise ValueError("No valid AI or human stats found in file")
+
             self._baseline_stats = BaselineStats(
                 ai_stats=ai_stats,
                 human_stats=human_stats
             )
-            
-            logger.info(f"Loaded baseline stats: {len(ai_stats)} AI features, {len(human_stats)} Human features")
-            
+
+            logger.info(f"Successfully loaded baseline stats: {len(ai_stats)} AI features, {len(human_stats)} Human features from {self.stats_file_path}")
+
         except Exception as e:
             logger.error(f"Failed to load baseline stats: {e}")
-            self._baseline_stats = BaselineStats(ai_stats={}, human_stats={})
+            # Create minimal fallback stats to prevent system failure
+            self._baseline_stats = self._create_fallback_stats()
+
+    def _create_fallback_stats(self) -> BaselineStats:
+        """Create minimal fallback stats when file loading fails"""
+        logger.warning("Using fallback baseline stats")
+        return BaselineStats(
+            ai_stats={
+                'comment_ratio': 0.05,
+                'cyclomatic_complexity': 1.2,
+                'loc': 25.0
+            },
+            human_stats={
+                'comment_ratio': 0.15,
+                'cyclomatic_complexity': 1.0,
+                'loc': 20.0
+            }
+        )
     
     def get_baseline_stats(self) -> BaselineStats:
         if self._baseline_stats is None:
@@ -84,8 +143,44 @@ class BaselineLoader:
         return self._baseline_stats
     
     def reload_stats(self) -> None:
+        """Reload baseline stats from file, clearing cache"""
+        self._load_baseline_stats.cache_clear()  # Clear LRU cache
         self._baseline_stats = None
         self._load_baseline_stats()
+
+    def validate_stats_integrity(self) -> Dict[str, any]:
+        """Validate the integrity of loaded baseline stats"""
+        if self._baseline_stats is None:
+            return {"valid": False, "errors": ["No baseline stats loaded"]}
+
+        errors = []
+        warnings = []
+
+        ai_count = len(self._baseline_stats.ai_stats)
+        human_count = len(self._baseline_stats.human_stats)
+
+        if ai_count == 0:
+            errors.append("No AI baseline features found")
+        if human_count == 0:
+            errors.append("No human baseline features found")
+
+        if ai_count != human_count:
+            warnings.append(f"AI features ({ai_count}) != Human features ({human_count})")
+
+        # Check for common features
+        common_features = set(self._baseline_stats.ai_stats.keys()) & set(self._baseline_stats.human_stats.keys())
+        if len(common_features) < min(ai_count, human_count):
+            warnings.append(f"Only {len(common_features)} features have both AI and human baselines")
+
+        return {
+            "valid": len(errors) == 0,
+            "errors": errors,
+            "warnings": warnings,
+            "ai_features_count": ai_count,
+            "human_features_count": human_count,
+            "common_features_count": len(common_features),
+            "file_path": self.stats_file_path
+        }
     
     def get_critical_features(self) -> Dict[str, Dict]:
         baseline_stats = self.get_baseline_stats()

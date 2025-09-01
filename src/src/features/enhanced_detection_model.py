@@ -35,34 +35,50 @@ except ImportError:
 try:
     import sys
     from pathlib import Path
-    
-    # Try multiple possible paths for backend/app
-    possible_backend_paths = [
-        # From src/src/features/ to backend/app/
-        Path(__file__).parent.parent.parent / "backend" / "app",
-        # From project root
-        Path(__file__).parent.parent.parent.parent / "src" / "backend" / "app",
-        # Relative from current working directory
-        Path("src/backend/app"),
-        Path("backend/app"),
-        # Direct path if running from project root
-        Path("../backend/app"),
-        Path("../../backend/app"),
-    ]
-    
-    backend_path = None
-    for path in possible_backend_paths:
-        if path.exists() and (path / "baseline_loader.py").exists():
-            backend_path = path
-            break
-    
-    if backend_path and str(backend_path) not in sys.path:
-        sys.path.insert(0, str(backend_path))
-    
-    from baseline_loader import get_baseline_loader
+
+    # Try multiple import strategies
+    baseline_loader_imported = False
+
+    # Strategy 1: Try importing as app.baseline_loader (Docker environment)
+    try:
+        from app.baseline_loader import get_baseline_loader
+        baseline_loader_imported = True
+        print("Successfully imported baseline_loader as app.baseline_loader (Docker)")
+    except ImportError:
+        pass
+
+    # Strategy 2: Try importing from backend/app path (Development environment)
+    if not baseline_loader_imported:
+        possible_backend_paths = [
+            # From src/src/features/ to backend/app/
+            Path(__file__).parent.parent.parent / "backend" / "app",
+            # From project root
+            Path(__file__).parent.parent.parent.parent / "src" / "backend" / "app",
+            # Relative from current working directory
+            Path("src/backend/app"),
+            Path("backend/app"),
+            # Direct path if running from project root
+            Path("../backend/app"),
+            Path("../../backend/app"),
+        ]
+
+        for backend_path in possible_backend_paths:
+            if backend_path.exists() and (backend_path / "baseline_loader.py").exists():
+                if str(backend_path) not in sys.path:
+                    sys.path.insert(0, str(backend_path))
+                try:
+                    from baseline_loader import get_baseline_loader
+                    baseline_loader_imported = True
+                    print(f"Successfully imported baseline_loader from {backend_path} (Development)")
+                    break
+                except ImportError:
+                    continue
+
+    if not baseline_loader_imported:
+        raise ImportError("Could not import baseline_loader from any known location")
+
     HAS_BASELINE_LOADER = True
-    print(f"Successfully imported baseline_loader from {backend_path}")
-    
+
 except ImportError as e:
     HAS_BASELINE_LOADER = False
     print(f"Warning: Could not import baseline_loader: {e}, using fallback stats")
