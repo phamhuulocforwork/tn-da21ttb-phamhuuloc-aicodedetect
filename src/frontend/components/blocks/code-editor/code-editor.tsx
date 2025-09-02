@@ -128,7 +128,6 @@ export function CodeEditor({
   };
 
   const beforeMount = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (monaco: any) => {
       if (customLightTheme) {
         monaco.editor.defineTheme("custom-light-theme", customLightTheme);

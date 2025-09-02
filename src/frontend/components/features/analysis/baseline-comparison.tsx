@@ -43,11 +43,7 @@ echarts.use([
   CanvasRenderer,
 ]);
 
-function useParallelChart(
-  containerId: string,
-  features: FeatureInfo[],
-  title: string,
-) {
+function useParallelChart(containerId: string, features: FeatureInfo[]) {
   const ref = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
@@ -428,11 +424,71 @@ function BaselineSummaryCard({ summary }: { summary: BaselineSummary }) {
   );
 }
 
+function FeatureGroupChart({
+  groupKey,
+  features,
+  chunkIndex,
+  totalChunks,
+}: {
+  groupKey: string;
+  groupName: string;
+  features: FeatureInfo[];
+  chunkIndex: number;
+  totalChunks: number;
+}) {
+  const ref = useParallelChart(`${groupKey}-parallel-${chunkIndex}`, features);
+
+  return (
+    <div className='w-full'>
+      <div className='text-xs text-muted-foreground mb-2'>
+        Nhóm {chunkIndex + 1}/{totalChunks}
+      </div>
+      <div ref={ref} className='w-full h-[350px] rounded-md border' />
+    </div>
+  );
+}
+
 export function BaselineComparisonView({
   baselineSummary,
   featuresWithComparison,
   featureGroups,
 }: BaselineComparisonProps) {
+  const topFeaturesData = React.useMemo(() => {
+    if (!featureGroups || Object.keys(featureGroups).length === 0) {
+      return null;
+    }
+
+    const allWithBaseline: FeatureInfo[] = Object.values(featureGroups)
+      .flatMap((g) => g.features)
+      .filter((f) => !!f.baseline_comparison);
+
+    if (allWithBaseline.length === 0) return null;
+
+    const sorted = [...allWithBaseline].sort((a, b) => {
+      const aDiff = a.baseline_comparison
+        ? Math.abs(
+            a.baseline_comparison.ai_baseline -
+              a.baseline_comparison.human_baseline,
+          ) * (a.baseline_comparison.confidence || 1)
+        : 0;
+      const bDiff = b.baseline_comparison
+        ? Math.abs(
+            b.baseline_comparison.ai_baseline -
+              b.baseline_comparison.human_baseline,
+          ) * (b.baseline_comparison.confidence || 1)
+        : 0;
+      return bDiff - aDiff;
+    });
+
+    const topK = 14;
+    return sorted.slice(0, topK);
+  }, [featureGroups]);
+
+  const topFeaturesRef = useParallelChart(
+    `top-parallel`,
+    topFeaturesData || [],
+  );
+
   if (!baselineSummary && featuresWithComparison.length === 0) {
     return (
       <Card className='border-dashed'>
@@ -454,55 +510,25 @@ export function BaselineComparisonView({
     <div className='divide-y-2 space-y-4'>
       {baselineSummary && <BaselineSummaryCard summary={baselineSummary} />}
 
-      {featureGroups &&
-        Object.keys(featureGroups).length > 0 &&
-        (() => {
-          const allWithBaseline: FeatureInfo[] = Object.values(featureGroups)
-            .flatMap((g) => g.features)
-            .filter((f) => !!f.baseline_comparison);
-          if (allWithBaseline.length === 0) return null;
-
-          const sorted = [...allWithBaseline].sort((a, b) => {
-            const aDiff = a.baseline_comparison
-              ? Math.abs(
-                  a.baseline_comparison.ai_baseline -
-                    a.baseline_comparison.human_baseline,
-                ) * (a.baseline_comparison.confidence || 1)
-              : 0;
-            const bDiff = b.baseline_comparison
-              ? Math.abs(
-                  b.baseline_comparison.ai_baseline -
-                    b.baseline_comparison.human_baseline,
-                ) * (b.baseline_comparison.confidence || 1)
-              : 0;
-            return bDiff - aDiff;
-          });
-
-          const topK = 14;
-          const topFeatures = sorted.slice(0, topK);
-          const ref = useParallelChart(
-            `top-parallel`,
-            topFeatures,
-            `Top features`,
-          );
-
-          return (
-            <Card>
-              <CardHeader>
-                <CardTitle className='flex items-center justify-between'>
-                  Top Features (Overall)
-                  <Badge variant='secondary'>{topFeatures.length}</Badge>
-                </CardTitle>
-                <CardDescription>
-                  Các đặc trưng phân biệt AI vs Human mạnh nhất theo baseline
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div ref={ref} className='w-full h-[380px] rounded-md border' />
-              </CardContent>
-            </Card>
-          );
-        })()}
+      {topFeaturesData && (
+        <Card>
+          <CardHeader>
+            <CardTitle className='flex items-center justify-between'>
+              Top Features (Overall)
+              <Badge variant='secondary'>{topFeaturesData.length}</Badge>
+            </CardTitle>
+            <CardDescription>
+              Các đặc trưng phân biệt AI vs Human mạnh nhất theo baseline
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div
+              ref={topFeaturesRef}
+              className='w-full h-[380px] rounded-md border'
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {featureGroups && Object.keys(featureGroups).length > 0 && (
         <div className='space-y-4'>
@@ -550,24 +576,16 @@ export function BaselineComparisonView({
                     </CardDescription>
                   </CardHeader>
                   <CardContent className='space-y-4'>
-                    {chunks.map((features, idx) => {
-                      const ref = useParallelChart(
-                        `${key}-parallel-${idx}`,
-                        features,
-                        `${group.group_name} #${idx + 1}`,
-                      );
-                      return (
-                        <div key={idx} className='w-full'>
-                          <div className='text-xs text-muted-foreground mb-2'>
-                            Nhóm {idx + 1}/{chunks.length}
-                          </div>
-                          <div
-                            ref={ref}
-                            className='w-full h-[350px] rounded-md border'
-                          />
-                        </div>
-                      );
-                    })}
+                    {chunks.map((features, idx) => (
+                      <FeatureGroupChart
+                        key={idx}
+                        groupKey={key}
+                        groupName={group.group_name}
+                        features={features}
+                        chunkIndex={idx}
+                        totalChunks={chunks.length}
+                      />
+                    ))}
                   </CardContent>
                 </Card>
               );

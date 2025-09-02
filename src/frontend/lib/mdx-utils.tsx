@@ -107,7 +107,6 @@ export const defaultMdxComponents = {
 
 interface MDXRendererProps {
   content: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   components?: Record<string, React.ComponentType<any>>;
   className?: string;
   loadingText?: string;
@@ -125,7 +124,6 @@ export function MDXRenderer({
   errorDescription = "Không thể hiển thị nội dung. Vui lòng thử lại.",
   onError,
 }: MDXRendererProps) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mdxSource, setMdxSource] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -210,7 +208,6 @@ export function MDXRenderer({
 
 // Hook for MDX processing
 export function useMDXContent(content: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mdxSource, setMdxSource] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

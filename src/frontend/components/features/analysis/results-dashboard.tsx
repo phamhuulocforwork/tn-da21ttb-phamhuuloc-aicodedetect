@@ -33,7 +33,6 @@ import { AIMDXResponse, AnalysisResponse } from "@/lib/api-types";
 import { MDXRenderer } from "@/lib/mdx-utils";
 
 import BaselineComparisonView from "./baseline-comparison";
-import FeatureCharts from "./feature-charts";
 
 interface ResultsDashboardProps {
   result: AnalysisResponse | AIMDXResponse | null;
@@ -42,18 +41,6 @@ interface ResultsDashboardProps {
   onRetry?: () => void;
   onExportReport?: () => void;
 }
-
-const getScoreColor = (score: number): string => {
-  if (score <= 0.3) return "text-green-600 dark:text-green-400";
-  if (score <= 0.6) return "text-yellow-600 dark:text-yellow-400";
-  return "text-red-600 dark:text-red-400";
-};
-
-const getScoreLabel = (score: number): string => {
-  if (score <= 0.3) return "Giống human";
-  if (score <= 0.6) return "Hỗn hợp";
-  return "Giống AI";
-};
 
 export default function ResultsDashboard({
   result,
@@ -198,7 +185,7 @@ export default function ResultsDashboard({
                 {isAnalysisResponse(result) &&
                   result.assessment.baseline_summary && (
                     <div className='mt-6'>
-                      <Card className='border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10'>
+                      <Card>
                         <CardHeader className='pb-4'>
                           <div className='flex items-center justify-between'>
                             <div>

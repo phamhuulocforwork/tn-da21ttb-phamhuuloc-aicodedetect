@@ -2,18 +2,8 @@
 
 import * as React from "react";
 
-import {
-  CheckCircle,
-  ExternalLink,
-  FileText,
-  Folder,
-  Link,
-  Loader2,
-  LogIn,
-  RefreshCw,
-} from "lucide-react";
+import { CheckCircle, FileText, Link, Loader2, RefreshCw } from "lucide-react";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Card,

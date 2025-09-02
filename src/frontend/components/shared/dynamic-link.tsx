@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { ArrowRight, ExternalLink } from "lucide-react";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 import { cn, getIsExternalLink } from "@/lib/utils";
 

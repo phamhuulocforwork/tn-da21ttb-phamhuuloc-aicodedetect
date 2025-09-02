@@ -26,7 +26,6 @@ export function CodeInputSection({
   onCodeChange,
   onSubmit,
   isSubmitting,
-  analysisMode,
   onFileContentLoaded,
 }: CodeInputSectionProps) {
   return (
@@ -41,7 +40,6 @@ export function CodeInputSection({
         onChange={onCodeChange}
         onSubmit={onSubmit}
         isSubmitting={isSubmitting}
-        analysisMode={analysisMode}
         onFileContentLoaded={onFileContentLoaded}
         placeholder='Dán mã C/C++ vào đây để phân tích...'
         customDarkTheme={{

@@ -6,7 +6,6 @@ import {
   CheckCircle,
   ExternalLink,
   FileText,
-  Link,
   RefreshCw,
   Send,
   Upload,
@@ -31,7 +30,6 @@ import {
   FileUploadItemMetadata,
   FileUploadItemPreview,
   FileUploadList,
-  FileUploadTrigger,
 } from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -66,7 +64,7 @@ export function MultipleAnalysisPage() {
   const [batchData, setBatchData] =
     React.useState<BatchAnalysisResponse | null>(null);
   const [isUploading, setIsUploading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+
   const [pollingInterval, setPollingInterval] =
     React.useState<NodeJS.Timeout | null>(null);
 
@@ -85,7 +83,6 @@ export function MultipleAnalysisPage() {
         !selectedFile.name.endsWith(".zip") &&
         !selectedFile.name.endsWith(".rar")
       ) {
-        setError("Chỉ hỗ trợ file ZIP hoặc RAR");
         setFile(null);
         setFiles([]);
         return;
@@ -93,7 +90,6 @@ export function MultipleAnalysisPage() {
 
       const maxSize = 50 * 1024 * 1024; // 50MB
       if (selectedFile.size > maxSize) {
-        setError("File không được vượt quá 50MB");
         setFile(null);
         setFiles([]);
         return;
@@ -101,41 +97,37 @@ export function MultipleAnalysisPage() {
 
       setFile(selectedFile);
       setFiles(newFiles);
-      setError(null);
     } else {
       setFile(null);
       setFiles([]);
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleFileReject = (rejectedFile: File, message: string) => {
-    setError(`${rejectedFile.name}: ${message}`);
     setFile(null);
     setFiles([]);
   };
 
   const handleGoogleDriveUrlChange = (value: string) => {
     setGoogleDriveUrl(value);
-    setError(null);
 
     if (value && !value.includes("drive.google.com")) {
-      setError("URL không hợp lệ. Vui lòng nhập URL Google Drive hợp lệ.");
+      // URL validation logic can be added here if needed
     }
   };
 
   const handleOauthAuthSuccess = () => {
     setIsOauthAuthorized(true);
-    setError(null);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleOauthAuthError = (error: string) => {
-    setError(error);
     setIsOauthAuthorized(false);
   };
 
   const handleOauthFilesSelected = (files: ProcessedFile[]) => {
     setOauthFiles(files);
-    setError(null);
   };
 
   const startPolling = (batchId: string) => {
@@ -159,7 +151,6 @@ export function MultipleAnalysisPage() {
   };
 
   const handleStartAnalysis = async () => {
-    setError(null);
     setIsUploading(true);
 
     try {
@@ -191,7 +182,7 @@ export function MultipleAnalysisPage() {
         startPolling(data.batch_id);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Đã xảy ra lỗi");
+      console.error("Analysis error:", err);
     } finally {
       setIsUploading(false);
     }
@@ -204,9 +195,7 @@ export function MultipleAnalysisPage() {
       const data = await apiClient.getBatchStatus(batchData.batch_id);
       setBatchData(data);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Không thể làm mới trạng thái",
-      );
+      console.error("Refresh status error:", err);
     }
   };
 

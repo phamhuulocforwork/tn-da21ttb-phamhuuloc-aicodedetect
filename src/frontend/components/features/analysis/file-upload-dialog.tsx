@@ -22,7 +22,6 @@ import {
   FileUploadItemMetadata,
   FileUploadItemPreview,
   FileUploadList,
-  FileUploadTrigger,
 } from "@/components/ui/file-upload";
 
 interface FileUploadDialogProps {

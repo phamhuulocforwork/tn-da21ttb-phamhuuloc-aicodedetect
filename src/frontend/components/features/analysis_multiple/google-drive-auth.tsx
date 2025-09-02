@@ -2,13 +2,7 @@
 
 import * as React from "react";
 
-import {
-  CheckCircle,
-  Loader2,
-  Shield,
-  User,
-  X,
-} from "lucide-react";
+import { CheckCircle, Loader2, Shield, User, X } from "lucide-react";
 
 import GoogleIcon from "@/components/icons/google-icons";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -44,37 +38,37 @@ export function GoogleDriveAuth({
   }, []);
 
   React.useEffect(() => {
+    const initializeService = async () => {
+      setIsInitializing(true);
+      setInitError(null);
+
+      try {
+        const success = await driveService.initialize();
+        if (!success) {
+          throw new Error("Failed to initialize Google Drive service");
+        }
+
+        setIsAuthorized(driveService.isAuthorized());
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
+        setInitError(errorMessage);
+        onAuthError(errorMessage);
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+
     if (isConfigured) {
       initializeService();
     }
-  }, [isConfigured]);
+  }, [isConfigured, driveService, onAuthError]);
 
   React.useEffect(() => {
     if (isAuthorized) {
       onAuthSuccess();
     }
   }, [isAuthorized, onAuthSuccess]);
-
-  const initializeService = async () => {
-    setIsInitializing(true);
-    setInitError(null);
-
-    try {
-      const success = await driveService.initialize();
-      if (!success) {
-        throw new Error("Failed to initialize Google Drive service");
-      }
-
-      setIsAuthorized(driveService.isAuthorized());
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-      setInitError(errorMessage);
-      onAuthError(errorMessage);
-    } finally {
-      setIsInitializing(false);
-    }
-  };
 
   const handleAuthorize = async () => {
     setIsAuthorizing(true);
@@ -128,14 +122,6 @@ export function GoogleDriveAuth({
           <div className='space-y-2'>
             <p className='font-medium'>Lỗi khởi tạo Google Drive service</p>
             <p className='text-sm'>{initError}</p>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={initializeService}
-              className='text-red-700 border-red-300 hover:bg-red-100'
-            >
-              Thử lại
-            </Button>
           </div>
         </AlertDescription>
       </Alert>

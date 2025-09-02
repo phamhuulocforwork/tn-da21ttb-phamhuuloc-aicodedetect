@@ -43,6 +43,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { FeatureGroup } from "@/lib/api-types";
 
+// NOTE: Component này k còn được sử dụng
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -266,7 +268,6 @@ const RadarChartVisualization = ({ group }: { group: FeatureGroup }) => {
               border: "1px solid hsl(var(--border))",
               borderRadius: "6px",
             }}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             formatter={(value: number, name: string, props: any) => {
               const data = props.payload;
               const lines = [
@@ -412,7 +413,6 @@ const BoxPlotVisualization = ({ group }: { group: FeatureGroup }) => {
           tooltip: {
             callbacks: {
               title: () => group.group_name,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               label: (context: any) => {
                 const stats = context.parsed;
                 return [
