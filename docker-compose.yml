@@ -1,12 +1,10 @@
-version: "3.9"
-
 services:
   backend:
     build:
       context: ./src/backend
       dockerfile: Dockerfile
-    ports:
-      - "${BACKEND_PORT:-8000}:${BACKEND_PORT:-8000}"
+    expose:
+      - "${BACKEND_PORT:-8000}"
     environment:
       - ENVIRONMENT=production
       - LOG_LEVEL=info
@@ -31,12 +29,17 @@ services:
       dockerfile: Dockerfile
       args:
         - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://backend:8000}
-    ports:
-      - "${FRONTEND_PORT:-3000}:${FRONTEND_PORT:-3000}"
+        - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+        - NEXT_PUBLIC_ENABLE_CHARTS=${NEXT_PUBLIC_ENABLE_CHARTS:-true}
+        - NEXT_PUBLIC_MAX_CODE_LENGTH=${NEXT_PUBLIC_MAX_CODE_LENGTH:-50000}
+    expose:
+      - "${FRONTEND_PORT:-3000}"
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://backend:8000}
       - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+      - NEXT_PUBLIC_ENABLE_CHARTS=${NEXT_PUBLIC_ENABLE_CHARTS:-true}
+      - NEXT_PUBLIC_MAX_CODE_LENGTH=${NEXT_PUBLIC_MAX_CODE_LENGTH:-50000}
       - PORT=${FRONTEND_PORT:-3000}
       - NEXT_TELEMETRY_DISABLED=1
     depends_on:
@@ -44,6 +47,43 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - BACKEND_HOST=backend
+      - BACKEND_PORT=${BACKEND_PORT:-8000}
+      - FRONTEND_HOST=frontend
+      - FRONTEND_PORT=${FRONTEND_PORT:-3000}
+      - SSL_DOMAIN=${SSL_DOMAIN:-}
+      - SSL_EMAIL=${SSL_EMAIL:-}
+      - SSL_STAGING=${SSL_STAGING:-false}
+    volumes:
+      - nginx_logs:/var/log/nginx
+      - nginx_ssl:/etc/nginx/ssl
+      - letsencrypt:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+    networks:
+      - app-network
+
+volumes:
+  nginx_logs:
+    driver: local
+  nginx_ssl:
+    driver: local
+  letsencrypt:
+    driver: local
+  certbot_www:
+    driver: local
 
 networks:
   app-network:
