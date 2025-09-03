@@ -101,7 +101,7 @@ create_app_user() {
 }
 
 # Function to setup SSH hardening
-setup_ssh_hardening() {
+# setup_ssh_hardening() {
     log_step "Setting up SSH hardening..."
 
     # Backup original config
@@ -286,13 +286,13 @@ main() {
     install_docker
     configure_firewall
     create_app_user
-    setup_ssh_hardening
+    # setup_ssh_hardening
     install_monitoring
     setup_log_rotation
     create_systemd_service
     create_deployment_script
 
-    show_completion
+    # show_completion
 }
 
 # Run main function
