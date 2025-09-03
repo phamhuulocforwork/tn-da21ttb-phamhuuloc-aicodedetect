@@ -2,8 +2,6 @@
 # This file contains production-specific configurations
 # It will be automatically merged with docker-compose.yml
 
-version: "3.9"
-
 services:
   backend:
     # Use production-optimized settings
@@ -34,7 +32,7 @@ services:
   frontend:
     # Production Next.js optimizations
     environment:
-      - NEXT_PUBLIC_API_URL=https://yourdomain.com/api
+      - NEXT_PUBLIC_API_URL=http://backend:8000
     # Resource limits
     deploy:
       resources:
@@ -100,5 +98,3 @@ volumes:
 networks:
   app-network:
     driver: bridge
-    driver_opts:
-      com.docker.network.bridge.name: br-ai-code-detect
