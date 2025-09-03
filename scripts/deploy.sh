@@ -2,12 +2,11 @@
 
 set -e
 
-# Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 log_info() {
     echo -e "${GREEN}[INFO]${NC} $1"
@@ -25,7 +24,6 @@ log_step() {
     echo -e "${BLUE}[STEP]${NC} $1"
 }
 
-# Function to check if .env file exists
 check_env_file() {
     if [ ! -f ".env" ]; then
         log_error ".env file not found!"
@@ -36,7 +34,6 @@ check_env_file() {
     fi
 }
 
-# Function to check Docker and Docker Compose
 check_docker() {
     log_step "Checking Docker installation..."
 
@@ -45,7 +42,6 @@ check_docker() {
         exit 1
     fi
 
-    # Check for Docker Compose (v2 first, then v1)
     if command -v docker &> /dev/null && docker compose version &> /dev/null; then
         COMPOSE_CMD="docker compose"
         log_info "Docker Compose v2 is available"
@@ -63,7 +59,6 @@ check_docker() {
     log_info "Docker and Docker Compose are available"
 }
 
-# Function to pull latest changes (if using git)
 pull_latest_changes() {
     if [ -d ".git" ]; then
         log_step "Pulling latest changes from git..."
@@ -74,14 +69,12 @@ pull_latest_changes() {
     fi
 }
 
-# Function to stop existing containers
 stop_containers() {
     log_step "Stopping existing containers..."
     $COMPOSE_CMD down || true
     log_info "Existing containers stopped"
 }
 
-# Function to clean up unused resources
 cleanup_docker() {
     log_step "Cleaning up Docker resources..."
     docker system prune -f || true
@@ -89,11 +82,9 @@ cleanup_docker() {
     log_info "Docker resources cleaned up"
 }
 
-# Function to build and start containers
 build_and_start() {
     log_step "Building and starting containers..."
 
-    # Build with no cache for fresh builds
     if [ "$1" = "--no-cache" ]; then
         log_info "Building without cache..."
         $COMPOSE_CMD build --no-cache
@@ -101,13 +92,11 @@ build_and_start() {
         $COMPOSE_CMD build
     fi
 
-    # Start services
     $COMPOSE_CMD up -d
 
     log_info "Containers built and started"
 }
 
-# Function to wait for services to be ready
 wait_for_services() {
     log_step "Waiting for services to be ready..."
 
@@ -130,7 +119,6 @@ wait_for_services() {
     exit 1
 }
 
-# Function to show status
 show_status() {
     log_step "Checking service status..."
     echo ""
@@ -147,7 +135,6 @@ show_status() {
     echo "  - Restart services: $COMPOSE_CMD restart"
 }
 
-# Function to backup current deployment
 backup_current() {
     if [ -d "data" ] || [ -d "logs" ]; then
         local backup_dir="backup_$(date +%Y%m%d_%H%M%S)"
@@ -155,12 +142,10 @@ backup_current() {
 
         mkdir -p "$backup_dir"
 
-        # Backup data directory if exists
         if [ -d "data" ]; then
             cp -r data "$backup_dir/"
         fi
 
-        # Backup logs if exists
         if [ -d "logs" ]; then
             cp -r logs "$backup_dir/"
         fi
@@ -169,12 +154,10 @@ backup_current() {
     fi
 }
 
-# Main deployment function
 deploy() {
     local no_cache=false
     local skip_backup=false
 
-    # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
             --no-cache)
@@ -196,16 +179,13 @@ deploy() {
     log_info "🚀 Starting AI Code Detection System deployment..."
     echo ""
 
-    # Pre-deployment checks
     check_env_file
     check_docker
 
-    # Backup current deployment
     if [ "$skip_backup" = false ]; then
         backup_current
     fi
 
-    # Deployment steps
     pull_latest_changes
     stop_containers
     cleanup_docker
@@ -218,7 +198,6 @@ deploy() {
     show_status
 }
 
-# Function to show help
 show_help() {
     echo "AI Code Detection System - Deployment Script"
     echo ""
@@ -235,7 +214,6 @@ show_help() {
     echo "  $0 --skip-backup      # Skip backup (faster deployment)"
 }
 
-# Main script logic
 case "${1:-}" in
     --help|-h)
         show_help

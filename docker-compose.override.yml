@@ -1,16 +1,10 @@
-# Production overrides for AI Code Detection System
-# This file contains production-specific configurations
-# It will be automatically merged with docker-compose.yml
-
 services:
   backend:
-    # Use production-optimized settings
     environment:
       - GUNICORN_WORKERS=4
       - GUNICORN_WORKER_CLASS=uvicorn.workers.UvicornWorker
       - GUNICORN_BIND=0.0.0.0:8000
       - GUNICORN_TIMEOUT=300
-    # Add resource limits for production
     deploy:
       resources:
         limits:
@@ -19,21 +13,17 @@ services:
         reservations:
           cpus: "0.5"
           memory: 512M
-    # Health check with production settings
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 60s
-    # Restart policy for production
     restart: always
 
   frontend:
-    # Production Next.js optimizations
     environment:
       - NEXT_PUBLIC_API_URL=http://backend:8000
-    # Resource limits
     deploy:
       resources:
         limits:
@@ -42,7 +32,6 @@ services:
         reservations:
           cpus: "0.25"
           memory: 256M
-    # Health check
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
       interval: 30s
@@ -52,10 +41,8 @@ services:
     restart: always
 
   nginx:
-    # Production SSL and performance settings
     environment:
       - SSL_STAGING=false
-    # Resource limits
     deploy:
       resources:
         limits:
@@ -64,7 +51,6 @@ services:
         reservations:
           cpus: "0.25"
           memory: 128M
-    # Production health check
     healthcheck:
       test:
         [
@@ -76,14 +62,12 @@ services:
       retries: 3
       start_period: 30s
     restart: always
-    # Production logging
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
 
-# Production volumes with proper drivers
 volumes:
   nginx_logs:
     driver: local
@@ -94,7 +78,6 @@ volumes:
   certbot_www:
     driver: local
 
-# Production networks
 networks:
   app-network:
     driver: bridge

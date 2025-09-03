@@ -7,7 +7,6 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build-time environment variables (NEXT_PUBLIC_* must be available at build time)
 ARG NEXT_PUBLIC_API_URL=http://backend:8000
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
@@ -29,7 +28,6 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Runtime environment variables (inherited from builder stage)
 ARG NEXT_PUBLIC_API_URL=http://backend:8000
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
