@@ -1,136 +1,346 @@
-# Suggested Development Commands
+# Lệnh phát triển quan trọng
 
-## Core ML Engine (src/src/)
+## Frontend Development
 
-### Setup và Environment
+### Cài đặt và khởi chạy
 
 ```bash
-cd src/src && source venv/bin/activate
-make setup                    # Tạo virtual environment và install dependencies
-make install                  # Update dependencies
+# Cài đặt dependencies
+cd src/frontend
+npm install
+
+# Khởi chạy development server với Turbopack
+npm run dev
+
+# Build production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Khởi chạy production server
+npm run start
 ```
 
-### Feature Extraction và Analysis
+### Code Quality
 
 ```bash
-# Batch feature extraction (tạo dataset features mới)
-python batch_feature_extraction.py --dataset dataset --max-files 2000 --output features/large_features.csv
+# Kiểm tra linting
+npm run lint
 
-# Analysis và visualization
-python analyze_features.py --csv features/large_features.csv --plots-dir analysis_plots
+# Format code với Prettier
+npm run format
 
-# Complete pipeline training
-python complete_pipeline.py train dataset --max-files 2000 --save-model models/model.json
+# Kiểm tra format (không sửa)
+npm run format:check
+
+# Clean build artifacts
+npm run clean
 ```
 
-## Backend API (src/backend/)
+## Backend Development
 
-### Development Commands
+### Python Environment
 
 ```bash
+# Tạo virtual environment
 cd src/backend
-make help                     # Show all available commands
-make setup                    # Setup virtual environment
-make dev                      # Run development server (http://localhost:8000)
-make start                    # Run production server
-make clean                    # Clean up environment
+python -m venv venv
 
-# Manual setup
-python3 -m venv venv
-source venv/bin/activate
+# Activate virtual environment
+source venv/bin/activate  # Linux/Mac
+# hoặc
+venv\Scripts\activate     # Windows
+
+# Cài đặt dependencies
 pip install -r requirements.txt
-uvicorn app.main:app --reload
+
+# Khởi chạy development server
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+### Testing
+
+```bash
+# Chạy tests
+pytest
+
+# Chạy tests với coverage
+pytest --cov=app
+
+# Chạy tests async
+pytest -k "test_" --asyncio-mode=auto
+```
+
+## Full Stack Development
+
+### Docker Development
+
+```bash
+# Khởi chạy tất cả services (development)
+docker-compose -f docker-compose.dev.yml up -d
+
+# Khởi chạy tất cả services (production)
+docker-compose up -d
+
+# Xem logs tất cả services
+docker-compose logs -f
+
+# Xem logs service cụ thể
+docker-compose logs -f backend
+docker-compose logs -f frontend
+docker-compose logs -f nginx
+
+# Restart services
+docker-compose restart
+
+# Dừng tất cả services
+docker-compose down
+```
+
+### Service Management Script
+
+```bash
+# Script quản lý services (khuyến nghị)
+./scripts/manage.sh status          # Xem trạng thái services
+./scripts/manage.sh logs            # Xem logs tất cả
+./scripts/manage.sh logs nginx      # Xem logs nginx
+./scripts/manage.sh restart         # Restart tất cả
+./scripts/manage.sh stop            # Dừng tất cả
+./scripts/manage.sh start           # Khởi động tất cả
+./scripts/manage.sh rebuild         # Rebuild và restart
+./scripts/manage.sh health          # Kiểm tra health
+./scripts/manage.sh shell backend   # Mở shell trong container backend
+```
+
+## Analysis Modules (Python)
+
+### Feature Extraction & Analysis
+
+```bash
+# Chạy feature extraction
+cd src/src
+python analyze_features.py
+
+# Chạy batch feature extraction
+python batch_feature_extraction.py
+
+# Chạy complete pipeline
+python complete_pipeline.py
+
+# Tạo plots và visualizations
+python analysis_plots/
+```
+
+### Model Training & Testing
+
+```bash
+# Train detection models
+python models/train_model.py
+
+# Test optimized binary classifier
+python optimized_binary_classifier.py
+
+# Chạy super linter integration
+python super_linter_integration.py
+```
+
+## Deployment & Production
+
+### Automated Deployment
+
+```bash
+# Setup VPS tự động (root user)
+sudo ./scripts/setup-vps.sh
+
+# Deploy tự động
+./scripts/deploy.sh
+```
+
+### Manual Deployment Steps
+
+```bash
+# 1. Clone repository
+git clone <repository-url> app
+cd app
+
+# 2. Cấu hình environment
+cp env.example .env
+nano .env  # Chỉnh sửa API keys
+
+# 3. Deploy với Docker
+docker-compose up --build -d
+
+# 4. Kiểm tra deployment
+./scripts/manage.sh health
+./scripts/manage.sh status
+```
+
+### SSL & Security
+
+```bash
+# Kiểm tra SSL status
+./scripts/manage.sh ssl-status
+
+# Renew SSL certificates
+./scripts/manage.sh ssl-renew
+
+# Backup dữ liệu
+./scripts/manage.sh backup
+```
+
+## Development Workflow
+
+### Git Workflow
+
+```bash
+# Tạo branch mới
+git checkout -b feature/new-feature
+
+# Commit changes
+git add .
+git commit -m "feat: add new feature"
+
+# Push branch
+git push origin feature/new-feature
+
+# Merge với main
+git checkout main
+git pull origin main
+git merge feature/new-feature
+```
+
+### Code Quality Checks
+
+```bash
+# Frontend
+cd src/frontend
+npm run lint
+npm run format:check
+
+# Backend
+cd src/backend
+python -m flake8 app/
+python -m black --check app/
+
+# Analysis modules
+cd src/src
+python -m pylint features/
+```
+
+## Database & Data Management
+
+### Baseline Stats Management
+
+```bash
+# Debug baseline stats
+curl http://localhost:8000/api/debug/baseline-stats
+
+# Reload baseline stats
+curl -X POST http://localhost:8000/api/debug/reload-baseline
+```
+
+## Monitoring & Debugging
 
 ### API Testing
 
 ```bash
-python test_api.py           # Run API tests
-curl http://localhost:8000/health  # Health check
+# Health check
+curl http://localhost:8000/health
+
+# API docs
+open http://localhost:8000/docs
+
+# Test single file analysis
+curl -X POST "http://localhost:8000/api/analysis/combined-analysis" \
+  -H "Content-Type: application/json" \
+  -d '{"code": "#include <stdio.h>\nint main() { return 0; }", "filename": "test.c", "language": "c"}'
+
+# Test batch analysis
+curl -X POST "http://localhost:8000/api/analysis/batch/upload-zip" \
+  -F "file=@test_files.zip"
 ```
 
-### Docker Deployment
+### Container Debugging
 
 ```bash
-docker-compose up --build    # Build và run với Docker
+# Mở shell trong container
+docker-compose exec backend sh
+docker-compose exec frontend sh
+docker-compose exec nginx sh
+
+# Xem resource usage
+docker stats
+
+# Inspect container
+docker inspect <container-name>
 ```
 
-## Frontend (src/frontend/)
+## Performance & Optimization
 
-### Development Commands
+### Frontend Optimization
 
 ```bash
-cd src/frontend
-npm install                   # Install dependencies
-npm run dev                   # Start development server (http://localhost:3000)
-npm run build                 # Build for production
-npm run start                 # Start production server
-npm run lint                  # Run ESLint
-npm run format                # Format code với Prettier
+# Analyze bundle size
+npm run build --analyze
+
+# Check Lighthouse score
+npx lighthouse http://localhost:3000
 ```
 
-### Development Utilities
+### Backend Optimization
 
 ```bash
-npm run clean                 # Clean .next directory
-npm run clean:all            # Clean .next và node_modules
-npm run preview              # Build và preview production
+# Profile Python code
+python -m cProfile app/main.py
+
+# Memory profiling
+python -m memory_profiler app/main.py
 ```
 
-## System Commands (Linux)
+## Environment Setup
 
-### Project Navigation
-
-```bash
-ls -la                       # List files với details
-find . -name "*.py" -type f  # Find Python files
-grep -r "keyword" src/       # Search in source files
-cd src/backend && pwd        # Navigate và show current path
-```
-
-### Process Management
+### Local Development Setup
 
 ```bash
-lsof -ti:8000 | xargs kill -9  # Kill process on port 8000
-ps aux | grep python           # Find Python processes
-kill -9 PID                    # Kill specific process
-```
+# 1. Clone repository
+git clone <repository-url>
+cd tn-da21ttb-phamhuuloc-aicodedetect
 
-### Git Operations
+# 2. Setup backend
+cd src/backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 
-```bash
-git status                   # Check repository status
-git add .                    # Stage all changes
-git commit -m "message"      # Commit changes
-git push origin main         # Push to remote
-git log --oneline -10        # Show recent commits
-```
+# 3. Setup frontend
+cd ../frontend
+npm install
 
-## Complete Development Workflow
+# 4. Setup environment variables
+cp .env.example .env
+# Edit .env với API keys
 
-### 1. Start Full Development Environment
-
-```bash
+# 5. Start development servers
 # Terminal 1: Backend
-cd src/backend && make dev
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 # Terminal 2: Frontend
-cd src/frontend && npm run dev
+npm run dev
 
-# Terminal 3: ML Core (if needed)
-cd src/src && source venv/bin/activate
+# Terminal 3: Database (nếu cần)
+docker-compose -f docker-compose.dev.yml up -d
 ```
 
-### 2. Run Analysis Pipeline
+### Production Environment Setup
 
 ```bash
-cd src/src && source venv/bin/activate
-python batch_feature_extraction.py --dataset dataset --max-files 2000 --output features/large_features.csv
-python analyze_features.py --csv features/large_features.csv --plots-dir analysis_plots
+# VPS Ubuntu 22.04 setup
+sudo ./scripts/setup-vps.sh
+su - appuser
+git clone <repository-url> app
+cd app
+cp env.example .env
+# Configure .env
+./scripts/deploy.sh
 ```
-
-### 3. Access Applications
-
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs

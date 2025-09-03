@@ -4,35 +4,250 @@
 
 ### 📚 Thông tin dự án
 
-**Trường**: Trường Đại học Trà Vinh
-**Khoa**: Khoa Kỹ thuật & Công nghệ
-**Lớp**: DA21TTB
-**Loại**: Khóa luận tốt nghiệp ngành Công nghệ thông tin
-**Mã sinh viên**: DA21TTB-110120138
-**Tên sinh viên**: Phạm Hữu Lộc
-**Giảng viên hướng dẫn**: TS. Nguyễn Bảo Ân
+**Trường**: Trường Đại học Trà Vinh<br>
+**Khoa**: Khoa Kỹ thuật & Công nghệ<br>
+**Lớp**: DA21TTB<br>
+**Loại**: Khóa luận tốt nghiệp ngành Công nghệ thông tin<br>
+**Mã sinh viên**: DA21TTB-110121055<br>
+**Tên sinh viên**: Phạm Hữu Lộc<br>
+**Giảng viên hướng dẫn**: TS. Nguyễn Bảo Ân<br>
+**Năm bảo vệ**: 2025
 
 ---
 
 ## 🎯 Mục tiêu nghiên cứu
 
-Hệ thống phân tích và phát hiện mã nguồn được tạo ra bởi các mô hình AI (như ChatGPT, GitHub Copilot) so với mã nguồn được viết bởi lập trình viên con người. Dự án tập trung vào:
+**Tên đề tài**: Xây dựng cơ chế phát hiện AI-generated code trong bài tập lập trình sinh viên
 
-- **Phân tích AST (Abstract Syntax Tree)**: Cấu trúc ngữ pháp và logic của mã
-- **Phân tích phong cách coding**: Patterns đặc trưng của AI vs Human
-- **So sánh baseline**: Điểm chuẩn từ dataset lớn
-- **AI Detection Models**: Machine learning models để phân loại
-- **Batch Analysis**: Phân tích nhiều files cùng lúc
-- **Google Drive Integration**: Tích hợp OAuth2 để truy cập files
+Hệ thống phân tích và phát hiện mã nguồn được tạo ra bởi các mô hình AI (như ChatGPT, GitHub Copilot, Claude) so với mã nguồn được viết bởi lập trình viên con người. Dự án tập trung vào việc xây dựng một công cụ toàn diện với **4 phương pháp phân tích** và **100+ đặc trưng** để hỗ trợ giảng viên và nhà phát triển đánh giá tính xác thực của code.
+
+### Mục tiêu chính:
+
+- **Xây dựng hệ thống phân tích mã nguồn toàn diện** sử dụng nhiều phương pháp tiếp cận khác nhau
+- **Phát triển 4 module phân tích chuyên biệt** với tổng cộng hơn 100 đặc trưng
+- **Tạo giao diện web thân thiện** với khả năng hiển thị kết quả phân tích chi tiết
+- **Đánh giá hiệu quả** của hệ thống trong việc phát hiện code AI-generated
+
+### Các phương pháp phân tích chính:
+
+#### 1. **Phân tích tổng hợp** (100+ đặc trưng)
+
+- Kết hợp tất cả các module phân tích
+- Đưa ra kết quả toàn diện nhất
+
+#### 2. **Phân tích AST (Abstract Syntax Tree)** (25+ đặc trưng)
+
+- Cấu trúc ngữ pháp và logic của mã
+- Patterns đặc trưng của AI vs Human
+- Sử dụng regex pattern matching thay vì parser truyền thống
+
+#### 3. **Phân tích phong cách Human** (39+ đặc trưng)
+
+- Phát hiện "không nhất quán tự nhiên" của code con người
+- Phân tích spacing, indentation, naming conventions
+- Tính điểm overall_human_score (0-1 scale)
+
+#### 4. **AI Analysis với Google Gemini** (Phân tích thông minh)
+
+- Tích hợp Google Gemini 2.0 Flash API
+- Phân tích với khả năng lập luận và giải thích
+- Output format MDX có cấu trúc
 
 ---
 
 ## 🛠️ Công nghệ sử dụng
 
-- Frontend: `Next.js`, `TypeScript`, `TailwindCSS`, `Shadcn/UI`, `Monaco Editor`, `Recharts`, `Chart.js`, `next-themes`
-- Backend: `FastAPI`, `Python 3.8+`, `Uvicorn`, `Google Gemini API`, `aiofiles`, `aiohttp`, `google-api-python-client`, `zipfile`, `rarfile`
-- Analysis: `Feature Extractor`, `AST Analyzer`, `Human Style Analyzer`, `ML Classifiers`, `Baseline Comparison`
-- DevOps: `Docker`, `Docker Compose`, `Turbopack`, `Swagger UI`, `ReDoc`
+- **Frontend**: `Next.js 15.3.5`, `TypeScript 5`, `React 19.0.0`, `TailwindCSS 4`, `Shadcn/UI`, `Radix UI`, `Monaco Editor`, `Chart.js 4.5.0`, `Recharts 2.15.4`, `ECharts 6.0.0`, `Lucide React`, `Framer Motion`, `next-themes`
+
+- **Backend**: `FastAPI`, `Python 3.8+`, `Uvicorn`, `Google Gemini 2.0 Flash API`, `aiohttp`, `aiofiles`, `zipfile`, `rarfile`, `google-api-python-client`
+
+- **Analysis Modules (Python Core)**: AST Analyzer (25+ đặc trưng), Human Style Analyzer (39+ đặc trưng), Advanced Features (32+ đặc trưng), Detection Models (Heuristic & binary classifiers), Baseline Comparison (dataset statistics & feature normalization)
+
+- **DevOps & Infrastructure**: `Docker 20.10+`, `Docker Compose`, `Nginx`, `Let's Encrypt`, Reverse Proxy (load balancing, static file serving)
+
+---
+
+## 📊 Các đặc trưng phân tích (100+ features)
+
+### 🎯 AST Analyzer Module (25+ đặc trưng)
+
+#### Nhóm cấu trúc (Structure Features)
+
+- `total_nodes`: Tổng số node ước lượng trong AST
+- `nodes_per_loc`: Mật độ node trên mỗi dòng code
+- `max_depth`: Độ sâu tối đa của AST
+- `branching_factor`: Hệ số phân nhánh
+
+#### Nhóm luồng điều khiển (Control Flow)
+
+- `if_statements`, `for_loops`, `while_loops`, `switch_statements`
+- `nested_control_depth`: Độ sâu lồng nhau tối đa
+- `*_per_loc`: Mật độ trên mỗi dòng code
+
+#### Nhóm hàm và biến (Functions & Variables)
+
+- `function_count`, `avg_function_length`, `recursive_functions`
+- `variable_count`, `camel_case_ratio`, `snake_case_ratio`
+- `single_char_vars_ratio`: Tỷ lệ biến 1 ký tự
+
+#### Nhóm patterns (Code Patterns)
+
+- `magic_numbers`, `string_literals`, `include_count`
+- `indentation_consistency`, `brace_style_consistency`
+
+### 🎨 Human Style Analyzer Module (39+ đặc trưng)
+
+#### Nhóm vấn đề khoảng trắng (Spacing Issues)
+
+- `missing_space_before/after_operator`
+- `extra_space_before/after_operator`
+- `space_after_opening_paren`, `space_before_closing_paren`
+- `trailing_spaces`, `spacing_issues_ratio`
+
+#### Nhóm vấn đề thụt lề (Indentation Issues)
+
+- `mixed_tabs_spaces`, `inconsistent_indentation`
+- `unusual_indent_size`, `indentation_issues_ratio`
+
+#### Nhóm bất nhất quán đặt tên (Naming Inconsistency)
+
+- `mixed_camel_snake`, `unclear_abbreviations`
+- `naming_inconsistency_ratio`
+
+#### Nhóm vấn đề định dạng (Formatting Issues)
+
+- `inconsistent_brace_style`, `poor_comment_formatting`
+- `formatting_issues_ratio`
+
+**Điểm tổng thể**: `overall_human_score` (0-1 scale)
+
+### 🔬 Advanced Features Module (32+ đặc trưng)
+
+#### Nhóm đặc trưng cơ bản
+
+- `loc`, `token_count`, `cyclomatic_complexity`
+- `comment_ratio`, `blank_ratio`
+
+#### Nhóm redundancy
+
+- `duplicate_lines`, `copy_paste_score`
+- `repeated_patterns`, `similar_function_ratio`
+
+#### Nhóm complexity
+
+- `halstead_complexity`, `cognitive_complexity`
+- `maintainability_index`
+
+#### Nhóm AI patterns
+
+- `template_usage_score`, `boilerplate_ratio`
+- `error_handling_score`, `over_engineering_score`
+
+### 🤖 AI Analysis Module (Google Gemini)
+
+**Output format MDX có cấu trúc:**
+
+```markdown
+# Phân tích Code AI Detection
+
+## Kết quả dự đoán
+
+**Dự đoán:** [AI-generated/Human-written]
+**Độ tin cậy:** [0-100]%
+**Xác suất AI:** [0-100]%
+**Xác suất Human:** [0-100]%
+
+## Phân tích chi tiết
+
+### Phong cách mã nguồn
+
+### Cấu trúc code
+
+### Patterns cú pháp
+
+### Documentation
+
+## Chỉ số quan trọng
+
+### Patterns AI phát hiện
+
+### Patterns Human phát hiện
+
+## Lý do chính (3 lý do)
+
+## Giải thích độ tin cậy
+
+## Ghi chú bổ sung
+```
+
+---
+
+## 🏗️ Kiến trúc hệ thống
+
+### Frontend (Next.js)
+
+```
+src/frontend/
+├── app/                    # Next.js App Router
+│   ├── (auth)/            # Route groups
+│   ├── api/               # API routes
+│   └── layout.tsx         # Root layout
+├── components/            # React components
+│   ├── ui/               # Shadcn/UI components
+│   ├── forms/            # Form components
+│   ├── charts/           # Chart components
+│   └── analysis/         # Analysis-specific components
+├── lib/                  # Utilities
+│   ├── api.ts            # API client
+│   ├── utils.ts          # Utility functions
+│   └── validations.ts    # Form validations
+├── hooks/                # Custom React hooks
+└── types/                # TypeScript definitions
+```
+
+### Backend (FastAPI)
+
+```
+src/backend/app/
+├── main.py               # FastAPI application
+├── baseline_loader.py    # Baseline statistics
+├── chart_helpers.py      # Chart generation
+└── __init__.py
+```
+
+### Analysis Modules (Python Core)
+
+```
+src/src/
+├── features/             # Feature extractors
+│   ├── ast_analyzer.py          # 25+ AST features
+│   ├── human_style_analyzer.py  # 39+ style features
+│   ├── advanced_features.py     # 32+ advanced features
+│   └── detection_models.py      # ML classifiers
+├── models/               # ML models & baseline
+├── dataset/              # Training datasets
+├── analysis_plots/       # Visualization utilities
+└── requirements.txt      # Analysis dependencies
+```
+
+### Production Infrastructure
+
+```
+tn-da21ttb-phamhuuloc-aicodedetect/
+├── docker-compose.yml         # Production stack
+├── docker-compose.dev.yml     # Development stack
+├── nginx/                     # Reverse proxy config
+│   ├── nginx.conf
+│   ├── conf.d/
+│   └── ssl/
+├── scripts/                   # Management scripts
+│   ├── deploy.sh             # Auto deployment
+│   ├── manage.sh             # Service management
+│   └── setup-vps.sh          # VPS setup
+└── src/                      # Application source
+```
+
+---
 
 ## 🚀 Cài đặt và chạy
 
@@ -340,5 +555,3 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_oauth_client_id
 NEXT_PUBLIC_ENABLE_CHARTS=true
 NEXT_PUBLIC_MAX_CODE_LENGTH=50000
 ```
-
----

@@ -1,50 +1,65 @@
-# AI Code Detection Project Overview
+# AI Code Detection System - Tổng quan dự án
 
-## Project Purpose
+## Thông tin dự án
 
-Hệ thống phân tích và phát hiện mã nguồn AI-generated vs human-written cho ngôn ngữ C/C++. Dự án bao gồm:
+- **Tên dự án**: AI Code Detection System
+- **Mục đích**: Phát hiện mã nguồn được tạo bởi AI (như ChatGPT, GitHub Copilot) so với mã nguồn viết bởi lập trình viên con người
+- **Trường**: Trường Đại học Trà Vinh
+- **Khoa**: Khoa Kỹ thuật & Công nghệ
+- **Lớp**: DA21TTB
+- **Loại**: Khóa luận tốt nghiệp ngành Công nghệ thông tin
+- **Mã sinh viên**: DA21TTB-110121055
+- **Tên sinh viên**: Phạm Hữu Lộc
+- **Giảng viên hướng dẫn**: TS. Nguyễn Bảo Ân
 
-- **Feature extraction** từ source code (80+ features)
-- **Machine learning models** để classification
-- **Web interface** để interactive analysis
-- **API backend** cho integration
+## Mục tiêu nghiên cứu
 
-## Architecture Components
+Hệ thống phân tích và phát hiện mã nguồn được tạo ra bởi các mô hình AI so với mã nguồn được viết bởi lập trình viên con người, tập trung vào:
 
-### 1. Core ML Engine (`src/src/`)
+### Phân tích kỹ thuật chính:
 
-- **Python-based** với data science stack
-- **Feature extractors**: AST, human style, advanced patterns
-- **Model training pipeline** với dataset management
-- **Batch processing** cho large-scale analysis
+1. **Phân tích AST (Abstract Syntax Tree)**: Cấu trúc ngữ pháp và logic của mã
+2. **Phân tích phong cách coding**: Patterns đặc trưng của AI vs Human
+3. **So sánh baseline**: Điểm chuẩn từ dataset lớn
+4. **AI Detection Models**: Machine learning models để phân loại
+5. **Batch Analysis**: Phân tích nhiều files cùng lúc
+6. **Google Drive Integration**: Tích hợp OAuth2 để truy cập files
 
-### 2. Backend API (`src/backend/`)
+## Kiến trúc hệ thống
 
-- **FastAPI framework** với comprehensive endpoints
-- **Real-time analysis** với multiple methods
-- **File upload support** và validation
-- **Structured responses** cho frontend integration
+```
+tn-da21ttb-phamhuuloc-aicodedetect/
+├── src/
+│   ├── backend/                    # FastAPI backend
+│   ├── frontend/                   # Next.js frontend
+│   └── src/                        # Python analysis modules
+├── scripts/                        # Management scripts
+├── docker-compose.yml             # Production setup
+├── nginx/                         # Nginx configuration
+└── thesis/                        # Documentation
+```
 
-### 3. Frontend Interface (`src/frontend/`)
+## Các tính năng chính
 
-- **Next.js 15** với modern React patterns
-- **Interactive code editor** (Monaco Editor)
-- **Data visualization** (Recharts, Chart.js)
-- **Responsive design** với dark/light themes
+- **Single File Analysis**: Phân tích một file code duy nhất
+- **Batch Analysis**: Phân tích nhiều files từ ZIP, RAR hoặc Google Drive
+- **AI Analysis**: Sử dụng Google Gemini AI để phân tích code patterns
+- **Feature Extraction**: Trích xuất các đặc trưng từ AST và style analysis
+- **Baseline Comparison**: So sánh với dataset baseline của AI và Human code
+- **Real-time Analysis**: Phân tích real-time với progress tracking
+- **OAuth2 Integration**: Kết nối với Google Drive để phân tích files
+- **Visualization**: Charts và graphs để hiển thị kết quả phân tích
 
-## Key Features
+## Ngôn ngữ lập trình hỗ trợ
 
-- **Multi-method analysis**: Combined, AST-only, Style-only, Advanced
-- **Real-time processing**: 1-5 seconds analysis time
-- **Interactive visualizations**: Charts, metrics, detailed reports
-- **File upload support**: .c, .cpp, .txt files (max 1MB)
-- **Export functionality**: JSON reports và raw data
-- **API-first design**: RESTful endpoints với comprehensive docs
+- C/C++ (chính)
+- Python (analysis modules)
+- TypeScript/JavaScript (frontend)
+- Shell scripts (deployment)
 
-## Tech Stack Summary
+## Đối tượng sử dụng
 
-- **Languages**: Python, TypeScript, C/C++ (analysis target)
-- **Frameworks**: FastAPI, Next.js, React
-- **ML Libraries**: NumPy, Pandas, custom feature extractors
-- **UI Components**: Shadcn/UI, Radix primitives
-- **Development**: Docker support, comprehensive Makefiles
+- Sinh viên và giảng viên ngành CNTT
+- Nhà phát triển phần mềm
+- Nhà nghiên cứu AI
+- Các tổ chức cần kiểm tra tính xác thực của code
