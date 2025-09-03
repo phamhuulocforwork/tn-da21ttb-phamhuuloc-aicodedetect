@@ -182,15 +182,15 @@ export interface BatchAnalysisResponse {
 
 export enum ApiEndpoints {
   HEALTH = "/health",
-  COMBINED_ANALYSIS = "/api/analysis/combined-analysis",
-  AI_ANALYSIS = "/api/analysis/ai-analysis",
-  UPLOAD_FILE = "/api/analysis/upload-file",
-  METHODS = "/api/analysis/methods",
+  COMBINED_ANALYSIS = "/analysis/combined-analysis",
+  AI_ANALYSIS = "/analysis/ai-analysis",
+  UPLOAD_FILE = "/analysis/upload-file",
+  METHODS = "/analysis/methods",
 
-  BATCH_UPLOAD_ZIP = "/api/analysis/batch/upload-zip",
-  BATCH_GOOGLE_DRIVE = "/api/analysis/batch/google-drive",
-  BATCH_STATUS = "/api/analysis/batch/{batch_id}/status",
-  BATCH_RESULTS = "/api/analysis/batch/{batch_id}/results",
-  BATCH_METHODS = "/api/analysis/batch/methods",
-  BATCH_OAUTH_FILES = "/api/analysis/batch/oauth-files",
+  BATCH_UPLOAD_ZIP = "/analysis/batch/upload-zip",
+  BATCH_GOOGLE_DRIVE = "/analysis/batch/google-drive",
+  BATCH_STATUS = "/analysis/batch/{batch_id}/status",
+  BATCH_RESULTS = "/analysis/batch/{batch_id}/results",
+  BATCH_METHODS = "/analysis/batch/methods",
+  BATCH_OAUTH_FILES = "/analysis/batch/oauth-files",
 }

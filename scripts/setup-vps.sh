@@ -221,7 +221,7 @@ cd /home/appuser/app
 
 # Pull latest changes
 if [ -d ".git" ]; then
-    git pull origin main
+    git pull
 fi
 
 # Stop existing containers
