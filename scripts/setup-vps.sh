@@ -67,9 +67,6 @@ configure_firewall() {
     # Install ufw if not present
     apt install -y ufw
 
-    # Reset ufw to default
-    ufw --force reset
-
     # Allow SSH
     ufw allow ssh
     ufw allow 22
