@@ -57,7 +57,7 @@ check_docker() {
 pull_latest_changes() {
     if [ -d ".git" ]; then
         log_step "Pulling latest changes from git..."
-        git pull origin main
+        git pull
         log_info "Latest changes pulled"
     else
         log_info "Not a git repository, skipping git pull"
