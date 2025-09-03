@@ -101,7 +101,7 @@ create_app_user() {
 }
 
 # Function to setup SSH hardening
-# setup_ssh_hardening() {
+setup_ssh_hardening() {
     log_step "Setting up SSH hardening..."
 
     # Backup original config
