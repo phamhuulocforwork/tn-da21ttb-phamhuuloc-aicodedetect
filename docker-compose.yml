@@ -37,9 +37,6 @@ services:
       - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
       - PORT=${FRONTEND_PORT:-3000}
       - NEXT_TELEMETRY_DISABLED=1
-    volumes:
-      - frontend_static:/app/.next/static
-      - frontend_public:/app/public
     depends_on:
       - backend
     restart: unless-stopped
@@ -66,8 +63,6 @@ services:
       - nginx_ssl:/etc/nginx/ssl
       - letsencrypt:/etc/letsencrypt
       - certbot_www:/var/www/certbot
-      - frontend_static:/var/www/frontend_static
-      - frontend_public:/var/www/frontend_public
     depends_on:
       - backend
       - frontend
@@ -83,10 +78,6 @@ volumes:
   letsencrypt:
     driver: local
   certbot_www:
-    driver: local
-  frontend_static:
-    driver: local
-  frontend_public:
     driver: local
 
 networks:
