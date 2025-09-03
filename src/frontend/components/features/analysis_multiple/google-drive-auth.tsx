@@ -2,10 +2,9 @@
 
 import * as React from "react";
 
-import { CheckCircle, Loader2, Shield, User, X } from "lucide-react";
+import { CheckCircle, Loader2, Shield, User } from "lucide-react";
 
 import GoogleIcon from "@/components/icons/google-icons";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -90,69 +89,69 @@ export function GoogleDriveAuth({
     }
   };
 
-  const handleRevoke = async () => {
-    try {
-      await driveService.revokeAuthorization();
-      setIsAuthorized(false);
-      onAuthError("Đã ngắt kết nối khỏi Google Drive");
-    } catch (error) {
-      console.error("Failed to revoke authorization:", error);
-      onAuthError("Không thể ngắt kết nối khỏi Google Drive");
-    }
-  };
+  // const handleRevoke = async () => {
+  //   try {
+  //     await driveService.revokeAuthorization();
+  //     setIsAuthorized(false);
+  //     onAuthError("Đã ngắt kết nối khỏi Google Drive");
+  //   } catch (error) {
+  //     console.error("Failed to revoke authorization:", error);
+  //     onAuthError("Không thể ngắt kết nối khỏi Google Drive");
+  //   }
+  // };
 
-  if (!isConfigured) {
-    return (
-      <Alert className='border-yellow-200 bg-yellow-50'>
-        <Shield className='h-4 w-4 text-yellow-600' />
-        <AlertDescription className='text-yellow-800'>
-          <div className='space-y-2'>
-            <p className='font-medium'>Google OAuth2 chưa được cấu hình</p>
-          </div>
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  // if (!isConfigured) {
+  //   return (
+  //     <Alert className='border-yellow-200 bg-yellow-50'>
+  //       <Shield className='h-4 w-4 text-yellow-600' />
+  //       <AlertDescription className='text-yellow-800'>
+  //         <div className='space-y-2'>
+  //           <p className='font-medium'>Google OAuth2 chưa được cấu hình</p>
+  //         </div>
+  //       </AlertDescription>
+  //     </Alert>
+  //   );
+  // }
 
-  if (initError) {
-    return (
-      <Alert className='border-red-200 bg-red-50'>
-        <X className='h-4 w-4 text-red-600' />
-        <AlertDescription className='text-red-800'>
-          <div className='space-y-2'>
-            <p className='font-medium'>Lỗi khởi tạo Google Drive service</p>
-            <p className='text-sm'>{initError}</p>
-          </div>
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  // if (initError) {
+  //   return (
+  //     <Alert className='border-red-200 bg-red-50'>
+  //       <X className='h-4 w-4 text-red-600' />
+  //       <AlertDescription className='text-red-800'>
+  //         <div className='space-y-2'>
+  //           <p className='font-medium'>Lỗi khởi tạo Google Drive service</p>
+  //           <p className='text-sm'>{initError}</p>
+  //         </div>
+  //       </AlertDescription>
+  //     </Alert>
+  //   );
+  // }
 
-  if (isAuthorized) {
-    return (
-      <Alert className='border-green-200 bg-green-50'>
-        <CheckCircle className='h-4 w-4 text-green-600' />
-        <AlertDescription className='text-green-800'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <p className='font-medium'>Đã kết nối với Google Drive</p>
-              <p className='text-sm'>
-                Bạn có thể truy cập files từ Google Drive của mình.
-              </p>
-            </div>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={handleRevoke}
-              className='text-green-700 border-green-300 hover:bg-green-100'
-            >
-              Ngắt kết nối
-            </Button>
-          </div>
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  // if (isAuthorized) {
+  //   return (
+  //     <Alert className='border-green-200 bg-green-50'>
+  //       <CheckCircle className='h-4 w-4 text-green-600' />
+  //       <AlertDescription className='text-green-800'>
+  //         <div className='flex items-center justify-between'>
+  //           <div>
+  //             <p className='font-medium'>Đã kết nối với Google Drive</p>
+  //             <p className='text-sm'>
+  //               Bạn có thể truy cập files từ Google Drive của mình.
+  //             </p>
+  //           </div>
+  //           <Button
+  //             variant='outline'
+  //             size='sm'
+  //             onClick={handleRevoke}
+  //             className='text-green-700 border-green-300 hover:bg-green-100'
+  //           >
+  //             Ngắt kết nối
+  //           </Button>
+  //         </div>
+  //       </AlertDescription>
+  //     </Alert>
+  //   );
+  // }
 
   return (
     <Card className='border-primary-200'>
