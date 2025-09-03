@@ -18,7 +18,7 @@ export function Providers({
   children,
   themeProps = {
     attribute: "class",
-    defaultTheme: "system",
+    defaultTheme: "light",
     enableSystem: true,
     disableTransitionOnChange: true,
   },
