@@ -68,6 +68,7 @@ get_letsencrypt_cert() {
         log_info "Let's Encrypt certificate obtained successfully"
 
         # Create symbolic links for default certificate location
+        mkdir -p /etc/letsencrypt/live/default
         ln -sf "/etc/letsencrypt/live/${domain}/fullchain.pem" /etc/letsencrypt/live/default/fullchain.pem
         ln -sf "/etc/letsencrypt/live/${domain}/privkey.pem" /etc/letsencrypt/live/default/privkey.pem
 
