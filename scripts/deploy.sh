@@ -45,8 +45,18 @@ check_docker() {
         exit 1
     fi
 
-    if ! command -v docker-compose &> /dev/null; then
+    # Check for Docker Compose (v2 first, then v1)
+    if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+        COMPOSE_CMD="docker compose"
+        log_info "Docker Compose v2 is available"
+    elif command -v docker-compose &> /dev/null; then
+        COMPOSE_CMD="docker-compose"
+        log_info "Docker Compose v1 is available"
+    else
         log_error "Docker Compose is not installed or not in PATH"
+        log_info "Please install Docker Compose:"
+        log_info "  Ubuntu/Debian: apt install docker-compose-plugin"
+        log_info "  Or install standalone: https://docs.docker.com/compose/install/"
         exit 1
     fi
 
@@ -67,7 +77,7 @@ pull_latest_changes() {
 # Function to stop existing containers
 stop_containers() {
     log_step "Stopping existing containers..."
-    docker-compose down || true
+    $COMPOSE_CMD down || true
     log_info "Existing containers stopped"
 }
 
@@ -86,13 +96,13 @@ build_and_start() {
     # Build with no cache for fresh builds
     if [ "$1" = "--no-cache" ]; then
         log_info "Building without cache..."
-        docker-compose build --no-cache
+        $COMPOSE_CMD build --no-cache
     else
-        docker-compose build
+        $COMPOSE_CMD build
     fi
 
     # Start services
-    docker-compose up -d
+    $COMPOSE_CMD up -d
 
     log_info "Containers built and started"
 }
@@ -105,7 +115,7 @@ wait_for_services() {
     local attempt=1
 
     while [ $attempt -le $max_attempts ]; do
-        if docker-compose exec -T nginx curl -f http://localhost/health &>/dev/null; then
+        if $COMPOSE_CMD exec -T nginx curl -f http://localhost/health &>/dev/null; then
             log_info "All services are ready!"
             return 0
         fi
@@ -116,7 +126,7 @@ wait_for_services() {
     done
 
     log_error "Services failed to start within ${max_attempts} attempts"
-    log_info "Check logs with: docker-compose logs"
+    log_info "Check logs with: $COMPOSE_CMD logs"
     exit 1
 }
 
@@ -124,7 +134,7 @@ wait_for_services() {
 show_status() {
     log_step "Checking service status..."
     echo ""
-    docker-compose ps
+    $COMPOSE_CMD ps
     echo ""
     log_info "Service URLs:"
     echo "  - HTTP:  http://localhost"
@@ -132,9 +142,9 @@ show_status() {
     echo "  - API:   http://localhost/api"
     echo ""
     log_info "Useful commands:"
-    echo "  - View logs: docker-compose logs -f"
-    echo "  - Stop services: docker-compose down"
-    echo "  - Restart services: docker-compose restart"
+    echo "  - View logs: $COMPOSE_CMD logs -f"
+    echo "  - Stop services: $COMPOSE_CMD down"
+    echo "  - Restart services: $COMPOSE_CMD restart"
 }
 
 # Function to backup current deployment
