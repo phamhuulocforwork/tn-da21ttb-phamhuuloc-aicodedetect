@@ -43,27 +43,169 @@ Hệ thống phân tích và phát hiện mã nguồn được tạo ra bởi c�
 - **Docker**: 20.10+ (optional)
 - **Git**: Latest version
 
-### 1. Sử dụng Docker
+### 1. Triển khai với Docker (Khuyến nghị cho Production)
+
+#### Chuẩn bị VPS Ubuntu 22.04
 
 ```bash
-# Clone repository
-git clone https://github.com/your-username/tn-da21ttb-phamhuuloc-aicodedetect.git
-cd tn-da21ttb-phamhuuloc-aicodedetect
+# 1. Setup VPS tự động (chạy với root)
+sudo ./scripts/setup-vps.sh
+
+# 2. Chuyển sang user appuser
+su - appuser
+
+# 3. Clone repository
+git clone https://github.com/your-username/tn-da21ttb-phamhuuloc-aicodedetect.git app
+cd app
 ```
 
-```bash
-# Tạo env
-cp .env.example .env
-```
+#### Cấu hình Environment
 
 ```bash
-# Chạy development environment
-docker-compose -f docker-compose.dev.yml up --build
+# Copy file cấu hình mẫu
+cp env.example .env
+
+# Chỉnh sửa file .env với thông tin thực tế
+nano .env
+
+# Các biến quan trọng cần cấu hình:
+# - GEMINI_API_KEY: API key từ Google AI Studio
+# - GOOGLE_DRIVE_API_KEY: API key cho Google Drive integration
+# - SSL_DOMAIN: Domain của bạn (để có HTTPS)
+# - SSL_EMAIL: Email để nhận thông báo SSL
 ```
 
+#### Triển khai ứng dụng
+
 ```bash
-# Hoặc chạy production
-docker-compose up --build
+# Chạy script deploy tự động
+./scripts/deploy.sh
+
+# Hoặc chạy thủ công
+docker-compose up --build -d
+```
+
+#### Kiểm tra trạng thái
+
+```bash
+# Xem trạng thái services
+./scripts/manage.sh status
+
+# Xem logs
+./scripts/manage.sh logs
+
+# Kiểm tra health
+./scripts/manage.sh health
+```
+
+### 2. Quản lý ứng dụng
+
+#### Các lệnh quản lý thường dùng
+
+```bash
+# Restart services
+./scripts/manage.sh restart
+
+# Xem logs của service cụ thể
+./scripts/manage.sh logs nginx
+./scripts/manage.sh logs backend
+
+# Backup dữ liệu
+./scripts/manage.sh backup
+
+# Mở shell trong container
+./scripts/manage.sh shell backend
+
+# Kiểm tra SSL certificate
+./scripts/manage.sh ssl-status
+
+# Renew SSL certificate
+./scripts/manage.sh ssl-renew
+```
+
+### 3. Cấu trúc Production
+
+```
+tn-da21ttb-phamhuuloc-aicodedetect/
+├── docker-compose.yml          # Cấu hình chính
+├── docker-compose.override.yml # Cấu hình production
+├── env.example                 # Template environment
+├── nginx/                      # Nginx configuration
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   ├── conf.d/
+│   ├── init-ssl.sh
+│   └── docker-entrypoint.sh
+├── scripts/                    # Management scripts
+│   ├── deploy.sh              # Auto deployment
+│   ├── manage.sh              # Service management
+│   └── setup-vps.sh           # VPS setup
+└── src/                       # Application source
+```
+
+### 4. SSL và Domain Configuration
+
+#### Thiết lập Domain
+
+1. Trỏ domain về IP VPS của bạn
+2. Cập nhật `SSL_DOMAIN` trong file `.env`
+3. Chạy `./scripts/deploy.sh` để áp dụng thay đổi
+
+#### SSL Certificate tự động
+
+- Hệ thống tự động tạo SSL certificate từ Let's Encrypt
+- Certificate được renew tự động mỗi 90 ngày
+- Sử dụng `SSL_STAGING=true` trong `.env` để test SSL
+
+### 5. Monitoring và Logs
+
+#### Xem logs real-time
+
+```bash
+# Tất cả services
+docker-compose logs -f
+
+# Service cụ thể
+docker-compose logs -f nginx
+```
+
+#### Health checks
+
+```bash
+# Kiểm tra health của tất cả services
+./scripts/manage.sh health
+
+# Kiểm tra từng service
+curl http://localhost/health
+curl http://localhost/api/health
+```
+
+### 6. Backup và Recovery
+
+#### Tự động backup
+
+```bash
+# Tạo backup
+./scripts/manage.sh backup
+
+# Backup sẽ được lưu trong thư mục backup_YYYYMMDD_HHMMSS/
+```
+
+#### Khôi phục từ backup
+
+```bash
+# Dừng services
+docker-compose down
+
+# Khôi phục volumes
+docker run --rm -v $(pwd):/backup \
+  -v nginx_logs:/nginx_logs \
+  -v nginx_ssl:/nginx_ssl \
+  -v letsencrypt:/letsencrypt \
+  alpine tar xzf /backup/backup_dir/volumes.tar.gz
+
+# Khởi động lại
+docker-compose up -d
 ```
 
 ### 2. Chạy cục bộ
