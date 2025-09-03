@@ -45,35 +45,35 @@
 
 ## 📆 Tuần 7 (19/05 - 25/05): Kiểm thử - tinh chỉnh thuật toán
 
-- [ ] Thử nghiệm với nhiều mẫu code
-- [ ] Tối ưu ngưỡng cảnh báo
-- [ ] Loại bỏ false positive nhiều nhất có thể
-- [ ] Báo cáo tiến độ tuần 6 với GVHD
+- [x] Thử nghiệm với nhiều mẫu code
+- [x] Tối ưu ngưỡng cảnh báo
+- [x] Loại bỏ false positive nhiều nhất có thể
+- [x] Báo cáo tiến độ tuần 6 với GVHD
 
 ## 📆 Tuần 8 (26/05 - 01/06): Phát triển giao diện người dùng
 
-- [ ] Web app nhỏ để nhập mã và hiển thị kết quả
-- [ ] Giao diện đơn giản (Next.js/FastAPI)
-- [ ] Hoàn thiện chức năng toàn hệ thống
-- [ ] Báo cáo tiến độ tuần 7 GVHD
+- [x] Web app nhỏ để nhập mã và hiển thị kết quả
+- [x] Giao diện đơn giản (Next.js/FastAPI)
+- [x] Hoàn thiện chức năng toàn hệ thống
+- [x] Báo cáo tiến độ tuần 7 GVHD
 
 ## 📆 Tuần 9 (02/06 - 08/06): Kiểm thử toàn hệ thống + viết khóa luận
 
-- [ ] Test thử toàn diện
-- [ ] Viết các phần chính của khóa luận: Cơ sở lý thuyết, Phương pháp tiếp cận, Phân tích dữ liệu
-- [ ] Báo cáo tiến độ tuần 8 với GVHD
+- [x] Test thử toàn diện
+- [x] Viết các phần chính của khóa luận: Cơ sở lý thuyết, Phương pháp tiếp cận, Phân tích dữ liệu
+- [x] Báo cáo tiến độ tuần 8 với GVHD
 
 ## 📆 Tuần 10 (09/06 - 11/06): Chỉnh sửa - Viết báo cáo hoàn chỉnh
 
-- [ ] Viết phần đánh giá, kết luận, hướng phát triển
-- [ ] Gửi GVHD xem bản nháp
+- [x] Viết phần đánh giá, kết luận, hướng phát triển
+- [x] Gửi GVHD xem bản nháp
 
 ## 📆 Tuần 11 (12/06 - 14/06): Sửa báo cáo theo phản hồi GVHD
 
-- [ ] Hoàn thiện quyển khóa luận, chuẩn bị slide báo cáo
-- [ ] Gửi khóa luận hoàn chỉnh
+- [x] Hoàn thiện quyển khóa luận, chuẩn bị slide báo cáo
+- [x] Gửi khóa luận hoàn chỉnh
 
 ## 📆 Tuần 12 (15/06 - 16/06): Bảo vệ, nộp đồ khóa luận
 
-- [ ] Chuẩn bị trình bày
-- [ ] Nộp source code, tài liệu, slide
+- [x] Chuẩn bị trình bày
+- [x] Nộp source code, tài liệu, slide
