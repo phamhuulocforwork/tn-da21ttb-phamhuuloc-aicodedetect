@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 
 import { AnalysisSelector } from "@/components/features/analysis/analysis-selector";
 import { CodeInputSection } from "@/components/features/analysis/code-input-section";
-import { FloatingMenu } from "@/components/features/analysis/floating-menu";
+// import { FloatingMenu } from "@/components/features/analysis/floating-menu";
 import { ResultsSection } from "@/components/features/analysis/results-section";
 import { AnalysisMode } from "@/components/features/analysis/types";
 import { AnalysisLayout } from "@/components/layout/analysis-layout";
@@ -163,7 +163,7 @@ function AnalysisPageContent() {
           canRetry={code.trim().length > 0}
         />
 
-        <FloatingMenu />
+        {/* <FloatingMenu /> */}
       </div>
     </AnalysisLayout>
   );

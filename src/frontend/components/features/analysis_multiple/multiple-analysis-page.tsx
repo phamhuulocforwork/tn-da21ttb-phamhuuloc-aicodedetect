@@ -226,19 +226,20 @@ export function MultipleAnalysisPage() {
               onValueChange={(value) =>
                 setSourceType(value as "file_upload" | "google_drive_oauth")
               }
+              defaultValue='google_drive_oauth'
             >
-              <TabsList className='grid w-full grid-cols-2'>
-                <TabsTrigger value='file_upload'>
+              <TabsList className='grid w-full grid-cols-1'>
+                {/* <TabsTrigger value='file_upload'>
                   <Upload className='h-4 w-4 mr-1' />
                   Tải Lên File
-                </TabsTrigger>
+                </TabsTrigger> */}
                 <TabsTrigger value='google_drive_oauth'>
                   <GoogleDrive className='h-4 w-4 mr-1' />
                   Google Drive
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value='file_upload' className='space-y-4'>
+              {/* <TabsContent value='file_upload' className='space-y-4'>
                 <RadioGroup
                   value={uploadType}
                   onValueChange={(value) =>
@@ -324,7 +325,7 @@ export function MultipleAnalysisPage() {
                     </div>
                   )}
                 </RadioGroup>
-              </TabsContent>
+              </TabsContent> */}
 
               <TabsContent value='google_drive_oauth' className='space-y-4'>
                 {!isOauthAuthorized ? (
