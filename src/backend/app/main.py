@@ -646,8 +646,13 @@ async def analyze_file_batch(files_info: List[Dict[str, str]]) -> List[FileAnaly
 
             if analysis_response.success:
                 assessment = analysis_response.assessment
-                ai_similarity = assessment.overall_score * 100
-                human_similarity = (1 - assessment.overall_score) * 100
+
+                if assessment.baseline_summary:
+                    ai_similarity = assessment.baseline_summary.overall_ai_similarity * 100
+                    human_similarity = assessment.baseline_summary.overall_human_similarity * 100
+                else:
+                    ai_similarity = assessment.overall_score * 100
+                    human_similarity = (1 - assessment.overall_score) * 100
 
                 return FileAnalysisResult(
                     filename=file_info['filename'],
