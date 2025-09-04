@@ -12,3 +12,4 @@ export { ResultsSection } from "./results-section";
 export { default as ResultsDashboard } from "./results-dashboard";
 export { default as BaselineComparisonView } from "./baseline-comparison";
 export { default as FeatureCharts } from "./feature-charts";
+export { default as PredictionResultsCard } from "./prediction-results-card";

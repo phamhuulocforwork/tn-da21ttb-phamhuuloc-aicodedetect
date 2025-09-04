@@ -33,6 +33,7 @@ import { AIMDXResponse, AnalysisResponse } from "@/lib/api-types";
 import { MDXRenderer } from "@/lib/mdx-utils";
 
 import BaselineComparisonView from "./baseline-comparison";
+import PredictionResultsCard from "./prediction-results-card";
 
 interface ResultsDashboardProps {
   result: AnalysisResponse | AIMDXResponse | null;
@@ -480,26 +481,28 @@ export default function ResultsDashboard({
 
         <TabsContent value='ai' className='space-y-6'>
           {isAIAnalysis ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className='flex items-center gap-2'>
-                  <Sparkles className='h-5 w-5' />
-                  AI Analysis
-                </CardTitle>
-                <CardDescription>
-                  Kết quả phân tích từ AI với đánh giá chi tiết về patterns và
-                  reasoning
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <MDXRenderer
-                  content={aiMdxContent}
-                  loadingText='Đang xử lý nội dung phân tích AI...'
-                  errorTitle='Lỗi xử lý nội dung phân tích'
-                  errorDescription='Không thể hiển thị kết quả phân tích AI. Vui lòng thử lại.'
-                />
-              </CardContent>
-            </Card>
+            <>
+              <PredictionResultsCard mdxContent={aiMdxContent} />
+              <Card>
+                <CardHeader>
+                  <CardTitle className='flex items-center gap-2'>
+                    <Sparkles className='h-5 w-5' />
+                    Phân tích chi tiết từ AI
+                  </CardTitle>
+                  <CardDescription>
+                    Đánh giá chi tiết về patterns và reasoning của AI
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <MDXRenderer
+                    content={aiMdxContent}
+                    loadingText='Đang xử lý nội dung phân tích AI...'
+                    errorTitle='Lỗi xử lý nội dung phân tích'
+                    errorDescription='Không thể hiển thị kết quả phân tích AI. Vui lòng thử lại.'
+                  />
+                </CardContent>
+              </Card>
+            </>
           ) : (
             <Card>
               <CardHeader>
